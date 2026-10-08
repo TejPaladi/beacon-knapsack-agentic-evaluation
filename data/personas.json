@@ -1,0 +1,68 @@
+{
+  "earlJones": {
+    "name": "Earl Jones",
+    "dietaryPreferences": {"dairy": 1, "meat": 1, "nuts": 0, "glutenFree": false, "diabetes": false, "vegetarian": false, "vegan": false},
+    "nutritionalGoals": {"calories": 2400, "carbs": 300, "protein": 185, "fiber": 38},
+    "mealPlanConfig": {"mealPlanLength": 1, "mealsPerDay": 3, "mealPlanName": "Earl's Plan"},
+    "mealSpecificOptions": [
+      {"mealName": "Breakfast", "mealTime": "08:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Lunch", "mealTime": "12:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Dinner", "mealTime": "18:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}}
+    ]
+  },
+  "jessicaSmith": {
+    "name": "Jessica Smith",
+    "dietaryPreferences": {"dairy": 0, "meat": -1, "nuts": 1, "glutenFree": false, "diabetes": true, "vegetarian": false, "vegan": false},
+    "nutritionalGoals": {"calories": 1800, "carbs": 200, "protein": 90, "fiber": 28},
+    "mealPlanConfig": {"mealPlanLength": 1, "mealsPerDay": 3, "mealPlanName": "Jessica's Plan"},
+    "mealSpecificOptions": [
+      {"mealName": "Breakfast", "mealTime": "08:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Lunch", "mealTime": "12:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Dinner", "mealTime": "18:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}}
+    ]
+  },
+  "A-NV": {
+    "name": "Aaliyah Brooks",
+    "dietaryPreferences": {"dairy": 0, "meat": 1, "nuts": 1, "glutenFree": false, "diabetes": false, "vegetarian": false, "vegan": false},
+    "nutritionalGoals": {"calories": 3500, "carbs": 438, "protein": 82, "fiber": 35},
+    "mealPlanConfig": {"mealPlanLength": 1, "mealsPerDay": 3, "mealPlanName": "Aaliyas's Plan"},
+    "mealSpecificOptions": [
+      {"mealName": "Breakfast", "mealTime": "08:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Lunch", "mealTime": "12:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Dinner", "mealTime": "18:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}}
+    ]
+  },
+  "NA-V": {
+    "name": "Becca Moore",
+    "dietaryPreferences": {"dairy": 0, "meat": -1, "nuts": 1, "glutenFree": false, "diabetes": false, "vegetarian": true, "vegan": false},
+    "nutritionalGoals": {"calories": 2000, "carbs": 130, "protein": 64, "fiber": 28},
+    "mealPlanConfig": {"mealPlanLength": 1, "mealsPerDay": 3, "mealPlanName": "Becca's Plan"},
+    "mealSpecificOptions": [
+      {"mealName": "Breakfast", "mealTime": "08:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Lunch", "mealTime": "12:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Dinner", "mealTime": "18:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}}
+    ]
+  },
+  "NA-NV": {
+    "name": "Greg Taylor",
+    "dietaryPreferences": {"dairy": 0, "meat": 1, "nuts": 1, "glutenFree": false, "diabetes": false, "vegetarian": false, "vegan": false},
+    "nutritionalGoals": {"calories": 2000, "carbs": 130, "protein": 66, "fiber": 28},
+    "mealPlanConfig": {"mealPlanLength": 1, "mealsPerDay": 3, "mealPlanName": "Greg's Plan"},
+    "mealSpecificOptions": [
+      {"mealName": "Breakfast", "mealTime": "08:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Lunch", "mealTime": "12:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Dinner", "mealTime": "18:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}}
+    ]
+  },
+  "A-V": {
+    "name": "Dylan Bennet",
+    "dietaryPreferences": {"dairy": 0, "meat": -1, "nuts": 1, "glutenFree": false, "diabetes": false, "vegetarian": true, "vegan": false},
+    "nutritionalGoals": {"calories": 3500, "carbs": 438, "protein": 90, "fiber": 35},
+    "mealPlanConfig": {"mealPlanLength": 1, "mealsPerDay": 3, "mealPlanName": "Dylan's Plan"},
+    "mealSpecificOptions": [
+      {"mealName": "Breakfast", "mealTime": "08:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Lunch", "mealTime": "12:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}},
+      {"mealName": "Dinner", "mealTime": "18:00", "mealTypes": {"mainCourse": true, "side": true, "dessert": false, "beverage": true}}
+    ]
+  }
+}
