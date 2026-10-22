@@ -109,6 +109,11 @@ dataset and prompt hashes, repository commits, tool traces, errors, and
 latency. No API key is needed. See
 [results/README.md](results/README.md) for the exact metric definitions.
 
+The completed two-model result is available in
+[results/robustness_comparison.md](results/robustness_comparison.md). Granite
+passed 22/30 cases and Qwen3.5 passed 16/30. Neither model successfully asked
+for clarification on the six unknown, missing, or ambiguous-persona requests.
+
 ## Setup
 
 ### 1. Obtain the compatible Beacon backend
