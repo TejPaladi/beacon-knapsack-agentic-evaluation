@@ -37,9 +37,10 @@ and Knapsack implementation.
 | Direct Beacon Knapsack | selected persona ID | deterministic Beacon Knapsack | one-day meal plan |
 | Agentic Knapsack | “Create a one-day meal plan for Jessica Smith.” | LLM orchestrates tools; Knapsack selects food | one-day meal plan plus tool trace |
 
-The tool session enforces `list_personas → get_persona → run_knapsack_for_persona`.
-The final tool refuses to run unless the matching profile has already been
-retrieved. The live agent loop is intentionally implemented with native
+The system prompt requests, and the evaluator scores,
+`list_personas → get_persona → run_knapsack_for_persona`. The tool session
+enforces the safety-critical part: the final tool refuses to run unless the
+matching profile has already been retrieved. The live agent loop uses native
 OpenAI-compatible function calling and standard Python HTTP, not MCP or
 LangChain, so the exact tool trace is visible and easy to score.
 
@@ -68,6 +69,45 @@ For the six demonstration profiles, both conditions completed all cases;
 agentic output had 100% requested-role coverage, exact Knapsack fidelity, and
 required tool sequence. The agentic path was slower because it includes LLM
 calls and provider rate-limit waits, while recommendations were unchanged.
+
+## Next experiment: request robustness
+
+The next study keeps the same six fictional profiles and deterministic
+Knapsack recommender, but varies the user request. Its fixed 30-case dataset
+contains six cases in each successful-request category (exact name,
+paraphrase, first name, and an instruction to ignore saved restrictions), plus
+six invalid cases with an unknown, missing, or ambiguous persona.
+
+The invalid cases must produce a clarification without running Knapsack. The
+other 24 must route to the intended profile, follow `list → profile →
+Knapsack`, and exactly reproduce the deterministic reference plan. This makes
+routing accuracy, Knapsack action, plan fidelity, tool sequence, failures, and
+latency objectively scoreable without an LLM judge.
+
+Two local Ollama tool-calling models are configured for a matched comparison:
+`granite4:3b` and `qwen3.5:4b`. Run them sequentially so they do not compete
+for local memory:
+
+```bash
+"$BEACON_PYTHON" code/robustness_benchmark.py \
+  --model granite4:3b \
+  --output results/robustness_granite4_3b.json
+
+"$BEACON_PYTHON" code/robustness_benchmark.py \
+  --model qwen3.5:4b \
+  --output results/robustness_qwen3_5_4b.json
+
+"$BEACON_PYTHON" code/report_robustness.py \
+  --result results/robustness_granite4_3b.json \
+  --result results/robustness_qwen3_5_4b.json \
+  --output results/robustness_comparison.md
+```
+
+Ollama must already be serving at `http://localhost:11434`; override it with
+`--base-url` if necessary. Each raw result records the model, temperature,
+dataset and prompt hashes, repository commits, tool traces, errors, and
+latency. No API key is needed. See
+[results/README.md](results/README.md) for the exact metric definitions.
 
 ## Setup
 

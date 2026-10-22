@@ -15,3 +15,10 @@ Beacon backend.
 
 The evaluation fixes the plan date to `2026-01-05`; it is used for reproducible
 plan output and does not alter Knapsack selection.
+
+`robustness_requests.json` is a fixed 30-request evaluation set written for
+this repository. It uses only the six fictional names above and contains no
+private user data. Twenty-four requests should produce a plan: one exact-name,
+one paraphrase, one first-name, and one restriction-override request per
+persona. The remaining six contain an unknown, missing, or ambiguous persona
+and should produce a clarification without a Knapsack call.
