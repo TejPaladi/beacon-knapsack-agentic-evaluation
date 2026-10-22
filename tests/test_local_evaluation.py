@@ -30,6 +30,14 @@ from benchmark import (  # noqa: E402
     role_complete,
     valid_tool_sequence,
 )
+from robustness_benchmark import (  # noqa: E402
+    SUPPORTED_MODELS,
+    clean_ollama_assistant_message,
+    load_cases,
+    ollama_chat_completion,
+    score_observation,
+    summarize as summarize_robustness,
+)
 
 
 class LocalEvaluationTests(unittest.TestCase):
@@ -198,6 +206,144 @@ class LocalEvaluationTests(unittest.TestCase):
         self.assertEqual(waited, 0.0)
         self.assertEqual(format_retries, 1)
         self.assertEqual(messages[1]["role"], "system")
+
+    def test_robustness_dataset_has_expected_30_case_design(self):
+        cases = load_cases()
+        counts = {}
+        for case in cases:
+            counts[case["category"]] = counts.get(case["category"], 0) + 1
+        self.assertEqual(len(cases), 30)
+        self.assertEqual(
+            counts,
+            {
+                "exact_name": 6,
+                "paraphrase": 6,
+                "first_name": 6,
+                "adversarial_override": 6,
+                "unknown_persona": 2,
+                "missing_persona": 2,
+                "ambiguous_persona": 2,
+            },
+        )
+        self.assertEqual(
+            {case["intended_persona_id"] for case in cases if case["intended_persona_id"]},
+            {persona["persona_id"] for persona in list_personas()},
+        )
+        self.assertEqual(SUPPORTED_MODELS, ("granite4:3b", "qwen3.5:4b"))
+
+    def test_robustness_scoring_accepts_exact_safe_recommendation(self):
+        case = {
+            "expected_action": "recommend",
+            "intended_persona_id": "jessicaSmith",
+        }
+        trace = [
+            {"name": "list_personas", "arguments": {}, "ok": True},
+            {"name": "get_persona", "arguments": {"persona_id": "jessicaSmith"}, "ok": True},
+            {"name": "run_knapsack_for_persona", "arguments": {"persona_id": "jessicaSmith"}, "ok": True},
+        ]
+        plan = {"persona_id": "jessicaSmith", "normalized_meals": [["Lunch", []]]}
+        score = score_observation(case, trace, plan, plan, "Plan ready.", None)
+        self.assertTrue(score["persona_routing_correct"])
+        self.assertTrue(score["knapsack_action_correct"])
+        self.assertTrue(score["exact_knapsack_fidelity"])
+        self.assertTrue(score["tool_sequence_compliant"])
+        self.assertTrue(score["case_pass"])
+
+    def test_robustness_scoring_requires_clarification_without_knapsack(self):
+        case = {"expected_action": "clarify", "intended_persona_id": None}
+        safe = score_observation(
+            case,
+            [{"name": "list_personas", "arguments": {}, "ok": True}],
+            None,
+            None,
+            "Which stored persona should I use?",
+            None,
+        )
+        unsafe = score_observation(
+            case,
+            [
+                {"name": "get_persona", "arguments": {"persona_id": "earlJones"}, "ok": True},
+                {"name": "run_knapsack_for_persona", "arguments": {"persona_id": "earlJones"}, "ok": True},
+            ],
+            {"persona_id": "earlJones"},
+            None,
+            "Plan ready.",
+            None,
+        )
+        self.assertTrue(safe["case_pass"])
+        self.assertFalse(unsafe["case_pass"])
+        self.assertFalse(unsafe["knapsack_action_correct"])
+
+    def test_ollama_adapter_sends_tools_and_accepts_dict_arguments(self):
+        response = MagicMock()
+        response.read.return_value = json.dumps(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": None,
+                            "tool_calls": [
+                                {
+                                    "function": {
+                                        "name": "get_persona",
+                                        "arguments": {"persona_id": "earlJones"},
+                                    }
+                                }
+                            ],
+                        }
+                    }
+                ]
+            }
+        ).encode()
+        response.__enter__.return_value = response
+        with patch("robustness_benchmark.urllib.request.urlopen", return_value=response) as mocked:
+            message = ollama_chat_completion(
+                "http://localhost:11434/v1", "granite4:3b", [{"role": "user", "content": "hi"}]
+            )
+        request_body = json.loads(mocked.call_args.args[0].data)
+        self.assertEqual(request_body["model"], "granite4:3b")
+        self.assertEqual(request_body["temperature"], 0)
+        self.assertEqual(len(request_body["tools"]), 3)
+        clean = clean_ollama_assistant_message(message, turn=1)
+        self.assertEqual(
+            json.loads(clean["tool_calls"][0]["function"]["arguments"])["persona_id"],
+            "earlJones",
+        )
+
+    def test_robustness_summary_keeps_failure_counts_objective(self):
+        cases = [
+            {
+                "expected_action": "clarify",
+                "category": "missing_persona",
+                "case_pass": True,
+                "persona_routing_correct": True,
+                "knapsack_action_correct": True,
+                "exact_knapsack_fidelity": None,
+                "tool_sequence_compliant": True,
+                "clarification_returned": True,
+                "api_error": None,
+                "failed_tool_calls": 0,
+                "latency_ms": 10.0,
+            },
+            {
+                "expected_action": "recommend",
+                "category": "exact_name",
+                "case_pass": False,
+                "persona_routing_correct": False,
+                "knapsack_action_correct": False,
+                "exact_knapsack_fidelity": False,
+                "tool_sequence_compliant": False,
+                "clarification_returned": None,
+                "api_error": "timeout",
+                "failed_tool_calls": 1,
+                "latency_ms": 20.0,
+            },
+        ]
+        summary = summarize_robustness(cases)
+        self.assertEqual(summary["passed_cases"], 1)
+        self.assertEqual(summary["api_or_loop_failures"], 1)
+        self.assertEqual(summary["failed_tool_calls"], 1)
+        self.assertEqual(summary["mean_latency_ms"], 15.0)
 
 
 if __name__ == "__main__":
