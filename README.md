@@ -4,6 +4,9 @@ This repository evaluates one narrow question: when Beacon's deterministic
 Knapsack recommender is held fixed, can an LLM reliably orchestrate the
 required profile-retrieval and recommendation steps?
 
+The current paper-style study is available in
+[paper/paper_draft.md](paper/paper_draft.md).
+
 ```
 Direct baseline:  selected persona ──────────────────> Beacon Knapsack ─> plan
 Agentic setting:  plain request ─> LLM ─> tools ─────> Beacon Knapsack ─> plan
