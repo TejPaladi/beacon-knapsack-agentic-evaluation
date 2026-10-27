@@ -114,6 +114,50 @@ The completed two-model result is available in
 passed 22/30 cases and Qwen3.5 passed 16/30. Neither model successfully asked
 for clarification on the six unknown, missing, or ambiguous-persona requests.
 
+## Policy-gated hybrid extension
+
+The prompt-only result exposed a specific system risk: a model could select an
+unrelated stored profile when identity was missing, unknown, or ambiguous. The
+new matched extension adds a deterministic policy layer around the same agent:
+
+1. resolve exactly one explicit stored full name or unique first name before the
+   model runs;
+2. return a deterministic clarification without profile or Knapsack access when
+   identity is unresolved or ambiguous;
+3. lock `get_persona` and `run_knapsack_for_persona` to the authorized ID; and
+4. render the final confirmation from trusted application state after Knapsack,
+   avoiding an unnecessary final model turn and unsupported nutrition claims.
+
+The LLM still has to orchestrate `list → profile → Knapsack` for every valid
+request. A blocked wrong call remains a model-compliance failure, while the gate
+prevents it from becoming a wrong-person recommendation.
+
+The expanded evaluation uses the full five-model local tool-agent list also used
+by the ADF extension: `llama3.2:1b`, `llama3.2:3b`, `phi4-mini:3.8b`,
+`qwen3.5:4b`, and `granite4:3b`. See
+[`docs/improvement_plan.md`](docs/improvement_plan.md) and
+[`docs/literature_survey_and_novelty.md`](docs/literature_survey_and_novelty.md)
+for the controlled design, literature basis, and bounded novelty claim.
+
+Run one matched pair with:
+
+```bash
+"$BEACON_PYTHON" code/robustness_benchmark.py \
+  --architecture ungated_agent --model granite4:3b \
+  --output results/policy_gate_matrix/ungated_agent__granite4_3b.json
+
+"$BEACON_PYTHON" code/robustness_benchmark.py \
+  --architecture policy_gated_agent --model granite4:3b \
+  --output results/policy_gate_matrix/policy_gated_agent__granite4_3b.json
+```
+
+MCP and LangChain are deliberately not experimental requirements here. MCP
+standardizes tool discovery and transport, while LangChain supplies a reusable
+agent harness; neither changes whether the model genuinely chooses and sequences
+tools. The explicit native loop keeps the evaluated trace and policy boundary
+small and auditable. An MCP/LangChain mirror would be a useful portability and
+framework-overhead study, but it is not the safety contribution.
+
 ## Setup
 
 ### 1. Obtain the compatible Beacon backend
