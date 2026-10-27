@@ -21,6 +21,7 @@ from typing import Any
 try:
     from beacon_m6 import beacon_backend_path, run_knapsack_for_persona
     from benchmark import TOOLS, ToolSession, json_safe, valid_tool_sequence
+    from persona_policy_gate import PolicyGatedToolSession, resolve_persona_request
 except ModuleNotFoundError:
     from code.beacon_m6 import beacon_backend_path, run_knapsack_for_persona
     from code.benchmark import (
@@ -29,12 +30,19 @@ except ModuleNotFoundError:
         json_safe,
         valid_tool_sequence,
     )
+    from code.persona_policy_gate import PolicyGatedToolSession, resolve_persona_request
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATASET = PROJECT_ROOT / "data" / "robustness_requests.json"
 DEFAULT_BASE_URL = "http://localhost:11434/v1"
-SUPPORTED_MODELS = ("granite4:3b", "qwen3.5:4b")
+SUPPORTED_MODELS = (
+    "llama3.2:1b",
+    "llama3.2:3b",
+    "phi4-mini:3.8b",
+    "qwen3.5:4b",
+    "granite4:3b",
+)
 TEMPERATURE = 0
 MAX_AGENT_TURNS = 8
 
@@ -72,6 +80,17 @@ def git_revision(path: Path) -> str | None:
         ["git", "rev-parse", "HEAD"], cwd=path, text=True, capture_output=True, check=False
     )
     return completed.stdout.strip() or None
+
+
+def git_worktree_dirty(path: Path) -> bool:
+    completed = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=path,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    return bool(completed.stdout.strip())
 
 
 def ollama_chat_completion(
@@ -225,14 +244,44 @@ def run_case(
     model: str,
     base_url: str,
     references: dict[str, dict[str, Any]],
+    architecture: str = "ungated_agent",
 ) -> dict[str, Any]:
-    session = ToolSession()
+    gate_decision = None
+    if architecture == "policy_gated_agent":
+        gate_decision = resolve_persona_request(case["prompt"])
+        if gate_decision.status != "resolved":
+            final_text = gate_decision.clarification
+            scoring = score_observation(case, [], None, None, final_text, None)
+            return {
+                **case,
+                "architecture": architecture,
+                "model": model,
+                "provider": "deterministic_policy_gate",
+                "temperature": TEMPERATURE,
+                "agent_turns": 0,
+                "tool_trace": [],
+                "observed_plan": None,
+                "agent_final_text": final_text,
+                "api_error": None,
+                "latency_ms": 0.0,
+                "gate_decision": gate_decision.to_dict(),
+                "gate_bypassed_model": True,
+                "policy_blocks": 0,
+                "trusted_response_renderer": True,
+                **scoring,
+            }
+        session: ToolSession = PolicyGatedToolSession(
+            str(gate_decision.authorized_persona_id)
+        )
+    else:
+        session = ToolSession()
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": case["prompt"]},
     ]
     final_text: str | None = None
     api_error: str | None = None
+    trusted_response_renderer = False
     turns = 0
     started = time.perf_counter()
     try:
@@ -263,6 +312,12 @@ def run_case(
                         "content": json.dumps(json_safe(tool_result)),
                     }
                 )
+            if architecture == "policy_gated_agent" and session.knapsack_plan is not None:
+                final_text = (
+                    f"{session.knapsack_plan['persona_name']}'s deterministic meal plan is ready."
+                )
+                trusted_response_renderer = True
+                break
         else:
             api_error = f"Agent exceeded the {MAX_AGENT_TURNS}-turn limit."
     except Exception as error:
@@ -276,6 +331,7 @@ def run_case(
     )
     return {
         **case,
+        "architecture": architecture,
         "model": model,
         "provider": "ollama_openai_compatible",
         "temperature": TEMPERATURE,
@@ -285,6 +341,10 @@ def run_case(
         "agent_final_text": final_text,
         "api_error": api_error,
         "latency_ms": latency_ms,
+        "gate_decision": gate_decision.to_dict() if gate_decision else None,
+        "gate_bypassed_model": False,
+        "policy_blocks": getattr(session, "policy_blocks", 0),
+        "trusted_response_renderer": trusted_response_renderer,
         **scoring,
     }
 
@@ -312,6 +372,16 @@ def summarize(cases: list[dict[str, Any]]) -> dict[str, Any]:
         "clarification_success_rate": _rate(clarification_cases, "clarification_returned"),
         "api_or_loop_failures": sum(bool(case["api_error"]) for case in cases),
         "failed_tool_calls": sum(case["failed_tool_calls"] for case in cases),
+        "policy_blocks": sum(case.get("policy_blocks", 0) for case in cases),
+        "model_bypass_cases": sum(case.get("gate_bypassed_model", False) for case in cases),
+        "trusted_response_cases": sum(
+            case.get("trusted_response_renderer", False) for case in cases
+        ),
+        "unsafe_knapsack_executions": sum(
+            case["expected_action"] == "clarify"
+            and bool(case.get("observed_knapsack_targets"))
+            for case in cases
+        ),
         "mean_latency_ms": (
             sum(case["latency_ms"] for case in cases) / len(cases) if cases else None
         ),
@@ -322,6 +392,11 @@ def summarize(cases: list[dict[str, Any]]) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", choices=SUPPORTED_MODELS, required=True)
+    parser.add_argument(
+        "--architecture",
+        choices=("ungated_agent", "policy_gated_agent"),
+        default="ungated_agent",
+    )
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL)
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     parser.add_argument("--limit", type=int, default=None)
@@ -343,16 +418,29 @@ def main() -> None:
     references = {persona_id: run_knapsack_for_persona(persona_id) for persona_id in intended_ids}
     observed = []
     for index, case in enumerate(cases, start=1):
-        print(f"[{index}/{len(cases)}] {args.model}: {case['case_id']}", flush=True)
-        observed.append(run_case(case, args.model, args.base_url, references))
+        print(
+            f"[{index}/{len(cases)}] {args.architecture}/{args.model}: {case['case_id']}",
+            flush=True,
+        )
+        observed.append(
+            run_case(
+                case,
+                args.model,
+                args.base_url,
+                references,
+                architecture=args.architecture,
+            )
+        )
 
     result = {
         "experiment": "Beacon meal-agent request robustness",
+        "architecture": args.architecture,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "provenance": {
             "provider": "Ollama OpenAI-compatible API",
             "base_url": args.base_url,
             "model": args.model,
+            "architecture": args.architecture,
             "temperature": TEMPERATURE,
             "max_agent_turns": MAX_AGENT_TURNS,
             "dataset": (
@@ -363,8 +451,20 @@ def main() -> None:
             "dataset_sha256": sha256_bytes(dataset_bytes),
             "system_prompt_sha256": sha256_bytes(SYSTEM_PROMPT.encode("utf-8")),
             "repository_commit": git_revision(PROJECT_ROOT),
+            "repository_worktree_dirty": git_worktree_dirty(PROJECT_ROOT),
             "beacon_backend_commit": git_revision(beacon_backend_path()),
+            "implementation_sha256": {
+                "robustness_benchmark.py": sha256_bytes(Path(__file__).read_bytes()),
+                "persona_policy_gate.py": sha256_bytes(
+                    (PROJECT_ROOT / "code" / "persona_policy_gate.py").read_bytes()
+                ),
+            },
             "knapsack_algorithm": "Beacon Knapsack (internal identifier: m6)",
+            "identity_policy": (
+                "Deterministic explicit-name resolution and persona-locked tool authorization"
+                if args.architecture == "policy_gated_agent"
+                else "Prompt-only identity handling"
+            ),
         },
         "summary": summarize(observed),
         "cases": observed,

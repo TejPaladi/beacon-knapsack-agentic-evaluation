@@ -1,0 +1,80 @@
+# Improvement plan: policy-gated hybrid meal agent
+
+## Objective
+
+Improve the reliability of natural-language orchestration around Beacon's fixed
+deterministic Knapsack recommender without conflating orchestration quality with
+meal-selection quality.
+
+## Research questions
+
+1. How reliably do local LLMs route requests and execute the required tool workflow?
+2. Does a deterministic identity and authorization gate prevent recommendations
+   for missing, unknown, ambiguous, or mismatched personas?
+3. What utility, latency, and model-compliance tradeoffs does the gate introduce?
+4. In a separate follow-up, can an LLM improve preference or nutrition metrics by
+   reranking deterministic candidate plans without violating hard constraints?
+
+## Experiment A: orchestration safety
+
+### Matched conditions
+
+1. **Prompt-only agent:** the LLM receives the policy in its system prompt and
+   controls all three tools.
+2. **Policy-gated hybrid agent:** deterministic code resolves one explicit stored
+   persona before model execution, locks profile and Knapsack tools to that ID,
+   bypasses the model with a clarification when identity is unclear, and renders
+   the final response from trusted application state.
+
+Both conditions retain the same request set, tool semantics, Beacon backend,
+Knapsack implementation, temperature, and trace-based scorer.
+
+### Models
+
+- `llama3.2:1b`
+- `llama3.2:3b`
+- `phi4-mini:3.8b`
+- `qwen3.5:4b`
+- `granite4:3b`
+
+`qwen2-math:1.5b` is excluded because the reused ADF study identifies it as a
+direct-only model that does not support tool calling.
+
+### Primary metrics
+
+- complete-case pass rate;
+- intended-persona routing;
+- correct Knapsack action;
+- exact deterministic plan fidelity;
+- required tool sequence;
+- clarification success;
+- unsafe Knapsack executions on unclear requests;
+- policy-blocked calls;
+- API/loop and tool failures; and
+- latency.
+
+## Experiment B: recommendation source (follow-up)
+
+Keep this separate from Experiment A.
+
+1. **Deterministic-only:** Beacon Knapsack selects the plan.
+2. **LLM selector:** an LLM selects from a fixed, compact, hard-filtered candidate
+   set using the same stored profile. This tests ranking but preserves dietary
+   exclusions outside the model.
+3. **Constrained hybrid reranker:** deterministic code generates multiple valid
+   candidate plans; the LLM reranks them; a deterministic validator rejects any
+   role, restriction, or catalog violation.
+
+Compare goodness, Beacon quality, nutrition fit, preference fit, hard-constraint
+violations, consistency across repeated runs, latency, and explanation faithfulness.
+
+## Interpretation rules
+
+- MCP or LangChain adoption is an implementation/portability comparison, not the
+  scientific novelty.
+- A gate improvement is a system-level result; it does not mean the underlying
+  LLM became safer.
+- The present six-person data are simulated and do not establish clinical safety.
+- Recommendation-quality claims require Experiment B; orchestration results alone
+  cannot show that an LLM improves food selection.
+
