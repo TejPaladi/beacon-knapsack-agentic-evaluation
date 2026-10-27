@@ -84,9 +84,9 @@ Knapsack`, and exactly reproduce the deterministic reference plan. This makes
 routing accuracy, Knapsack action, plan fidelity, tool sequence, failures, and
 latency objectively scoreable without an LLM judge.
 
-Two local Ollama tool-calling models are configured for a matched comparison:
-`granite4:3b` and `qwen3.5:4b`. Run them sequentially so they do not compete
-for local memory:
+The initial matched comparison used two local Ollama tool-calling models:
+`granite4:3b` and `qwen3.5:4b`. They were run sequentially so they did not
+compete for local memory:
 
 ```bash
 "$BEACON_PYTHON" code/robustness_benchmark.py \
@@ -138,6 +138,15 @@ by the ADF extension: `llama3.2:1b`, `llama3.2:3b`, `phi4-mini:3.8b`,
 [`docs/improvement_plan.md`](docs/improvement_plan.md) and
 [`docs/literature_survey_and_novelty.md`](docs/literature_survey_and_novelty.md)
 for the controlled design, literature basis, and bounded novelty claim.
+
+The completed 300-case matrix is in
+[results/policy_gate_comparison.md](results/policy_gate_comparison.md). Across
+five models and 150 matched model-request pairs per architecture, complete-case
+passes increased from 49/150 to 73/150. The valid recommendation workflows were
+unchanged at 43/120; the gain came from unclear-persona cases improving from
+6/30 to 30/30. Unsafe Knapsack executions on unclear requests fell from 10 to
+zero, and mean per-case latency fell 44.9%. This is evidence of improved
+system-level safety and efficiency, not improved model capability.
 
 Run one matched pair with:
 
