@@ -41,3 +41,21 @@ workflow robustness, not clinical safety.
 The completed comparison is in
 [`robustness_comparison.md`](robustness_comparison.md). The two accompanying
 JSON files contain all 60 case-level tool traces and provenance metadata.
+
+## Policy-gated robustness evaluation
+
+[`policy_gate_comparison.md`](policy_gate_comparison.md) is the completed
+five-model comparison of prompt-only and policy-gated orchestration. The ten
+JSON files in `policy_gate_matrix/` contain all 300 case-level traces.
+
+The comparison separates two denominators that should not be combined when
+interpreting the result:
+
+- **Valid passed**: 24 requests per model where the agent must complete the
+  genuine `list → profile → Knapsack` workflow.
+- **Unclear passed**: 6 requests per model where the system must clarify and
+  must not run Knapsack.
+
+The deterministic gate changes authorization and response handling, not food
+selection. Valid-workflow performance therefore measures the model; unclear
+request safety measures the whole architecture.
