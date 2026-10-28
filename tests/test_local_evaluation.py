@@ -43,9 +43,71 @@ from persona_policy_gate import (  # noqa: E402
     PolicyGatedToolSession,
     resolve_persona_request,
 )
+from recommendation_source_benchmark import (  # noqa: E402
+    catalog_records,
+    compact_catalog_text,
+    score_selection,
+)
 
 
 class LocalEvaluationTests(unittest.TestCase):
+    def test_llm_selector_receives_compact_full_role_catalog(self):
+        records = catalog_records()
+        text = compact_catalog_text(records)
+        self.assertEqual(len(records), 139)
+        self.assertEqual(sum(record["kind"] == "food" for record in records), 107)
+        self.assertEqual(sum(record["kind"] == "beverage" for record in records), 32)
+        self.assertIn("kind|id|roles|name|D|M|N|LS|GF|V", text)
+        self.assertNotIn("ingredients", text.lower())
+
+    def test_llm_selector_scoring_accepts_a_valid_saved_plan(self):
+        records = catalog_records()
+        reference = run_knapsack_for_persona("earlJones")
+        response = {
+            "meals": [
+                {
+                    "meal_name": meal["meal_name"],
+                    "items": [
+                        {"role": item["role"], "item_id": item["item_id"]}
+                        for item in meal["items"]
+                    ],
+                }
+                for meal in reference["meals"]
+            ]
+        }
+        score = score_selection("earlJones", response, records)
+        self.assertTrue(score["format_and_catalog_valid"])
+        self.assertTrue(score["hard_constraint_adherence"])
+        self.assertTrue(score["exact_knapsack_match"])
+        self.assertTrue(score["case_pass"])
+
+    def test_llm_selector_scoring_detects_a_dietary_violation(self):
+        records = catalog_records()
+        reference = run_knapsack_for_persona("NA-V")
+        response = {
+            "meals": [
+                {
+                    "meal_name": meal["meal_name"],
+                    "items": [
+                        {"role": item["role"], "item_id": item["item_id"]}
+                        for item in meal["items"]
+                    ],
+                }
+                for meal in reference["meals"]
+            ]
+        }
+        meat_main = next(
+            record
+            for record in records
+            if record["kind"] == "food" and "M" in record["roles"] and record["meat"] == 1
+        )
+        response["meals"][0]["items"][0]["item_id"] = meat_main["id"]
+        score = score_selection("NA-V", response, records)
+        self.assertTrue(score["format_and_catalog_valid"])
+        self.assertFalse(score["hard_constraint_adherence"])
+        self.assertTrue(score["hard_constraint_violations"])
+        self.assertFalse(score["case_pass"])
+
     def test_policy_gate_resolves_full_and_first_names(self):
         full = resolve_persona_request("Create a plan for Jessica Smith.")
         first = resolve_persona_request("Please recommend meals for Jessica.")
