@@ -66,9 +66,38 @@ SYSTEM_PROMPT = """You are the meal selector in a controlled experiment.
 Select every requested meal-role item directly from the supplied catalog.
 No optimizer or tool will choose for you. Respect every true dietary condition.
 Use preference sliders as soft preferences: 1=prefer, 0=neutral, -1=avoid.
-Prefer variety and nutrition-goal fit. Return JSON only, with exactly this shape:
-{"meals":[{"meal_name":"Breakfast","items":[{"role":"main_course","item_id":"1"}]}]}
+Prefer variety and nutrition-goal fit. Return exactly nine selections: one main
+course, one side, and one beverage for each of Breakfast, Lunch, and Dinner.
 Use only supplied IDs and requested roles. Do not include explanations."""
+
+OUTPUT_SCHEMA = {
+            "type": "object",
+            "properties": {
+                "selections": {
+                    "type": "array",
+                    "minItems": 9,
+                    "maxItems": 9,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "meal_name": {
+                                "type": "string",
+                                "enum": ["Breakfast", "Lunch", "Dinner"],
+                            },
+                            "role": {
+                                "type": "string",
+                                "enum": ["main_course", "side", "beverage"],
+                            },
+                            "item_id": {"type": "string"},
+                        },
+                        "required": ["meal_name", "role", "item_id"],
+                        "additionalProperties": False,
+                    },
+                }
+            },
+            "required": ["selections"],
+            "additionalProperties": False,
+}
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -176,30 +205,35 @@ def catalog_records() -> list[dict[str, Any]]:
 
 
 def compact_catalog_text(records: list[dict[str, Any]]) -> str:
-    header = "kind|id|roles|name|D|M|N|LS|GF|V|kcal|carbs|protein|fiber"
+    header = "role|candidate_id|name|D|M|N|LS|GF|V|kcal|carbs|protein|fiber"
     rows = [header]
-    for item in records:
-        rows.append(
-            "|".join(
-                str(item[key])
-                for key in (
-                    "kind",
-                    "id",
-                    "roles",
-                    "name",
-                    "dairy",
-                    "meat",
-                    "nuts",
-                    "low_sugar",
-                    "gluten_free",
-                    "vegan",
-                    "kcal",
-                    "carbs",
-                    "protein",
-                    "fiber",
+    for role_symbol, label in (("M", "MAIN"), ("S", "SIDE"), ("B", "BEVERAGE")):
+        rows.append(f"[{label} CANDIDATES]")
+        for item in records:
+            if role_symbol not in item["roles"]:
+                continue
+            candidate_id = ("B" if item["kind"] == "beverage" else "F") + item["id"]
+            rows.append(
+                "|".join(
+                    [role_symbol, candidate_id]
+                    + [
+                        str(item[key])
+                        for key in (
+                            "name",
+                            "dairy",
+                            "meat",
+                            "nuts",
+                            "low_sugar",
+                            "gluten_free",
+                            "vegan",
+                            "kcal",
+                            "carbs",
+                            "protein",
+                            "fiber",
+                        )
+                    ]
                 )
             )
-        )
     return "\n".join(rows)
 
 
@@ -210,11 +244,19 @@ def prompt_for(persona_id: str, catalog_text: str) -> str:
         f"PROFILE={json.dumps(profile, separators=(',', ':'))}\n"
         "Catalog flags: D=dairy, M=meat, N=nuts, LS=low-sugar, "
         "GF=gluten-free, V=vegan; 1=true, 0=false, -=not applied.\n"
-        f"CATALOG\n{catalog_text}"
+        f"CATALOG\n{catalog_text}\nEND CATALOG\n"
+        "Now return exactly these nine distinct meal/role pairs: Breakfast, Lunch, "
+        "and Dinner each with main_course, side, and beverage. Select one valid "
+        "candidate_id for every pair in the item_id field. Use F-prefixed candidates for main_course "
+        "and side, and B-prefixed candidates for beverage."
     )
 
 
 def call_model(base_url: str, model: str, prompt: str) -> tuple[str, dict[str, int]]:
+    native_base = base_url.rstrip("/")
+    if native_base.endswith("/v1"):
+        native_base = native_base[:-3]
+    max_output_tokens = 900 if model.startswith("qwen3.5") else 400
     payload = json.dumps(
         {
             "model": model,
@@ -222,13 +264,14 @@ def call_model(base_url: str, model: str, prompt: str) -> tuple[str, dict[str, i
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
-            "temperature": 0,
-            "response_format": {"type": "json_object"},
-            "max_tokens": 700,
+            "format": OUTPUT_SCHEMA,
+            "stream": False,
+            "think": False,
+            "options": {"temperature": 0, "num_predict": max_output_tokens},
         }
     ).encode("utf-8")
     request = urllib.request.Request(
-        f"{base_url.rstrip('/')}/chat/completions",
+        f"{native_base}/api/chat",
         data=payload,
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -239,11 +282,10 @@ def call_model(base_url: str, model: str, prompt: str) -> tuple[str, dict[str, i
     except urllib.error.HTTPError as error:
         detail = error.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"Model HTTP {error.code}: {detail[:500]}") from error
-    message = body["choices"][0]["message"].get("content") or ""
-    usage = body.get("usage") or {}
-    return message, {
-        "prompt_tokens": int(usage.get("prompt_tokens") or 0),
-        "completion_tokens": int(usage.get("completion_tokens") or 0),
+    output = body["message"].get("content") or ""
+    return output, {
+        "prompt_tokens": int(body.get("prompt_eval_count") or 0),
+        "completion_tokens": int(body.get("eval_count") or 0),
     }
 
 
@@ -258,6 +300,22 @@ def parse_json_object(text: str) -> dict[str, Any]:
         parsed = json.loads(text[start : end + 1])
     if not isinstance(parsed, dict):
         raise ValueError("The model response is not a JSON object.")
+    if "selections" in parsed and "meals" not in parsed:
+        meals = []
+        for meal_name in ("Breakfast", "Lunch", "Dinner"):
+            items = [
+                {
+                    "role": selection.get("role"),
+                    "item_id": str(selection.get("item_id") or "")[1:]
+                    if str(selection.get("item_id") or "")[:1] in {"F", "B"}
+                    else selection.get("item_id"),
+                }
+                for selection in parsed.get("selections", [])
+                if isinstance(selection, dict)
+                and selection.get("meal_name") == meal_name
+            ]
+            meals.append({"meal_name": meal_name, "items": items})
+        parsed = {"meals": meals}
     return parsed
 
 
@@ -526,7 +584,7 @@ def main() -> None:
         "created_at": datetime.now(timezone.utc).isoformat(),
         "provenance": {
             "model": args.model,
-            "provider": "Ollama OpenAI-compatible API",
+            "provider": "Ollama native structured-output API",
             "base_url": args.base_url,
             "temperature": 0,
             "repository_commit": git_revision(PROJECT_ROOT),
