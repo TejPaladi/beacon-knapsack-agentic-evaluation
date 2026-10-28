@@ -57,7 +57,9 @@ class LocalEvaluationTests(unittest.TestCase):
         self.assertEqual(len(records), 139)
         self.assertEqual(sum(record["kind"] == "food" for record in records), 107)
         self.assertEqual(sum(record["kind"] == "beverage" for record in records), 32)
-        self.assertIn("kind|id|roles|name|D|M|N|LS|GF|V", text)
+        self.assertIn("role|candidate_id|name|D|M|N|LS|GF|V", text)
+        self.assertIn("[MAIN CANDIDATES]", text)
+        self.assertIn("[BEVERAGE CANDIDATES]", text)
         self.assertNotIn("ingredients", text.lower())
 
     def test_llm_selector_scoring_accepts_a_valid_saved_plan(self):
