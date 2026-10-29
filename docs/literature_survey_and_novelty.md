@@ -70,7 +70,7 @@ control flow from model-processed data and enforces capabilities at runtime.
 
 Our proposed gate is smaller than CaMeL and is not claimed to provide its formal
 security guarantees. It adopts the relevant architectural principle: persona
-authorization is enforced by deterministic code, not delegated to prompt
+identity binding is enforced by deterministic code, not delegated to prompt
 compliance.
 
 ## Connection to the ADF paper
@@ -78,7 +78,7 @@ compliance.
 The ADF study finds that known exact procedures should remain deterministic and
 that LLM agents should delegate exact work to tools. Our system applies this idea
 to a recommendation workflow: language interpretation remains model-driven,
-while identity authorization, Knapsack selection, validation, and response
+while identity resolution, Knapsack selection, validation, and response
 rendering are deterministic.
 
 - Garimella, Srivastava, and Sheth (2026), [Doing Less with More](https://arxiv.org/abs/2610.23921).
@@ -109,7 +109,7 @@ recommendation workflow:
 2. isolate natural-language routing and tool orchestration;
 3. separate agent compliance from system-level safety;
 4. enforce a deterministic persona capability gate and trusted response renderer;
-5. compare prompt-only and policy-gated systems on the same valid, adversarial,
+5. compare prompt-only, identity-gated, and no-LLM systems on the same valid, restriction-override,
    missing, unknown, and ambiguous requests across multiple local models; and
 6. measure exact plan fidelity, clarification, unsafe execution, failures, and
    latency without an LLM judge; and

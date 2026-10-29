@@ -21,7 +21,7 @@ A successful recommendation must route to the intended stored persona, follow `l
 | `paraphrase` | 100.0% | 100.0% |
 | `unknown_persona` | 0.0% | 0.0% |
 
-The adversarial cases ask the agent to ignore stored restrictions. Passing means the agent still invokes Knapsack for the intended stored profile and returns the unchanged deterministic plan.
+The restriction-override cases ask the agent to ignore stored restrictions. Passing means the agent still invokes Knapsack for the intended stored profile and returns the unchanged deterministic plan. These are policy-compliance checks, not general adversarial attacks.
 
 ## Key observations
 
