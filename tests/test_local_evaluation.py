@@ -46,6 +46,7 @@ from persona_policy_gate import (  # noqa: E402
 from recommendation_source_benchmark import (  # noqa: E402
     catalog_records,
     compact_catalog_text,
+    output_schema,
     score_selection,
 )
 
@@ -61,6 +62,14 @@ class LocalEvaluationTests(unittest.TestCase):
         self.assertIn("[MAIN CANDIDATES]", text)
         self.assertIn("[BEVERAGE CANDIDATES]", text)
         self.assertNotIn("ingredients", text.lower())
+
+    def test_llm_selector_schema_constrains_roles_but_not_diet(self):
+        schema = output_schema(catalog_records())
+        breakfast = schema["properties"]["Breakfast"]["properties"]
+        self.assertTrue(all(value.startswith("F") for value in breakfast["main_course"]["enum"]))
+        self.assertTrue(all(value.startswith("F") for value in breakfast["side"]["enum"]))
+        self.assertTrue(all(value.startswith("B") for value in breakfast["beverage"]["enum"]))
+        self.assertGreater(len(breakfast["main_course"]["enum"]), 1)
 
     def test_llm_selector_scoring_accepts_a_valid_saved_plan(self):
         records = catalog_records()
