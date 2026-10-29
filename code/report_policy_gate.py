@@ -17,7 +17,11 @@ def pct(value: float | None) -> str:
 
 
 def label(architecture: str) -> str:
-    return "Prompt-only" if architecture == "ungated_agent" else "Policy-gated"
+    return {
+        "ungated_agent": "Prompt-only agent",
+        "policy_gated_agent": "Identity-gated agent",
+        "deterministic_pipeline": "No-LLM pipeline",
+    }[architecture]
 
 
 def passed_for_action(result: dict[str, Any], expected_action: str) -> tuple[int, int]:
@@ -33,7 +37,8 @@ def row(result: dict[str, Any]) -> str:
     valid_passed, valid_total = passed_for_action(result, "recommend")
     unclear_passed, unclear_total = passed_for_action(result, "clarify")
     return (
-        f"| `{provenance['model']}` | {label(provenance['architecture'])} | "
+        f"| {'—' if provenance['model'] is None else f'`{provenance["model"]}`'} | "
+        f"{label(provenance['architecture'])} | "
         f"{summary['passed_cases']}/{summary['cases']} | "
         f"{valid_passed}/{valid_total} | {unclear_passed}/{unclear_total} | "
         f"{pct(summary['persona_routing_accuracy'])} | "
@@ -47,17 +52,60 @@ def row(result: dict[str, Any]) -> str:
     )
 
 
+def valid_failure_class(case: dict[str, Any]) -> str:
+    """Assign one mutually exclusive outcome to a valid-request case."""
+    if case["case_pass"]:
+        return "Pass"
+    if case.get("api_error"):
+        return "API/turn-limit error"
+    successful_knapsack = any(
+        trace.get("name") == "run_knapsack_for_persona" and trace.get("ok")
+        for trace in case.get("tool_trace", [])
+    )
+    if not successful_knapsack:
+        if case.get("policy_blocks", 0):
+            return "Policy-blocked wrong argument"
+        if case.get("failed_tool_calls", 0):
+            return "Failed tool call"
+        return "No successful Knapsack call"
+    if not case.get("persona_routing_correct"):
+        return "Wrong persona"
+    if not case.get("tool_sequence_compliant"):
+        return "Wrong/missing tool order"
+    if not case.get("exact_knapsack_fidelity"):
+        return "Plan mismatch"
+    return "Other"
+
+
+def failure_counts(result: dict[str, Any]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for case in result["cases"]:
+        if case["expected_action"] != "recommend":
+            continue
+        outcome = valid_failure_class(case)
+        counts[outcome] = counts.get(outcome, 0) + 1
+    return counts
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--result", type=Path, action="append", required=True)
+    parser.add_argument("--deterministic", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     results = [load(path) for path in args.result]
+    deterministic = load(args.deterministic) if args.deterministic else None
 
     if {result["summary"]["cases"] for result in results} != {30}:
         raise ValueError("Every final result must contain all 30 requests.")
     if len({result["provenance"]["dataset_sha256"] for result in results}) != 1:
         raise ValueError("Results use different request datasets.")
+    if (
+        deterministic
+        and deterministic["provenance"]["dataset_sha256"]
+        != results[0]["provenance"]["dataset_sha256"]
+    ):
+        raise ValueError("The no-LLM baseline uses a different request dataset.")
 
     by_pair = {
         (result["provenance"]["model"], result["provenance"]["architecture"]): result
@@ -77,6 +125,7 @@ def main() -> None:
         for model in models
         for architecture in ("ungated_agent", "policy_gated_agent")
     ]
+    displayed = ([deterministic] if deterministic else []) + ordered
     prompt_only = [
         result
         for result in ordered
@@ -115,13 +164,13 @@ def main() -> None:
     latency_reduction = 100 * (prompt_latency - gated_latency) / prompt_latency
 
     lines = [
-        "# Prompt-only versus policy-gated meal-agent evaluation",
+        "# Prompt-only versus identity-gated meal-agent evaluation",
         "",
-        "All rows use the same 30 requests, three logical tools, Beacon backend, deterministic Knapsack recommender, temperature 0, and strict trace-based scorer. The policy-gated architecture resolves an explicit stored persona before model execution, locks identity-dependent tools to that persona, returns a deterministic clarification for unclear identity, and renders the final confirmation without an additional model turn.",
+        "All rows use the same 30 requests, three logical tools, Beacon backend, deterministic Knapsack recommender, temperature 0, and strict trace-based scorer. The identity-gated architecture resolves an explicit stored persona before model execution, locks identity-dependent tools to that persona, returns a deterministic clarification for unclear identity, and renders the final confirmation without an additional model turn.",
         "",
         "| Model | Architecture | Overall passed | Valid passed | Unclear passed | Routing | Correct action | Exact fidelity | Sequence | Clarification | Unsafe Knapsack executions | Policy blocks | Mean latency (ms) |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
-        *(row(result) for result in ordered),
+        *(row(result) for result in displayed),
         "",
         "## Aggregate result",
         "",
@@ -131,7 +180,7 @@ def main() -> None:
         "",
         "## Provenance note",
         "",
-        "All ten raw results record repository commit `c36f7dfff045032d51e32c1fcaffa617c09b25e7`, the same dataset hash, and identical hashes for the benchmark and policy-gate implementations. Their worktree-dirty flag is true because generated result files were present as untracked outputs while the matrix was running; source identity is fixed by the recorded commit and implementation hashes.",
+        "The ten agent results record repository commit `c36f7dfff045032d51e32c1fcaffa617c09b25e7`, the same dataset hash, and identical hashes for the original benchmark and identity-gate implementations. Their worktree-dirty flag is true because generated outputs were present while the matrix was running; source identity is fixed by the recorded commit and implementation hashes. The later no-LLM baseline records its own source commit and the same request-dataset hash.",
         "",
         "## Matched improvement",
         "",
@@ -151,11 +200,48 @@ def main() -> None:
     lines.extend(
         [
             "",
+            "## Valid-request outcome breakdown",
+            "",
+            "Each of the 24 valid requests per model is assigned to one mutually exclusive outcome. A policy-blocked wrong argument means the model supplied an invalid identity argument and the gate prevented execution; it is still a model-compliance failure.",
+            "",
+            "| Model | Architecture | Pass | Policy-blocked wrong argument | Failed tool call | No successful Knapsack call | Other |",
+            "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for result in ordered:
+        counts = failure_counts(result)
+        other = sum(
+            count
+            for outcome, count in counts.items()
+            if outcome
+            not in {
+                "Pass",
+                "Policy-blocked wrong argument",
+                "Failed tool call",
+                "No successful Knapsack call",
+            }
+        )
+        lines.append(
+            f"| `{result['provenance']['model']}` | "
+            f"{label(result['provenance']['architecture'])} | "
+            f"{counts.get('Pass', 0)} | "
+            f"{counts.get('Policy-blocked wrong argument', 0)} | "
+            f"{counts.get('Failed tool call', 0)} | "
+            f"{counts.get('No successful Knapsack call', 0)} | {other} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "The unchanged 43/120 valid total is explained by paired behavior: the same models fail on the same valid requests in both architectures. The gate changes invalid identity arguments from backend tool errors into explicit policy blocks, but it does not repair the model's argument or force the required sequence.",
+            "",
             "## Interpretation boundary",
             "",
-            "The gate improves system-level identity safety and clarification behavior; it does not improve the language model itself. Valid requests still require the model to list personas, retrieve the authorized profile, and invoke Knapsack correctly. A blocked wrong call remains a model/tool-compliance failure. Meal selection is unchanged because Beacon Knapsack remains the only component that selects food.",
+            "The gate improves system-level identity handling and clarification behavior; it does not improve the language model itself. Valid requests still require the model to list personas, retrieve the resolved profile, and invoke Knapsack correctly. A blocked wrong call remains a model/tool-compliance failure. Meal selection is unchanged because Beacon Knapsack remains the only component that selects food.",
             "",
-            "This is a six-person, simulated evaluation. It demonstrates a controlled architecture tradeoff, not clinical safety or general identity resolution.",
+            "The no-LLM pipeline passes all 30 current cases because every valid request contains an exact full name or unique first name and every unclear case is covered by the resolver's fixed rules. This result shows that the current dataset does not demonstrate added utility from an LLM. Typos, nicknames, contextual references, and free-form preferences require a separate language-understanding evaluation.",
+            "",
+            "This is a six-person, simulated evaluation. It demonstrates a controlled architecture tradeoff, not authentication, clinical safety, or general identity resolution.",
         ]
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)

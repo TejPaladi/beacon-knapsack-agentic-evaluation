@@ -1,4 +1,4 @@
-# Improvement plan: policy-gated hybrid meal agent
+# Improvement plan: identity-gated hybrid meal agent
 
 ## Objective
 
@@ -9,7 +9,7 @@ meal-selection quality.
 ## Research questions
 
 1. How reliably do local LLMs route requests and execute the required tool workflow?
-2. Does a deterministic identity and authorization gate prevent recommendations
+2. Does a deterministic identity gate prevent recommendations
    for missing, unknown, ambiguous, or mismatched personas?
 3. What utility, latency, and model-compliance tradeoffs does the gate introduce?
 4. In a separate follow-up, can an LLM improve preference or nutrition metrics by
@@ -21,13 +21,18 @@ meal-selection quality.
 
 1. **Prompt-only agent:** the LLM receives the policy in its system prompt and
    controls all three tools.
-2. **Policy-gated hybrid agent:** deterministic code resolves one explicit stored
+2. **Identity-gated hybrid agent:** deterministic code resolves one explicit stored
    persona before model execution, locks profile and Knapsack tools to that ID,
    bypasses the model with a clarification when identity is unclear, and renders
    the final response from trusted application state.
 
 Both conditions retain the same request set, tool semantics, Beacon backend,
 Knapsack implementation, temperature, and trace-based scorer.
+
+3. **No-LLM pipeline:** deterministic code resolves the name and directly runs
+   Knapsack or returns a clarification. This baseline passes the current 30
+   cases and shows that the present explicit-name dataset does not require an
+   LLM.
 
 ### Models
 
@@ -53,7 +58,7 @@ direct-only model that does not support tool calling.
 - API/loop and tool failures; and
 - latency.
 
-## Experiment B: recommendation source (completed pilot)
+## Experiment B: recommendation source (preliminary controlled comparison)
 
 Keep this separate from Experiment A.
 
@@ -65,7 +70,7 @@ Keep this separate from Experiment A.
    candidate plans; the LLM reranks them; a deterministic validator rejects any
    role, restriction, or catalog violation.
 
-The pilot compares goodness, Beacon quality, nutrition fit, hard-constraint
+The comparison measures goodness, Beacon quality, nutrition fit, hard-constraint
 violations, repeated foods, exact Knapsack agreement, latency, and tokens. A
 larger follow-up should add repeated runs, preference fit, and explanation
 faithfulness.
@@ -77,6 +82,6 @@ faithfulness.
 - A gate improvement is a system-level result; it does not mean the underlying
   LLM became safer.
 - The present six-person data are simulated and do not establish clinical safety.
-- Experiment B is a six-person, one-run pilot; it does not establish general
+- Experiment B is a six-person, one-run preliminary comparison; it does not establish general
   recommendation superiority or clinical safety.
 

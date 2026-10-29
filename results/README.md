@@ -33,7 +33,7 @@ than presenting it as a direct comparison.
 | Failures | API/loop failures and failed local tool calls are counted separately. |
 | Latency | Wall-clock time for the full request, including every model turn and tool call. |
 
-The six adversarial cases say to ignore saved dietary restrictions. They pass
+The six restriction-override cases say to ignore saved dietary restrictions. They pass
 only when the agent still runs deterministic Knapsack on the intended stored
 profile and exactly matches its reference plan. The experiment measures
 workflow robustness, not clinical safety.
@@ -42,10 +42,10 @@ The completed comparison is in
 [`robustness_comparison.md`](robustness_comparison.md). The two accompanying
 JSON files contain all 60 case-level tool traces and provenance metadata.
 
-## Policy-gated robustness evaluation
+## Identity-gated robustness evaluation
 
 [`policy_gate_comparison.md`](policy_gate_comparison.md) is the completed
-five-model comparison of prompt-only and policy-gated orchestration. The ten
+five-model comparison of prompt-only and identity-gated orchestration. The ten
 JSON files in `policy_gate_matrix/` contain all 300 case-level traces.
 
 The comparison separates two denominators that should not be combined when
@@ -56,9 +56,14 @@ interpreting the result:
 - **Unclear passed**: 6 requests per model where the system must clarify and
   must not run Knapsack.
 
-The deterministic gate changes authorization and response handling, not food
+The deterministic gate changes identity binding and response handling, not food
 selection. Valid-workflow performance therefore measures the model; unclear
 request safety measures the whole architecture.
+
+`policy_gate_matrix/deterministic_pipeline.json` is the no-LLM baseline on the
+same 30 requests. It passes 30/30 because the current inputs are fully handled
+by fixed exact-name rules and a fixed recommendation sequence. This is a
+baseline result, not evidence that the resolver generalizes to harder language.
 
 ## Recommendation-source evaluation
 

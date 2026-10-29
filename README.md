@@ -1,8 +1,7 @@
 # Beacon Knapsack: Direct vs. Agentic Orchestration
 
-This repository evaluates one narrow question: when Beacon's deterministic
-Knapsack recommender is held fixed, can an LLM reliably orchestrate the
-required profile-retrieval and recommendation steps?
+This repository evaluates when an LLM adds value around Beacon's deterministic
+Knapsack recommender, and when a simpler deterministic pipeline is sufficient.
 
 The current paper-style study is available in
 [paper/paper_draft.md](paper/paper_draft.md).
@@ -10,6 +9,7 @@ The current paper-style study is available in
 ```
 Direct baseline:  selected persona ──────────────────> Beacon Knapsack ─> plan
 Agentic setting:  plain request ─> LLM ─> tools ─────> Beacon Knapsack ─> plan
+No-LLM setting:   plain request ─> name resolver ─────> Beacon Knapsack ─> plan
 ```
 
 The LLM never selects food. In the agentic condition it must identify the
@@ -39,6 +39,7 @@ and Knapsack implementation.
 | --- | --- | --- | --- |
 | Direct Beacon Knapsack | selected persona ID | deterministic Beacon Knapsack | one-day meal plan |
 | Agentic Knapsack | “Create a one-day meal plan for Jessica Smith.” | LLM orchestrates tools; Knapsack selects food | one-day meal plan plus tool trace |
+| No-LLM pipeline | same natural-language requests | deterministic name resolver and Knapsack | plan or clarification |
 
 The system prompt requests, and the evaluator scores,
 `list_personas → get_persona → run_knapsack_for_persona`. The tool session
@@ -73,12 +74,12 @@ agentic output had 100% requested-role coverage, exact Knapsack fidelity, and
 required tool sequence. The agentic path was slower because it includes LLM
 calls and provider rate-limit waits, while recommendations were unchanged.
 
-## Next experiment: request robustness
+## Request-robustness experiment
 
 The next study keeps the same six fictional profiles and deterministic
 Knapsack recommender, but varies the user request. Its fixed 30-case dataset
 contains six cases in each successful-request category (exact name,
-paraphrase, first name, and an instruction to ignore saved restrictions), plus
+paraphrase, first name, and a restriction-override instruction), plus
 six invalid cases with an unknown, missing, or ambiguous persona.
 
 The invalid cases must produce a clarification without running Knapsack. The
@@ -117,7 +118,7 @@ The completed two-model result is available in
 passed 22/30 cases and Qwen3.5 passed 16/30. Neither model successfully asked
 for clarification on the six unknown, missing, or ambiguous-persona requests.
 
-## Policy-gated hybrid extension
+## Identity-gated hybrid extension
 
 The prompt-only result exposed a specific system risk: a model could select an
 unrelated stored profile when identity was missing, unknown, or ambiguous. The
@@ -127,7 +128,7 @@ new matched extension adds a deterministic policy layer around the same agent:
    model runs;
 2. return a deterministic clarification without profile or Knapsack access when
    identity is unresolved or ambiguous;
-3. lock `get_persona` and `run_knapsack_for_persona` to the authorized ID; and
+3. lock `get_persona` and `run_knapsack_for_persona` to the resolved ID; and
 4. render the final confirmation from trusted application state after Knapsack,
    avoiding an unnecessary final model turn and unsupported nutrition claims.
 
@@ -151,6 +152,14 @@ unchanged at 43/120; the gain came from unclear-persona cases improving from
 zero, and mean per-case latency fell 44.9%. This is evidence of improved
 system-level safety and efficiency, not improved model capability.
 
+The no-LLM baseline passes 30/30 with 146.3 ms mean latency per case and no
+model tokens. Because all
+valid requests contain an exact name or unique first name and the other cases
+are covered by fixed resolver rules, this result is close to true by
+construction. It shows that the current request set does not establish a need
+for an LLM. Harder requests with typos, nicknames, conversational references,
+and free-form preferences are the necessary next evaluation.
+
 Run one matched pair with:
 
 ```bash
@@ -161,6 +170,11 @@ Run one matched pair with:
 "$BEACON_PYTHON" code/robustness_benchmark.py \
   --architecture policy_gated_agent --model granite4:3b \
   --output results/policy_gate_matrix/policy_gated_agent__granite4_3b.json
+
+# No model or API call.
+"$BEACON_PYTHON" code/robustness_benchmark.py \
+  --architecture deterministic_pipeline \
+  --output results/policy_gate_matrix/deterministic_pipeline.json
 ```
 
 MCP and LangChain are deliberately not experimental requirements here. MCP
@@ -184,7 +198,9 @@ The completed report is
 Knapsack produced 6/6 safe plans with mean Beacon quality 0.860. Granite also
 produced 6/6 safe plans but scored 0.679 and repeated two foods per plan on
 average. Llama produced only 3/6 safe plans, made four dietary violations, and
-scored 0.453. Both LLMs were over 20 times slower than direct Knapsack.
+scored 0.453 across all cases. Its three safe plans averaged 0.906, so the
+results do not support claiming that Knapsack has the highest conditional meal
+quality. Both LLMs were over 20 times slower than direct Knapsack.
 
 ## Setup
 
