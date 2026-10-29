@@ -170,6 +170,43 @@ class LocalEvaluationTests(unittest.TestCase):
         self.assertTrue(result["gate_bypassed_model"])
         self.assertTrue(result["trusted_response_renderer"])
 
+    def test_deterministic_pipeline_never_calls_a_model(self):
+        reference = run_knapsack_for_persona("jessicaSmith")
+        valid_case = {
+            "case_id": "valid",
+            "category": "exact_name",
+            "prompt": "Create a one-day meal plan for Jessica Smith.",
+            "expected_action": "recommend",
+            "intended_persona_id": "jessicaSmith",
+        }
+        unclear_case = {
+            "case_id": "unclear",
+            "category": "missing_persona",
+            "prompt": "Create a one-day meal plan.",
+            "expected_action": "clarify",
+            "intended_persona_id": None,
+        }
+        with patch("robustness_benchmark.ollama_chat_completion") as mocked_model:
+            valid = run_case(
+                valid_case,
+                None,
+                "http://localhost:11434/v1",
+                {"jessicaSmith": reference},
+                architecture="deterministic_pipeline",
+            )
+            unclear = run_case(
+                unclear_case,
+                None,
+                "http://localhost:11434/v1",
+                {"jessicaSmith": reference},
+                architecture="deterministic_pipeline",
+            )
+        mocked_model.assert_not_called()
+        self.assertTrue(valid["case_pass"])
+        self.assertTrue(valid["exact_knapsack_fidelity"])
+        self.assertTrue(unclear["case_pass"])
+        self.assertIsNone(unclear["observed_plan"])
+
     def test_snapshot_contains_six_beacon_personas(self):
         self.assertEqual(len(list_personas()), 6)
         self.assertIn({"persona_id": "jessicaSmith", "name": "Jessica Smith"}, list_personas())
