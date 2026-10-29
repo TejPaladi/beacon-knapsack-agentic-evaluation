@@ -1,4 +1,4 @@
-# Policy-Gated Agentic Orchestration for Deterministic Meal Recommendation
+# Deterministic, LLM-Only, and Policy-Gated Agentic Meal Recommendation
 
 **Sai Teja Paladi**  
 CSE 798 Independent Study  
@@ -28,7 +28,14 @@ to 73/150, unclear-request success increases from 6/30 to 30/30, unsafe Knapsack
 executions fall from 10 to zero, and mean latency decreases by 44.9%. Valid
 recommendation workflows remain unchanged at 43/120. The result is therefore a
 system-level safety and efficiency improvement, not an improvement in the
-underlying models or in meal quality.
+underlying models. Finally, we compare Knapsack with direct LLM meal selection
+from the same role-eligible catalog. Knapsack produces six of six safe plans
+with mean Beacon quality 0.860 in 183.5 ms. Granite produces six safe plans but
+lower quality (0.679), lower nutrition fit, repeated foods, and 4.34 s latency.
+Llama produces only three safe plans, makes four dietary violations, and scores
+0.453 quality in 4.04 s. The combined results support a division of labor in
+which deterministic components retain constraint-sensitive selection and
+authorization while models handle language-dependent interaction.
 
 **Keywords:** LLM agents, tool use, meal recommendation, deterministic
 optimization, policy enforcement, clarification
@@ -60,6 +67,9 @@ The study asks three research questions:
   adversarial, missing, unknown, and ambiguous-persona requests?
 - **RQ3:** Can a deterministic identity and authorization gate improve
   clarification safety without changing the recommender?
+- **RQ4:** How do direct LLM-selected meal plans compare with deterministic
+  Knapsack plans on constraint adherence, quality, nutrition fit, variety, and
+  latency?
 
 The paper makes three bounded contributions:
 
@@ -70,7 +80,10 @@ The paper makes three bounded contributions:
    verified results without a final generative step; and
 3. a trace-based, five-model evaluation that measures exact plan fidelity,
    tool order, clarification, unsafe execution, failures, and latency without an
-   LLM judge.
+   LLM judge; and
+4. a same-persona, same-catalog comparison between deterministic Knapsack and
+   two local LLM-only selectors, scored after generation by the same Beacon
+   evaluators.
 
 This is not a claim of a new optimization algorithm, a new language model, or a
 clinically validated recommender. It is a controlled systems study of agentic
@@ -265,7 +278,27 @@ architectures, producing 300 case-level executions. Runs are sequential to avoid
 local memory contention. Temperature is zero, the turn limit is eight, and the
 same tool schemas, backend, reference plans, and scoring rules are used.
 
-### 4.3 Scoring
+### 4.3 Experiment 3: deterministic versus LLM-only selection
+
+Experiment 3 tests RQ4 using the same six personas and local Beacon catalog.
+The deterministic condition runs Knapsack. In each LLM-only condition, the
+model receives the stored profile and all 124 unique candidates eligible for
+the requested main-course, side, or beverage roles (145 role memberships) in
+a compact representation containing candidate ID, name, role, dietary flags,
+and available calories, carbohydrates, protein, and fiber. The LLM selects the
+nine catalog items directly. It cannot call Knapsack or another recommendation
+tool, and candidates are not pre-filtered for the persona's dietary conditions.
+
+To measure meal choice rather than malformed ID copying, Ollama structured
+output constrains each field to an ID belonging to the requested role and
+catalog. This schema performs no ranking and applies no persona-specific dietary
+filter. `granite4:3b` and `llama3.2:3b` each make one call per persona at
+temperature zero. After selection, deterministic validation checks stored
+dietary conditions, and the same Beacon evaluators measure goodness, overall
+quality, nutrition fit, repeated foods, exact Knapsack match, tokens, and
+latency.
+
+### 4.4 Scoring
 
 A valid request passes only if it:
 
@@ -279,7 +312,12 @@ run Knapsack. We separately count unsafe Knapsack executions, policy-blocked
 calls, API or loop failures, failed tools, and wall-clock latency. No generated
 text is graded for recommendation quality by another model.
 
-### 4.4 Reproducibility
+An LLM-only plan is safe and valid only if it fills every requested meal role
+with a catalog member and violates none of the stored diabetes, vegetarian,
+vegan, or gluten-free conditions. Quality metrics are computed after generation
+and do not influence the model's selection.
+
+### 4.5 Reproducibility
 
 The benchmark records the dataset hash, prompt hash, source commit, hashes of
 the benchmark and policy-gate implementations, model, temperature, complete tool
@@ -332,7 +370,31 @@ passes and introduces no matched pass-to-fail regressions. The 44.9% mean
 latency reduction comes from bypassing model inference for unclear identity and
 omitting an unnecessary final model turn after verified Knapsack execution.
 
-### 5.3 Model capability versus architecture safety
+### 5.3 Deterministic versus LLM-only selection
+
+| Selector | Safe plans | Hard violations | Exact Knapsack matches | Goodness | Beacon quality | Nutrition fit | Repeated foods | Latency |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Beacon Knapsack | **6/6** | **0** | 6/6 reference | **1.000** | **0.860** | 0.549 | **0.0** | **183.5 ms** |
+| Granite 4 3B LLM-only | **6/6** | **0** | 0/6 | **1.000** | 0.679 | 0.479 | 2.0 | 4338.9 ms |
+| Llama 3.2 3B LLM-only | 3/6 | 4 | 0/6 | 0.981 | 0.453 | **0.563** | **0.0** | 4035.3 ms |
+
+Granite returns six dietary-adherent plans, but its mean Beacon quality is 0.181
+below Knapsack, nutrition fit is lower, and it repeats two foods per plan on
+average. Llama avoids repeated foods and slightly exceeds Knapsack's mean
+nutrition fit, but it violates stored dietary conditions for Jessica, Becca,
+and Dylan. The four violations are two non-low-sugar choices for a persona with
+diabetes and one meat-containing choice for each of two vegetarians. Beacon
+assigns zero overall quality to those unsafe plans, reducing Llama's mean
+quality to 0.453.
+
+Neither model exactly reproduces a Knapsack plan. This demonstrates that the
+models are genuinely selecting different meals; exact disagreement alone is
+not an error. The safety and quality metrics show why the difference matters.
+Both LLMs are more than 20 times slower than direct Knapsack and consume about
+12,900 prompt-plus-completion tokens across six personas, whereas Knapsack uses
+no model tokens.
+
+### 5.4 Model capability versus architecture safety
 
 The valid-workflow total is exactly 43/120 in both architectures. This is the
 most important interpretation boundary in the study: the gate does not improve
@@ -365,6 +427,12 @@ unclear model-request pairs, eliminates ten unsafe executions, and reduces mean
 latency without changing valid-workflow performance. It improves the system,
 not the underlying models.
 
+**RQ4:** Direct LLM selection does not outperform Knapsack in this pilot.
+Granite preserves dietary constraints but loses overall quality, nutrition fit,
+and variety. Llama improves the isolated nutrition-fit mean but violates hard
+conditions in half of the personas. Knapsack is faster, token-free, safe on all
+six cases, and has the highest overall Beacon quality.
+
 ### 6.2 What is novel
 
 The novelty is the combination of a task-specific architecture and controlled
@@ -376,7 +444,10 @@ evaluation:
 - it evaluates the same agent with and without that gate across five local
   models and identical requests; and
 - it scores executed state—identity, tool order, Knapsack action, and exact plan
-  fidelity—while separately reporting safety and model capability.
+  fidelity—while separately reporting safety and model capability; and
+- it compares deterministic and direct LLM selection on the same profiles,
+  catalog, roles, and post-hoc evaluators instead of comparing systems on
+  incompatible inputs.
 
 The work does not claim that deterministic authorization is itself a new idea.
 Its contribution is applying and measuring that principle in a reproducible
@@ -384,18 +455,24 @@ BEACON meal-agent workflow, exposing a concrete tradeoff that a final-answer
 accuracy metric would hide: a model can be good at valid tool trajectories and
 simultaneously unsafe when identity is unclear.
 
-### 6.3 Why the current paper is not an LLM-only recommendation comparison
+### 6.3 Architecture lesson from LLM-only selection
 
-Both main experimental architectures use Knapsack to select meals. The LLM
-controls workflow composition, not recommendation content. Therefore, the
-present results cannot answer whether an LLM ranks meals better or worse than
-Knapsack.
+The new recommendation-source experiment strengthens the architecture argument.
+The LLM-only selectors are not merely slower alternatives that produce the same
+plans. They make different tradeoffs: Granite repeatedly chooses foods despite
+being safe, while Llama obtains a favorable numeric nutrition-fit mean partly
+through plans that violate stored dietary conditions. A single aggregate metric
+would hide both failures.
 
-A separate six-case synthetic pilot in the broader project compared a small
-rule engine, LLM-only selection, and an MCP hybrid. Because that pilot uses
-different personas, data, constraints, and recommendation logic, its numbers
-are not pooled with the BEACON results. It serves only as preliminary
-feasibility evidence.
+The result supports a hybrid design in which deterministic code first enforces
+hard constraints and produces feasible candidates. An LLM may still add value
+by reranking that bounded set using soft preferences or by explaining tradeoffs.
+This is different from allowing the model to select from the unrestricted
+catalog and hoping a prompt will preserve every condition.
+
+The earlier six-case synthetic pilot in the broader project used different
+data and a simplified rule engine. Its numbers remain excluded from the Beacon
+tables rather than being pooled with the controlled comparison reported here.
 
 ## 7. Limitations and Ethical Scope
 
@@ -407,6 +484,12 @@ estimate variance across sampling, hardware, or model versions. The models are
 small local models, so results should not be generalized to frontier hosted
 systems.
 
+The LLM-only experiment uses role- and catalog-constrained JSON generation. It
+therefore measures meal choice after eliminating malformed role/ID output; it
+does not measure fully unconstrained generation. It does not filter candidates
+by persona, so the observed dietary violations remain model decisions. Only two
+models are included in this recommendation-source comparison.
+
 Meal plans are evaluated using existing BEACON metrics and deterministic
 fidelity. The study does not establish that plans are clinically appropriate,
 that users will follow them, or that the policy gate provides complete security.
@@ -417,20 +500,19 @@ The aggregate 49/150 and 73/150 observations contain repeated prompts across
 models and should not be treated as 150 independent human samples. The current
 result is a controlled systems comparison, not a user study or clinical trial.
 
-## 8. Next Experiment: Recommendation Source
+## 8. Next Experiment: Constrained Hybrid Reranking
 
-The next study should test recommendation quality separately from orchestration.
-It should hold personas, catalog, candidate visibility, and evaluation metrics
-fixed and compare:
+The next study should add a hybrid selection condition while retaining the two
+completed baselines. It should hold personas, catalog, candidate visibility,
+and evaluation metrics fixed and compare:
 
 1. **Deterministic Knapsack:** the existing reference selector;
-2. **LLM-only selector:** the model receives the same profile and catalog and
-   selects meal IDs directly; an external deterministic evaluator checks hard
-   restrictions and quality after selection; and
+2. **LLM-only selector:** the completed direct-selection condition;
 3. **Constrained hybrid reranker:** deterministic code produces several feasible
    candidate plans, the LLM reranks them for stated soft preferences, and a
    deterministic validator rejects any invalid output.
 
+Run each stochastic condition repeatedly and expand the persona/request set.
 Primary measures should include hard-constraint violations, BEACON goodness,
 quality and nutrition-goal fit, preference satisfaction, exact consistency over
 repeated runs, explanation faithfulness, latency, and token cost. This three-way
@@ -446,9 +528,13 @@ safe behavior when identity is insufficient. Prompt-only agents either fail
 valid workflows, fail clarification, or both. A small deterministic policy gate
 eliminates observed wrong-person Knapsack executions and reduces latency while
 preserving the models' valid-request performance. The main lesson is a division
-of responsibility: use the model for language-dependent orchestration, retain
-exact recommendation and authorization decisions in inspectable deterministic
-components, and evaluate both the trajectory and the resulting state.
+of responsibility. The direct-selection comparison reinforces this conclusion:
+one LLM sacrifices quality and variety while the other violates stored dietary
+conditions despite a favorable nutrition-fit mean. Use the model for
+language-dependent orchestration and bounded soft-preference ranking; retain
+constraint-sensitive recommendation and authorization decisions in inspectable
+deterministic components; and evaluate both the trajectory and the resulting
+state.
 
 ## References
 

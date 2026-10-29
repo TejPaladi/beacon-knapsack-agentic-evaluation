@@ -112,10 +112,13 @@ recommendation workflow:
 5. compare prompt-only and policy-gated systems on the same valid, adversarial,
    missing, unknown, and ambiguous requests across multiple local models; and
 6. measure exact plan fidelity, clarification, unsafe execution, failures, and
-   latency without an LLM judge.
+   latency without an LLM judge; and
+7. compare Knapsack with direct LLM meal selection on the same six profiles,
+   role-eligible catalog, and post-hoc Beacon evaluators, separating hard
+   violations from nutrition fit and overall quality.
 
 This is a defensible semester-scale contribution. A conference-strength claim
 would require more personas and linguistic variants, repeated trials, stronger
-and more diverse models, statistical analysis, and evaluation on an additional
-recommendation setting.
+and more diverse models, statistical analysis, a constrained hybrid-reranking
+condition, and evaluation on an additional group-recommendation setting.
 

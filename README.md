@@ -170,6 +170,22 @@ tools. The explicit native loop keeps the evaluated trace and policy boundary
 small and auditable. An MCP/LangChain mirror would be a useful portability and
 framework-overhead study, but it is not the safety contribution.
 
+## Deterministic versus LLM-only selection
+
+A separate recommendation-source experiment now compares Beacon Knapsack with
+direct selections from `granite4:3b` and `llama3.2:3b`. Each model sees the same
+stored profile and complete compact role-eligible catalog. It cannot call
+Knapsack, and no persona-specific dietary filter is applied before selection.
+A structured-output schema enforces only catalog membership and requested role;
+Beacon validation and quality scoring occur afterward.
+
+The completed report is
+[results/recommendation_source_comparison.md](results/recommendation_source_comparison.md).
+Knapsack produced 6/6 safe plans with mean Beacon quality 0.860. Granite also
+produced 6/6 safe plans but scored 0.679 and repeated two foods per plan on
+average. Llama produced only 3/6 safe plans, made four dietary violations, and
+scored 0.453. Both LLMs were over 20 times slower than direct Knapsack.
+
 ## Setup
 
 ### 1. Obtain the compatible Beacon backend

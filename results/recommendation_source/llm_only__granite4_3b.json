@@ -1,0 +1,1963 @@
+{
+  "experiment": "Beacon Knapsack versus LLM-only meal selection",
+  "created_at": "2026-10-29T01:05:01.995316+00:00",
+  "provenance": {
+    "model": "granite4:3b",
+    "provider": "Ollama native structured-output API",
+    "base_url": "http://localhost:11434/v1",
+    "temperature": 0,
+    "repository_commit": "370f8378dd9b1c619db24e5def8631b482d9ddd1",
+    "beacon_backend_commit": "7ebe3ae94d86dd6a4e9fc93ccc4734d549a531c4",
+    "system_prompt_sha256": "4615384bb281ee6a0e4ea1a58ec92e52b9f36bea8c06129c29b92b9e939bc1e3",
+    "catalog_sha256": "35d716b925103232bfa48e3de4bbd8a27aac35f365d519450dc50c7c7ec1a0c8",
+    "catalog_records": 139,
+    "selector": "LLM direct selection from complete role-specific candidate enums; no ranking, dietary pre-filter, or recommendation tool",
+    "output_constraint": "JSON schema enforces requested meal roles and catalog membership only",
+    "evaluator": "Post-hoc deterministic validation and Beacon quality metrics"
+  },
+  "summary": {
+    "cases": 6,
+    "safe_valid_plans": 6,
+    "format_and_catalog_valid": 6,
+    "hard_constraint_adherent": 6,
+    "hard_constraint_violations": 0,
+    "exact_knapsack_matches": 0,
+    "mean_duplicate_food_count": 2.0,
+    "mean_legacy_goodness": 1.0,
+    "mean_beacon_quality": 0.6790671666666667,
+    "mean_nutrition_fit": 0.47866916666666665,
+    "mean_latency_ms": 4338.904673831469,
+    "total_prompt_tokens": 12300,
+    "total_completion_tokens": 666
+  },
+  "llm_only_cases": [
+    {
+      "persona_id": "earlJones",
+      "persona_name": "Earl Jones",
+      "model": "granite4:3b",
+      "raw_response": "{\n  \"Breakfast\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3008\",\n    \"beverage\": \"B6\"\n  },\n  \"Lunch\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3104\",\n    \"beverage\": \"B2\"\n  },\n  \"Dinner\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3109\",\n    \"beverage\": \"B6\"\n  }\n}",
+      "api_error": null,
+      "latency_ms": 11284.365624997008,
+      "usage": {
+        "prompt_tokens": 2050,
+        "completion_tokens": 111
+      },
+      "plan": {
+        "persona_id": "earlJones",
+        "persona_name": "Earl Jones",
+        "algorithm": "LLM-only direct selection",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3008",
+                "name": "cabbage-and-carrot-skillet"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3104",
+                "name": "calabacitas-with-corn-and-beans"
+              },
+              {
+                "role": "beverage",
+                "item_id": "2",
+                "name": "Tea"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3109",
+                "name": "avocado-citrus-jicama-salad"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          }
+        ]
+      },
+      "format_and_catalog_valid": true,
+      "requested_role_coverage": true,
+      "hard_constraint_adherence": true,
+      "hard_constraint_violations": [],
+      "validation_errors": [],
+      "duplicate_food_count": 2,
+      "exact_knapsack_match": false,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.712002,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 0.5,
+            "nutrition_fit": 0.476678,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 0.666667
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 2400.0,
+            "carbs": 300.0,
+            "protein": 185.0,
+            "fiber": 38.0
+          },
+          "actual_totals": {
+            "calories": 1110.0,
+            "carbs": 168.0,
+            "protein": 37.0,
+            "fiber": 50.0
+          },
+          "per_nutrient_fit": {
+            "calories": 0.4625,
+            "carbs": 0.56,
+            "protein": 0.2,
+            "fiber": 0.684211
+          },
+          "mean_fit": 0.476678
+        }
+      },
+      "case_pass": true
+    },
+    {
+      "persona_id": "jessicaSmith",
+      "persona_name": "Jessica Smith",
+      "model": "granite4:3b",
+      "raw_response": "{\n  \"Breakfast\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3008\",\n    \"beverage\": \"B6\"\n  },\n  \"Lunch\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3104\",\n    \"beverage\": \"B2\"\n  },\n  \"Dinner\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3109\",\n    \"beverage\": \"B6\"\n  }\n}",
+      "api_error": null,
+      "latency_ms": 2960.3980419997242,
+      "usage": {
+        "prompt_tokens": 2050,
+        "completion_tokens": 111
+      },
+      "plan": {
+        "persona_id": "jessicaSmith",
+        "persona_name": "Jessica Smith",
+        "algorithm": "LLM-only direct selection",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3008",
+                "name": "cabbage-and-carrot-skillet"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3104",
+                "name": "calabacitas-with-corn-and-beans"
+              },
+              {
+                "role": "beverage",
+                "item_id": "2",
+                "name": "Tea"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3109",
+                "name": "avocado-citrus-jicama-salad"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          }
+        ]
+      },
+      "format_and_catalog_valid": true,
+      "requested_role_coverage": true,
+      "hard_constraint_adherence": true,
+      "hard_constraint_violations": [],
+      "validation_errors": [],
+      "duplicate_food_count": 2,
+      "exact_knapsack_match": false,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.72077,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 0.5,
+            "nutrition_fit": 0.520516,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 0.666667
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 1800.0,
+            "carbs": 200.0,
+            "protein": 90.0,
+            "fiber": 28.0
+          },
+          "actual_totals": {
+            "calories": 1110.0,
+            "carbs": 168.0,
+            "protein": 37.0,
+            "fiber": 50.0
+          },
+          "per_nutrient_fit": {
+            "calories": 0.616667,
+            "carbs": 0.84,
+            "protein": 0.411111,
+            "fiber": 0.214286
+          },
+          "mean_fit": 0.520516
+        }
+      },
+      "case_pass": true
+    },
+    {
+      "persona_id": "A-NV",
+      "persona_name": "Aaliyah Brooks",
+      "model": "granite4:3b",
+      "raw_response": "{\n  \"Breakfast\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3008\",\n    \"beverage\": \"B6\"\n  },\n  \"Lunch\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3104\",\n    \"beverage\": \"B2\"\n  },\n  \"Dinner\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3109\",\n    \"beverage\": \"B6\"\n  }\n}",
+      "api_error": null,
+      "latency_ms": 2960.986625002988,
+      "usage": {
+        "prompt_tokens": 2050,
+        "completion_tokens": 111
+      },
+      "plan": {
+        "persona_id": "A-NV",
+        "persona_name": "Aaliyah Brooks",
+        "algorithm": "LLM-only direct selection",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3008",
+                "name": "cabbage-and-carrot-skillet"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3104",
+                "name": "calabacitas-with-corn-and-beans"
+              },
+              {
+                "role": "beverage",
+                "item_id": "2",
+                "name": "Tea"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3109",
+                "name": "avocado-citrus-jicama-salad"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          }
+        ]
+      },
+      "format_and_catalog_valid": true,
+      "requested_role_coverage": true,
+      "hard_constraint_adherence": true,
+      "hard_constraint_violations": [],
+      "validation_errors": [],
+      "duplicate_food_count": 2,
+      "exact_knapsack_match": false,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.602834,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 0.0,
+            "nutrition_fit": 0.430838,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 0.666667
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 3500.0,
+            "carbs": 438.0,
+            "protein": 82.0,
+            "fiber": 35.0
+          },
+          "actual_totals": {
+            "calories": 1110.0,
+            "carbs": 168.0,
+            "protein": 37.0,
+            "fiber": 50.0
+          },
+          "per_nutrient_fit": {
+            "calories": 0.317143,
+            "carbs": 0.383562,
+            "protein": 0.45122,
+            "fiber": 0.571429
+          },
+          "mean_fit": 0.430838
+        }
+      },
+      "case_pass": true
+    },
+    {
+      "persona_id": "NA-V",
+      "persona_name": "Becca Moore",
+      "model": "granite4:3b",
+      "raw_response": "{\n  \"Breakfast\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3008\",\n    \"beverage\": \"B6\"\n  },\n  \"Lunch\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3104\",\n    \"beverage\": \"B2\"\n  },\n  \"Dinner\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3109\",\n    \"beverage\": \"B6\"\n  }\n}",
+      "api_error": null,
+      "latency_ms": 2951.848416996654,
+      "usage": {
+        "prompt_tokens": 2050,
+        "completion_tokens": 111
+      },
+      "plan": {
+        "persona_id": "NA-V",
+        "persona_name": "Becca Moore",
+        "algorithm": "LLM-only direct selection",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3008",
+                "name": "cabbage-and-carrot-skillet"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3104",
+                "name": "calabacitas-with-corn-and-beans"
+              },
+              {
+                "role": "beverage",
+                "item_id": "2",
+                "name": "Tea"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3109",
+                "name": "avocado-citrus-jicama-salad"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          }
+        ]
+      },
+      "format_and_catalog_valid": true,
+      "requested_role_coverage": true,
+      "hard_constraint_adherence": true,
+      "hard_constraint_violations": [],
+      "validation_errors": [],
+      "duplicate_food_count": 2,
+      "exact_knapsack_match": false,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.719422,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 0.5,
+            "nutrition_fit": 0.513776,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 0.666667
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 2000.0,
+            "carbs": 130.0,
+            "protein": 64.0,
+            "fiber": 28.0
+          },
+          "actual_totals": {
+            "calories": 1110.0,
+            "carbs": 168.0,
+            "protein": 37.0,
+            "fiber": 50.0
+          },
+          "per_nutrient_fit": {
+            "calories": 0.555,
+            "carbs": 0.707692,
+            "protein": 0.578125,
+            "fiber": 0.214286
+          },
+          "mean_fit": 0.513776
+        }
+      },
+      "case_pass": true
+    },
+    {
+      "persona_id": "NA-NV",
+      "persona_name": "Greg Taylor",
+      "model": "granite4:3b",
+      "raw_response": "{\n  \"Breakfast\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3008\",\n    \"beverage\": \"B6\"\n  },\n  \"Lunch\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3104\",\n    \"beverage\": \"B2\"\n  },\n  \"Dinner\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3109\",\n    \"beverage\": \"B6\"\n  }\n}",
+      "api_error": null,
+      "latency_ms": 2935.7240839963197,
+      "usage": {
+        "prompt_tokens": 2050,
+        "completion_tokens": 111
+      },
+      "plan": {
+        "persona_id": "NA-NV",
+        "persona_name": "Greg Taylor",
+        "algorithm": "LLM-only direct selection",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3008",
+                "name": "cabbage-and-carrot-skillet"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3104",
+                "name": "calabacitas-with-corn-and-beans"
+              },
+              {
+                "role": "beverage",
+                "item_id": "2",
+                "name": "Tea"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3109",
+                "name": "avocado-citrus-jicama-salad"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          }
+        ]
+      },
+      "format_and_catalog_valid": true,
+      "requested_role_coverage": true,
+      "hard_constraint_adherence": true,
+      "hard_constraint_violations": [],
+      "validation_errors": [],
+      "duplicate_food_count": 2,
+      "exact_knapsack_match": false,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.618546,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 0.0,
+            "nutrition_fit": 0.509396,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 0.666667
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 2000.0,
+            "carbs": 130.0,
+            "protein": 66.0,
+            "fiber": 28.0
+          },
+          "actual_totals": {
+            "calories": 1110.0,
+            "carbs": 168.0,
+            "protein": 37.0,
+            "fiber": 50.0
+          },
+          "per_nutrient_fit": {
+            "calories": 0.555,
+            "carbs": 0.707692,
+            "protein": 0.560606,
+            "fiber": 0.214286
+          },
+          "mean_fit": 0.509396
+        }
+      },
+      "case_pass": true
+    },
+    {
+      "persona_id": "A-V",
+      "persona_name": "Dylan Bennet",
+      "model": "granite4:3b",
+      "raw_response": "{\n  \"Breakfast\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3008\",\n    \"beverage\": \"B6\"\n  },\n  \"Lunch\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3104\",\n    \"beverage\": \"B2\"\n  },\n  \"Dinner\": {\n    \"main_course\": \"F3005\",\n    \"side\": \"F3109\",\n    \"beverage\": \"B6\"\n  }\n}",
+      "api_error": null,
+      "latency_ms": 2940.1052499961224,
+      "usage": {
+        "prompt_tokens": 2050,
+        "completion_tokens": 111
+      },
+      "plan": {
+        "persona_id": "A-V",
+        "persona_name": "Dylan Bennet",
+        "algorithm": "LLM-only direct selection",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3008",
+                "name": "cabbage-and-carrot-skillet"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3104",
+                "name": "calabacitas-with-corn-and-beans"
+              },
+              {
+                "role": "beverage",
+                "item_id": "2",
+                "name": "Tea"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3005",
+                "name": "okra-tomato-stew"
+              },
+              {
+                "role": "side",
+                "item_id": "3109",
+                "name": "avocado-citrus-jicama-salad"
+              },
+              {
+                "role": "beverage",
+                "item_id": "6",
+                "name": "Milk"
+              }
+            ]
+          }
+        ]
+      },
+      "format_and_catalog_valid": true,
+      "requested_role_coverage": true,
+      "hard_constraint_adherence": true,
+      "hard_constraint_violations": [],
+      "validation_errors": [],
+      "duplicate_food_count": 2,
+      "exact_knapsack_match": false,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.700829,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 0.5,
+            "nutrition_fit": 0.420811,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 0.666667
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 3500.0,
+            "carbs": 438.0,
+            "protein": 90.0,
+            "fiber": 35.0
+          },
+          "actual_totals": {
+            "calories": 1110.0,
+            "carbs": 168.0,
+            "protein": 37.0,
+            "fiber": 50.0
+          },
+          "per_nutrient_fit": {
+            "calories": 0.317143,
+            "carbs": 0.383562,
+            "protein": 0.411111,
+            "fiber": 0.571429
+          },
+          "mean_fit": 0.420811
+        }
+      },
+      "case_pass": true
+    }
+  ],
+  "direct_knapsack_cases": [
+    {
+      "persona_id": "earlJones",
+      "plan": {
+        "persona_id": "earlJones",
+        "persona_name": "Earl Jones",
+        "algorithm": "Beacon Knapsack",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          }
+        ],
+        "normalized_meals": [
+          [
+            "Breakfast",
+            [
+              [
+                "beverage",
+                "10"
+              ],
+              [
+                "main_course",
+                "130"
+              ],
+              [
+                "side",
+                "125"
+              ]
+            ]
+          ],
+          [
+            "Lunch",
+            [
+              [
+                "beverage",
+                "10"
+              ],
+              [
+                "main_course",
+                "131"
+              ],
+              [
+                "side",
+                "140"
+              ]
+            ]
+          ],
+          [
+            "Dinner",
+            [
+              [
+                "beverage",
+                "10"
+              ],
+              [
+                "main_course",
+                "130"
+              ],
+              [
+                "side",
+                "153"
+              ]
+            ]
+          ]
+        ]
+      },
+      "latency_ms": 223.9649159964756,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.851162,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 1.0,
+            "nutrition_fit": 0.50581,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 1.0
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 2400.0,
+            "carbs": 300.0,
+            "protein": 185.0,
+            "fiber": 38.0
+          },
+          "actual_totals": {
+            "calories": 2400.0,
+            "carbs": 92.0,
+            "protein": 98.0,
+            "fiber": 7.1
+          },
+          "per_nutrient_fit": {
+            "calories": 1.0,
+            "carbs": 0.306667,
+            "protein": 0.52973,
+            "fiber": 0.186842
+          },
+          "mean_fit": 0.50581
+        }
+      }
+    },
+    {
+      "persona_id": "jessicaSmith",
+      "plan": {
+        "persona_id": "jessicaSmith",
+        "persona_name": "Jessica Smith",
+        "algorithm": "Beacon Knapsack",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "161",
+                "name": "apple"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "169",
+                "name": "Medium Chick-fil-A\u00ae Waffle Potato Fries"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "3004",
+                "name": "sweet-potato-cornbread-muffins"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "normalized_meals": [
+          [
+            "Breakfast",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "3106"
+              ],
+              [
+                "side",
+                "161"
+              ]
+            ]
+          ],
+          [
+            "Lunch",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "133"
+              ],
+              [
+                "side",
+                "169"
+              ]
+            ]
+          ],
+          [
+            "Dinner",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "3106"
+              ],
+              [
+                "side",
+                "3004"
+              ]
+            ]
+          ]
+        ]
+      },
+      "latency_ms": 191.97445800091373,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.846181,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 1.0,
+            "nutrition_fit": 0.480907,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 1.0
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 1800.0,
+            "carbs": 200.0,
+            "protein": 90.0,
+            "fiber": 28.0
+          },
+          "actual_totals": {
+            "calories": 2244.0,
+            "carbs": 367.1,
+            "protein": 67.7,
+            "fiber": 48.9
+          },
+          "per_nutrient_fit": {
+            "calories": 0.753333,
+            "carbs": 0.1645,
+            "protein": 0.752222,
+            "fiber": 0.253571
+          },
+          "mean_fit": 0.480907
+        }
+      }
+    },
+    {
+      "persona_id": "A-NV",
+      "plan": {
+        "persona_id": "A-NV",
+        "persona_name": "Aaliyah Brooks",
+        "algorithm": "Beacon Knapsack",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "normalized_meals": [
+          [
+            "Breakfast",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "123"
+              ],
+              [
+                "side",
+                "125"
+              ]
+            ]
+          ],
+          [
+            "Lunch",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "130"
+              ],
+              [
+                "side",
+                "153"
+              ]
+            ]
+          ],
+          [
+            "Dinner",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "131"
+              ],
+              [
+                "side",
+                "125"
+              ]
+            ]
+          ]
+        ]
+      },
+      "latency_ms": 231.86133299896028,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.826786,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 1.0,
+            "nutrition_fit": 0.38393,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 1.0
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 3500.0,
+            "carbs": 438.0,
+            "protein": 82.0,
+            "fiber": 35.0
+          },
+          "actual_totals": {
+            "calories": 1527.0,
+            "carbs": 51.0,
+            "protein": 71.0,
+            "fiber": 4.1
+          },
+          "per_nutrient_fit": {
+            "calories": 0.436286,
+            "carbs": 0.116438,
+            "protein": 0.865854,
+            "fiber": 0.117143
+          },
+          "mean_fit": 0.38393
+        }
+      }
+    },
+    {
+      "persona_id": "NA-V",
+      "plan": {
+        "persona_id": "NA-V",
+        "persona_name": "Becca Moore",
+        "algorithm": "Beacon Knapsack",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "normalized_meals": [
+          [
+            "Breakfast",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "148"
+              ],
+              [
+                "side",
+                "168"
+              ]
+            ]
+          ],
+          [
+            "Lunch",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "3106"
+              ],
+              [
+                "side",
+                "140"
+              ]
+            ]
+          ],
+          [
+            "Dinner",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "133"
+              ],
+              [
+                "side",
+                "168"
+              ]
+            ]
+          ]
+        ]
+      },
+      "latency_ms": 114.92733300110558,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.87569,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 1.0,
+            "nutrition_fit": 0.628451,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 1.0
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 2000.0,
+            "carbs": 130.0,
+            "protein": 64.0,
+            "fiber": 28.0
+          },
+          "actual_totals": {
+            "calories": 2184.0,
+            "carbs": 321.1,
+            "protein": 58.2,
+            "fiber": 36.5
+          },
+          "per_nutrient_fit": {
+            "calories": 0.908,
+            "carbs": 0.0,
+            "protein": 0.909375,
+            "fiber": 0.696429
+          },
+          "mean_fit": 0.628451
+        }
+      }
+    },
+    {
+      "persona_id": "NA-NV",
+      "plan": {
+        "persona_id": "NA-NV",
+        "persona_name": "Greg Taylor",
+        "algorithm": "Beacon Knapsack",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "normalized_meals": [
+          [
+            "Breakfast",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "123"
+              ],
+              [
+                "side",
+                "125"
+              ]
+            ]
+          ],
+          [
+            "Lunch",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "130"
+              ],
+              [
+                "side",
+                "153"
+              ]
+            ]
+          ],
+          [
+            "Dinner",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "131"
+              ],
+              [
+                "side",
+                "125"
+              ]
+            ]
+          ]
+        ]
+      },
+      "latency_ms": 223.90404200268677,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.861324,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 1.0,
+            "nutrition_fit": 0.55662,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 1.0
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 2000.0,
+            "carbs": 130.0,
+            "protein": 66.0,
+            "fiber": 28.0
+          },
+          "actual_totals": {
+            "calories": 1527.0,
+            "carbs": 51.0,
+            "protein": 71.0,
+            "fiber": 4.1
+          },
+          "per_nutrient_fit": {
+            "calories": 0.7635,
+            "carbs": 0.392308,
+            "protein": 0.924242,
+            "fiber": 0.146429
+          },
+          "mean_fit": 0.55662
+        }
+      }
+    },
+    {
+      "persona_id": "A-V",
+      "plan": {
+        "persona_id": "A-V",
+        "persona_name": "Dylan Bennet",
+        "algorithm": "Beacon Knapsack",
+        "catalog_scope": "all local Beacon catalog sources",
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "normalized_meals": [
+          [
+            "Breakfast",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "148"
+              ],
+              [
+                "side",
+                "168"
+              ]
+            ]
+          ],
+          [
+            "Lunch",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "3106"
+              ],
+              [
+                "side",
+                "140"
+              ]
+            ]
+          ],
+          [
+            "Dinner",
+            [
+              [
+                "beverage",
+                "22"
+              ],
+              [
+                "main_course",
+                "133"
+              ],
+              [
+                "side",
+                "168"
+              ]
+            ]
+          ]
+        ]
+      },
+      "latency_ms": 114.32379100006074,
+      "quality_evaluation": {
+        "legacy_goodness": {
+          "score": 1.0,
+          "components": {
+            "variety": 1.0,
+            "role_coverage": 1.0,
+            "preference_constraint": 1.0
+          }
+        },
+        "quality": {
+          "valid": true,
+          "quality_score": 0.898046,
+          "hard_violations": [],
+          "scores": {
+            "role_coverage": 1.0,
+            "preference_alignment": 1.0,
+            "nutrition_fit": 0.740229,
+            "plan_variety": 0.666667,
+            "dietary_compliance": 1.0,
+            "catalog_diversity": 1.0
+          },
+          "weights": {
+            "role_coverage": 0.25,
+            "preference_alignment": 0.2,
+            "nutrition_fit": 0.2,
+            "plan_variety": 0.15,
+            "dietary_compliance": 0.1,
+            "catalog_diversity": 0.1
+          }
+        },
+        "nutrition_goal_adherence": {
+          "definition": "1 - absolute(actual - goal) / goal, clipped to [0, 1]",
+          "goals": {
+            "calories": 3500.0,
+            "carbs": 438.0,
+            "protein": 90.0,
+            "fiber": 35.0
+          },
+          "actual_totals": {
+            "calories": 2184.0,
+            "carbs": 321.1,
+            "protein": 58.2,
+            "fiber": 36.5
+          },
+          "per_nutrient_fit": {
+            "calories": 0.624,
+            "carbs": 0.733105,
+            "protein": 0.646667,
+            "fiber": 0.957143
+          },
+          "mean_fit": 0.740229
+        }
+      }
+    }
+  ]
+}

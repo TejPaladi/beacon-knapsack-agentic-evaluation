@@ -53,20 +53,22 @@ direct-only model that does not support tool calling.
 - API/loop and tool failures; and
 - latency.
 
-## Experiment B: recommendation source (follow-up)
+## Experiment B: recommendation source (completed pilot)
 
 Keep this separate from Experiment A.
 
 1. **Deterministic-only:** Beacon Knapsack selects the plan.
-2. **LLM selector:** an LLM selects from a fixed, compact, hard-filtered candidate
-   set using the same stored profile. This tests ranking but preserves dietary
-   exclusions outside the model.
-3. **Constrained hybrid reranker:** deterministic code generates multiple valid
+2. **LLM selector:** Granite 4 3B and Llama 3.2 3B select directly from the same
+   complete role-eligible catalog using the stored profile. Role/catalog syntax
+   is constrained, but no persona-specific dietary filter or recommender is used.
+3. **Constrained hybrid reranker (next):** deterministic code generates multiple valid
    candidate plans; the LLM reranks them; a deterministic validator rejects any
    role, restriction, or catalog violation.
 
-Compare goodness, Beacon quality, nutrition fit, preference fit, hard-constraint
-violations, consistency across repeated runs, latency, and explanation faithfulness.
+The pilot compares goodness, Beacon quality, nutrition fit, hard-constraint
+violations, repeated foods, exact Knapsack agreement, latency, and tokens. A
+larger follow-up should add repeated runs, preference fit, and explanation
+faithfulness.
 
 ## Interpretation rules
 
@@ -75,6 +77,6 @@ violations, consistency across repeated runs, latency, and explanation faithfuln
 - A gate improvement is a system-level result; it does not mean the underlying
   LLM became safer.
 - The present six-person data are simulated and do not establish clinical safety.
-- Recommendation-quality claims require Experiment B; orchestration results alone
-  cannot show that an LLM improves food selection.
+- Experiment B is a six-person, one-run pilot; it does not establish general
+  recommendation superiority or clinical safety.
 

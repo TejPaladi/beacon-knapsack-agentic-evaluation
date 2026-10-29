@@ -59,3 +59,16 @@ interpreting the result:
 The deterministic gate changes authorization and response handling, not food
 selection. Valid-workflow performance therefore measures the model; unclear
 request safety measures the whole architecture.
+
+## Recommendation-source evaluation
+
+[`recommendation_source_comparison.md`](recommendation_source_comparison.md)
+compares direct Knapsack with two LLM-only selectors on the same six personas
+and role-eligible catalog. Raw LLM selections, post-hoc violations, metrics,
+token counts, and direct reference plans are stored in
+`recommendation_source/`.
+
+The JSON schema restricts generated values to the requested role and catalog;
+it does not rank candidates or apply persona-specific dietary filtering. The
+LLM therefore owns the meal choice, while deterministic code is only the
+post-hoc evaluator.
