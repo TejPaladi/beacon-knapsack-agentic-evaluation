@@ -241,11 +241,74 @@ def score_observation(
 
 def run_case(
     case: dict[str, Any],
-    model: str,
+    model: str | None,
     base_url: str,
     references: dict[str, dict[str, Any]],
     architecture: str = "ungated_agent",
 ) -> dict[str, Any]:
+    if architecture == "deterministic_pipeline":
+        started = time.perf_counter()
+        decision = resolve_persona_request(case["prompt"])
+        intended = case["intended_persona_id"]
+        plan = None
+        trace = [{"name": "resolve_persona", "result": decision.to_dict(), "ok": True}]
+        if decision.status == "resolved":
+            resolved_id = str(decision.authorized_persona_id)
+            plan = run_knapsack_for_persona(resolved_id)
+            trace.append(
+                {
+                    "name": "run_knapsack_for_persona",
+                    "arguments": {"persona_id": resolved_id},
+                    "ok": True,
+                }
+            )
+            final_text = f"{plan['persona_name']}'s deterministic meal plan is ready."
+        else:
+            final_text = decision.clarification
+        expected_recommendation = case["expected_action"] == "recommend"
+        if expected_recommendation:
+            routing_correct = decision.authorized_persona_id == intended
+            action_correct = bool(plan and plan.get("persona_id") == intended)
+            exact_fidelity = bool(
+                action_correct
+                and references[str(intended)]["normalized_meals"]
+                == plan["normalized_meals"]
+            )
+            clarification_returned = None
+            case_pass = routing_correct and action_correct and exact_fidelity
+        else:
+            routing_correct = decision.status != "resolved"
+            action_correct = plan is None
+            exact_fidelity = None
+            clarification_returned = _looks_like_clarification(final_text)
+            case_pass = routing_correct and action_correct and clarification_returned
+        return {
+            **case,
+            "architecture": architecture,
+            "model": None,
+            "provider": "local_deterministic_pipeline",
+            "temperature": None,
+            "agent_turns": 0,
+            "tool_trace": trace,
+            "observed_plan": plan,
+            "agent_final_text": final_text,
+            "api_error": None,
+            "latency_ms": (time.perf_counter() - started) * 1000,
+            "gate_decision": decision.to_dict(),
+            "gate_bypassed_model": True,
+            "policy_blocks": 0,
+            "trusted_response_renderer": True,
+            "observed_profile_targets": [],
+            "observed_knapsack_targets": [plan["persona_id"]] if plan else [],
+            "persona_routing_correct": routing_correct,
+            "knapsack_action_correct": action_correct,
+            "exact_knapsack_fidelity": exact_fidelity,
+            "tool_sequence_compliant": None,
+            "clarification_returned": clarification_returned,
+            "failed_tool_calls": 0,
+            "case_pass": bool(case_pass),
+        }
+
     gate_decision = None
     if architecture == "policy_gated_agent":
         gate_decision = resolve_persona_request(case["prompt"])
@@ -286,7 +349,7 @@ def run_case(
     started = time.perf_counter()
     try:
         for turns in range(1, MAX_AGENT_TURNS + 1):
-            response = ollama_chat_completion(base_url, model, messages)
+            response = ollama_chat_completion(base_url, str(model), messages)
             clean_response = clean_ollama_assistant_message(response, turns)
             messages.append(clean_response)
             calls = response.get("tool_calls") or []
@@ -391,10 +454,10 @@ def summarize(cases: list[dict[str, Any]]) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", choices=SUPPORTED_MODELS, required=True)
+    parser.add_argument("--model", choices=SUPPORTED_MODELS)
     parser.add_argument(
         "--architecture",
-        choices=("ungated_agent", "policy_gated_agent"),
+        choices=("ungated_agent", "policy_gated_agent", "deterministic_pipeline"),
         default="ungated_agent",
     )
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL)
@@ -402,6 +465,8 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    if args.architecture != "deterministic_pipeline" and args.model is None:
+        parser.error("--model is required for an agent architecture.")
 
     dataset_bytes = args.dataset.read_bytes()
     cases = load_cases(args.dataset)
@@ -437,7 +502,11 @@ def main() -> None:
         "architecture": args.architecture,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "provenance": {
-            "provider": "Ollama OpenAI-compatible API",
+            "provider": (
+                "local deterministic Python"
+                if args.architecture == "deterministic_pipeline"
+                else "Ollama OpenAI-compatible API"
+            ),
             "base_url": args.base_url,
             "model": args.model,
             "architecture": args.architecture,
@@ -449,7 +518,11 @@ def main() -> None:
                 else args.dataset.name
             ),
             "dataset_sha256": sha256_bytes(dataset_bytes),
-            "system_prompt_sha256": sha256_bytes(SYSTEM_PROMPT.encode("utf-8")),
+            "system_prompt_sha256": (
+                None
+                if args.architecture == "deterministic_pipeline"
+                else sha256_bytes(SYSTEM_PROMPT.encode("utf-8"))
+            ),
             "repository_commit": git_revision(PROJECT_ROOT),
             "repository_worktree_dirty": git_worktree_dirty(PROJECT_ROOT),
             "beacon_backend_commit": git_revision(beacon_backend_path()),
@@ -460,11 +533,15 @@ def main() -> None:
                 ),
             },
             "knapsack_algorithm": "Beacon Knapsack (internal identifier: m6)",
-            "identity_policy": (
-                "Deterministic explicit-name resolution and persona-locked tool authorization"
-                if args.architecture == "policy_gated_agent"
-                else "Prompt-only identity handling"
-            ),
+            "identity_policy": {
+                "deterministic_pipeline": (
+                    "Deterministic explicit-name resolution followed directly by Knapsack"
+                ),
+                "policy_gated_agent": (
+                    "Deterministic explicit-name resolution and persona-locked tool binding"
+                ),
+                "ungated_agent": "Prompt-only identity handling",
+            }[args.architecture],
         },
         "summary": summarize(observed),
         "cases": observed,
