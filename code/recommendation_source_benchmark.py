@@ -66,38 +66,48 @@ SYSTEM_PROMPT = """You are the meal selector in a controlled experiment.
 Select every requested meal-role item directly from the supplied catalog.
 No optimizer or tool will choose for you. Respect every true dietary condition.
 Use preference sliders as soft preferences: 1=prefer, 0=neutral, -1=avoid.
-Prefer variety and nutrition-goal fit. Return exactly nine selections: one main
-course, one side, and one beverage for each of Breakfast, Lunch, and Dinner.
+Prefer variety and nutrition-goal fit. Return one main_course, side, and beverage
+candidate ID inside each of the Breakfast, Lunch, and Dinner objects.
 Use only supplied IDs and requested roles. Do not include explanations."""
 
-OUTPUT_SCHEMA = {
-            "type": "object",
-            "properties": {
-                "selections": {
-                    "type": "array",
-                    "minItems": 9,
-                    "maxItems": 9,
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "meal_name": {
-                                "type": "string",
-                                "enum": ["Breakfast", "Lunch", "Dinner"],
-                            },
-                            "role": {
-                                "type": "string",
-                                "enum": ["main_course", "side", "beverage"],
-                            },
-                            "item_id": {"type": "string"},
-                        },
-                        "required": ["meal_name", "role", "item_id"],
-                        "additionalProperties": False,
-                    },
-                }
-            },
-            "required": ["selections"],
-            "additionalProperties": False,
-}
+def output_schema(records: list[dict[str, Any]]) -> dict[str, Any]:
+    """Constrain syntax and role membership, but never rank or filter by persona."""
+
+    candidates = {
+        "main_course": [
+            "F" + record["id"]
+            for record in records
+            if record["kind"] == "food" and "M" in record["roles"]
+        ],
+        "side": [
+            "F" + record["id"]
+            for record in records
+            if record["kind"] == "food" and "S" in record["roles"]
+        ],
+        "beverage": [
+            "B" + record["id"]
+            for record in records
+            if record["kind"] == "beverage"
+        ],
+    }
+    meal_schema = {
+        "type": "object",
+        "properties": {
+            role: {"type": "string", "enum": values}
+            for role, values in candidates.items()
+        },
+        "required": ["main_course", "side", "beverage"],
+        "additionalProperties": False,
+    }
+    return {
+        "type": "object",
+        "properties": {
+            meal_name: meal_schema
+            for meal_name in ("Breakfast", "Lunch", "Dinner")
+        },
+        "required": ["Breakfast", "Lunch", "Dinner"],
+        "additionalProperties": False,
+    }
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -245,14 +255,18 @@ def prompt_for(persona_id: str, catalog_text: str) -> str:
         "Catalog flags: D=dairy, M=meat, N=nuts, LS=low-sugar, "
         "GF=gluten-free, V=vegan; 1=true, 0=false, -=not applied.\n"
         f"CATALOG\n{catalog_text}\nEND CATALOG\n"
-        "Now return exactly these nine distinct meal/role pairs: Breakfast, Lunch, "
-        "and Dinner each with main_course, side, and beverage. Select one valid "
-        "candidate_id for every pair in the item_id field. Use F-prefixed candidates for main_course "
-        "and side, and B-prefixed candidates for beverage."
+        "Now return Breakfast, Lunch, and Dinner objects, each with main_course, "
+        "side, and beverage fields. Use one F-prefixed candidate for each food "
+        "field and one B-prefixed candidate for each beverage field."
     )
 
 
-def call_model(base_url: str, model: str, prompt: str) -> tuple[str, dict[str, int]]:
+def call_model(
+    base_url: str,
+    model: str,
+    prompt: str,
+    schema: dict[str, Any],
+) -> tuple[str, dict[str, int]]:
     native_base = base_url.rstrip("/")
     if native_base.endswith("/v1"):
         native_base = native_base[:-3]
@@ -264,7 +278,7 @@ def call_model(base_url: str, model: str, prompt: str) -> tuple[str, dict[str, i
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
-            "format": OUTPUT_SCHEMA,
+            "format": schema,
             "stream": False,
             "think": False,
             "options": {"temperature": 0, "num_predict": max_output_tokens},
@@ -300,7 +314,22 @@ def parse_json_object(text: str) -> dict[str, Any]:
         parsed = json.loads(text[start : end + 1])
     if not isinstance(parsed, dict):
         raise ValueError("The model response is not a JSON object.")
-    if "selections" in parsed and "meals" not in parsed:
+    if all(meal_name in parsed for meal_name in ("Breakfast", "Lunch", "Dinner")):
+        meals = []
+        for meal_name in ("Breakfast", "Lunch", "Dinner"):
+            role_map = parsed.get(meal_name) or {}
+            items = [
+                {
+                    "role": role,
+                    "item_id": str(role_map.get(role) or "")[1:]
+                    if str(role_map.get(role) or "")[:1] in {"F", "B"}
+                    else role_map.get(role),
+                }
+                for role in ("main_course", "side", "beverage")
+            ]
+            meals.append({"meal_name": meal_name, "items": items})
+        parsed = {"meals": meals}
+    elif "selections" in parsed and "meals" not in parsed:
         meals = []
         for meal_name in ("Breakfast", "Lunch", "Dinner"):
             items = [
@@ -469,7 +498,7 @@ def run_case(
     usage = {"prompt_tokens": 0, "completion_tokens": 0}
     parsed: dict[str, Any] | None = None
     try:
-        raw_response, usage = call_model(base_url, model, prompt)
+        raw_response, usage = call_model(base_url, model, prompt, output_schema(records))
         parsed = parse_json_object(raw_response)
     except Exception as error:
         api_error = str(error)
@@ -592,7 +621,13 @@ def main() -> None:
             "system_prompt_sha256": sha256_bytes(SYSTEM_PROMPT.encode()),
             "catalog_sha256": sha256_bytes(catalog_text.encode()),
             "catalog_records": len(records),
-            "selector": "LLM direct JSON selection; no recommendation tool or pre-filter",
+            "selector": (
+                "LLM direct selection from complete role-specific candidate enums; "
+                "no ranking, dietary pre-filter, or recommendation tool"
+            ),
+            "output_constraint": (
+                "JSON schema enforces requested meal roles and catalog membership only"
+            ),
             "evaluator": "Post-hoc deterministic validation and Beacon quality metrics",
         },
         "summary": summarize(cases),
