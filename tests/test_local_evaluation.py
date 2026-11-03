@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 import unittest
 import json
+from copy import deepcopy
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -13,11 +14,22 @@ EXPERIMENT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(EXPERIMENT_ROOT / "code"))
 
 from beacon_m6 import (  # noqa: E402
+    calculate_plan_health_scores,
+    check_plan_violations,
     endpoint_request_payload,
     evaluate_knapsack_plan,
     list_personas,
     normalized_endpoint_days,
     run_knapsack_for_persona,
+)
+from meaningful_tools import (  # noqa: E402
+    MEANINGFUL_TOOLS,
+    MeaningfulToolSession,
+    resolve_profile_query,
+)
+from meaningful_tools_benchmark import (  # noqa: E402
+    expected_tools as meaningful_expected_tools,
+    load_cases as load_meaningful_cases,
 )
 from benchmark import (  # noqa: E402
     GROQ_USER_AGENT,
@@ -52,6 +64,87 @@ from recommendation_source_benchmark import (  # noqa: E402
 
 
 class LocalEvaluationTests(unittest.TestCase):
+    def test_meaningful_tool_schema_has_four_distinct_capabilities(self):
+        names = [tool["function"]["name"] for tool in MEANINGFUL_TOOLS]
+        self.assertEqual(
+            names,
+            [
+                "fetch_persona_profile",
+                "recommend_meal_plan",
+                "calculate_nutrition_scores",
+                "check_plan_violations",
+            ],
+        )
+
+    def test_combined_profile_tool_resolves_id_full_and_first_name(self):
+        self.assertEqual(resolve_profile_query("jessicaSmith")["persona_id"], "jessicaSmith")
+        self.assertEqual(resolve_profile_query("Jessica Smith")["persona_id"], "jessicaSmith")
+        self.assertEqual(resolve_profile_query("Jessica")["persona_id"], "jessicaSmith")
+        with self.assertRaises(ValueError):
+            resolve_profile_query("Priya")
+
+    def test_meaningful_tools_enforce_dependencies_and_optional_nutrition(self):
+        session = MeaningfulToolSession(allowed_persona_id="jessicaSmith")
+        early = session.call("recommend_meal_plan", {"persona_id": "jessicaSmith"})
+        self.assertIn("error", early)
+        profile = session.call(
+            "fetch_persona_profile", {"persona_query": "Jessica Smith"}
+        )
+        self.assertEqual(profile["persona_id"], "jessicaSmith")
+        plan = session.call("recommend_meal_plan", {"persona_id": "jessicaSmith"})
+        self.assertEqual(plan["persona_id"], "jessicaSmith")
+        nutrition = session.call("calculate_nutrition_scores", {})
+        self.assertIn("fsa_style_proxy", nutrition)
+        check = session.call("check_plan_violations", {})
+        self.assertTrue(check["passed"])
+        self.assertTrue(session.release_decision(enforce_check=True)["released"])
+
+    def test_nutrition_tool_reports_proxy_coverage_and_goal_fit(self):
+        plan = run_knapsack_for_persona("earlJones")
+        analysis = calculate_plan_health_scores("earlJones", plan)
+        self.assertEqual(analysis["item_count"], 9)
+        self.assertIn("mean_fit", analysis["goal_fit"])
+        for key in ("fsa_style_proxy", "who_style_proxy"):
+            self.assertGreaterEqual(analysis[key]["coverage"], 0.0)
+            self.assertLessEqual(analysis[key]["coverage"], 1.0)
+            self.assertEqual(analysis[key]["total_items"], 9)
+        self.assertIn("proxy", analysis["scope_note"].lower())
+
+    def test_violation_checker_and_release_gate_block_injected_missing_role(self):
+        reference = run_knapsack_for_persona("jessicaSmith")
+        corrupted = deepcopy(reference)
+        corrupted["meals"][0]["items"] = corrupted["meals"][0]["items"][1:]
+        check = check_plan_violations("jessicaSmith", corrupted)
+        self.assertFalse(check["passed"])
+        self.assertTrue(any(item["type"] == "missing_role" for item in check["violations"]))
+
+        session = MeaningfulToolSession(
+            allowed_persona_id="jessicaSmith", fault_injection="remove_first_role"
+        )
+        session.call("fetch_persona_profile", {"persona_query": "Jessica Smith"})
+        session.call("recommend_meal_plan", {"persona_id": "jessicaSmith"})
+        session.call("check_plan_violations", {})
+        self.assertFalse(session.release_decision(enforce_check=True)["released"])
+        self.assertTrue(session.release_decision(enforce_check=False)["released"])
+
+    def test_meaningful_dataset_has_fixed_balanced_design(self):
+        cases = load_meaningful_cases()
+        counts = {}
+        for case in cases:
+            counts[case["category"]] = counts.get(case["category"], 0) + 1
+        self.assertEqual(len(cases), 42)
+        self.assertEqual(set(counts.values()), {6})
+        nutrition_case = next(case for case in cases if case["case_id"] == "nutrition_earl")
+        self.assertEqual(
+            meaningful_expected_tools(nutrition_case),
+            [
+                "fetch_persona_profile",
+                "recommend_meal_plan",
+                "calculate_nutrition_scores",
+                "check_plan_violations",
+            ],
+        )
+
     def test_llm_selector_receives_compact_full_role_catalog(self):
         records = catalog_records()
         text = compact_catalog_text(records)

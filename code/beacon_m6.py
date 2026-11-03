@@ -384,3 +384,142 @@ def evaluate_knapsack_plan(persona_id: str, plan: dict[str, Any]) -> dict[str, A
             "mean_fit": quality["scores"]["nutrition_fit"],
         },
     }
+
+
+def calculate_plan_health_scores(
+    persona_id: str, plan: dict[str, Any]
+) -> dict[str, Any]:
+    """Return deterministic nutrition totals and FSA/WHO-style proxy scores.
+
+    This is a thin adapter over Beacon+'s committed ``health_scores`` module.
+    Scores are computed per catalog item and averaged over items with complete
+    inputs. Missing data are retained explicitly; they are never imputed.
+    """
+
+    if plan.get("persona_id") != persona_id:
+        raise ValueError("Plan persona does not match the requested persona.")
+
+    helpers = _recommendation_helpers()
+    from core.modules.health_scores import calculate_health_scores, macro_number
+
+    nutrient_keys = (
+        "calories",
+        "protein",
+        "carbs",
+        "fat",
+        "saturated_fat",
+        "sugar",
+        "sodium",
+        "fiber",
+    )
+    totals = {key: 0.0 for key in nutrient_keys}
+    missing_nutrients: dict[str, list[str]] = {key: [] for key in nutrient_keys}
+    item_results: list[dict[str, Any]] = []
+
+    for meal in plan.get("meals", []):
+        for selected in meal.get("items", []):
+            item_id = str(selected["item_id"])
+            role = str(selected["role"])
+            item = (
+                helpers.beverages.get(item_id)
+                if role == "beverage"
+                else helpers.food_items.get(item_id)
+            )
+            if item is None:
+                raise ValueError(f"Unknown catalog item: {item_id}")
+            macros = item.get("macronutrients") or item.get("nutrition") or {}
+            nutrient_values: dict[str, float | None] = {}
+            for nutrient in nutrient_keys:
+                value = macro_number(macros, nutrient)
+                nutrient_values[nutrient] = value
+                if value is None:
+                    missing_nutrients[nutrient].append(item_id)
+                else:
+                    totals[nutrient] += float(value)
+            item_results.append(
+                {
+                    "meal_name": meal["meal_name"],
+                    "role": role,
+                    "item_id": item_id,
+                    "name": selected.get("name") or _item_name(item_id, helpers),
+                    "nutrients": nutrient_values,
+                    "health_scores": calculate_health_scores(macros),
+                }
+            )
+
+    def aggregate(score_name: str) -> dict[str, Any]:
+        available = [
+            float(item["health_scores"][score_name]["score"])
+            for item in item_results
+            if isinstance(item["health_scores"][score_name].get("score"), (int, float))
+        ]
+        missing = [
+            {
+                "item_id": item["item_id"],
+                "missing_fields": item["health_scores"][score_name].get(
+                    "missing_fields", []
+                ),
+            }
+            for item in item_results
+            if item["health_scores"][score_name].get("score") is None
+        ]
+        template = (
+            item_results[0]["health_scores"][score_name]
+            if item_results
+            else {}
+        )
+        return {
+            "score": round(sum(available) / len(available), 6) if available else None,
+            "scored_items": len(available),
+            "total_items": len(item_results),
+            "coverage": (
+                round(len(available) / len(item_results), 6) if item_results else 0.0
+            ),
+            "missing_items": missing,
+            "direction": template.get("direction"),
+            "range": template.get("range"),
+            "method": f"Mean of available per-item {score_name.upper()}-style proxy scores",
+        }
+
+    evaluation = evaluate_knapsack_plan(persona_id, plan)
+    return {
+        "persona_id": persona_id,
+        "item_count": len(item_results),
+        "nutrient_totals": {key: round(value, 6) for key, value in totals.items()},
+        "nutrient_units": {
+            "calories": "kcal",
+            "protein": "g",
+            "carbs": "g",
+            "fat": "g",
+            "saturated_fat": "g",
+            "sugar": "g",
+            "sodium": "mg",
+            "fiber": "g",
+        },
+        "missing_nutrients": {
+            key: item_ids for key, item_ids in missing_nutrients.items() if item_ids
+        },
+        "goal_fit": evaluation["nutrition_goal_adherence"],
+        "fsa_style_proxy": aggregate("fsa"),
+        "who_style_proxy": aggregate("who"),
+        "items": item_results,
+        "scope_note": (
+            "FSA uses stored per-serving values as a proxy; WHO is a custom "
+            "WHO-style 0-7 range score. Neither is a clinical certification."
+        ),
+    }
+
+
+def check_plan_violations(
+    persona_id: str, plan: dict[str, Any]
+) -> dict[str, Any]:
+    """Run Beacon's deterministic structural and dietary validation."""
+
+    evaluation = evaluate_knapsack_plan(persona_id, plan)["quality"]
+    return {
+        "persona_id": persona_id,
+        "passed": bool(evaluation["valid"]),
+        "violation_count": len(evaluation["hard_violations"]),
+        "violations": evaluation["hard_violations"],
+        "rule": "A plan may be released only when passed is true.",
+    }
