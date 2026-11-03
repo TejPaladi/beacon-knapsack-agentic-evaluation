@@ -1,9 +1,13 @@
 """Meaningful, independently testable tools for the Beacon agent study.
 
 The tool boundaries follow responsibilities rather than implementation steps:
-profile retrieval, deterministic recommendation, nutrition analysis, and safety
-validation. The session retains the generated plan so the model never copies a
-large plan back into later tool arguments.
+profile retrieval, deterministic recommendation, nutrition analysis, safety
+validation, and release to the user. The session retains the generated plan so
+the model never copies a large plan back into later tool arguments.
+
+Release is a model action. Without the release gate, ``release_plan`` shows
+any existing plan, so the model's own call is the release decision. With the
+gate, the same call is refused unless the current plan passed validation.
 """
 
 from __future__ import annotations
@@ -97,6 +101,22 @@ MEANINGFUL_TOOLS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "release_plan",
+            "description": (
+                "Show the current recommended plan to the user. Call this only "
+                "after check_plan_violations has passed. Do not call it when "
+                "validation reported a violation."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": False,
+            },
+        },
+    },
 ]
 
 
@@ -132,23 +152,32 @@ def resolve_profile_query(query: str) -> dict[str, str]:
     return {"persona_id": exact[0]["persona_id"], "name": exact[0]["name"]}
 
 
+class PolicyBlocked(ValueError):
+    """A tool call refused by application policy rather than by a tool error."""
+
+
 class MeaningfulToolSession:
-    """Stateful tool gateway with dependency and optional identity enforcement."""
+    """Stateful tool gateway with dependency, identity, and release enforcement."""
 
     def __init__(
         self,
         *,
         allowed_persona_id: str | None = None,
         fault_injection: str | None = None,
+        enforce_release_check: bool = True,
     ) -> None:
         self.allowed_persona_id = allowed_persona_id
         self.fault_injection = fault_injection
+        self.enforce_release_check = enforce_release_check
         self.trace: list[dict[str, Any]] = []
         self.profile: dict[str, Any] | None = None
         self.plan: dict[str, Any] | None = None
         self.nutrition: dict[str, Any] | None = None
         self.violation_check: dict[str, Any] | None = None
+        self.released = False
+        self.released_checked: bool | None = None
         self.policy_blocks = 0
+        self.release_blocks = 0
 
     def _record(
         self,
@@ -157,10 +186,16 @@ class MeaningfulToolSession:
         *,
         ok: bool,
         error: str | None = None,
+        policy_blocked: bool = False,
+        outcome: dict[str, Any] | None = None,
     ) -> None:
         event: dict[str, Any] = {"name": name, "arguments": arguments, "ok": ok}
         if error is not None:
             event["error"] = error
+        if policy_blocked:
+            event["policy_blocked"] = True
+        if outcome is not None:
+            event["outcome"] = outcome
         self.trace.append(event)
 
     def _compact_plan(self, plan: dict[str, Any]) -> dict[str, Any]:
@@ -201,8 +236,9 @@ class MeaningfulToolSession:
                     self.allowed_persona_id is not None
                     and persona_id != self.allowed_persona_id
                 ):
-                    self.policy_blocks += 1
-                    raise ValueError("Profile does not match the application-resolved persona.")
+                    raise PolicyBlocked(
+                        "Profile does not match the application-resolved persona."
+                    )
                 self.profile = public_persona(persona_id)
                 result: dict[str, Any] = self.profile
             elif name == "recommend_meal_plan":
@@ -212,6 +248,8 @@ class MeaningfulToolSession:
                 self.plan = self._apply_fault(run_knapsack_for_persona(persona_id))
                 self.nutrition = None
                 self.violation_check = None
+                self.released = False
+                self.released_checked = None
                 result = self._compact_plan(self.plan)
             elif name == "calculate_nutrition_scores":
                 if self.plan is None or self.profile is None:
@@ -234,35 +272,51 @@ class MeaningfulToolSession:
                     str(self.profile["persona_id"]), self.plan
                 )
                 result = self.violation_check
+                outcome = {
+                    "passed": bool(self.violation_check["passed"]),
+                    "violation_count": int(self.violation_check["violation_count"]),
+                }
+                self._record(name, arguments, ok=True, outcome=outcome)
+                return result
+            elif name == "release_plan":
+                if self.plan is None:
+                    raise ValueError("Create a recommendation before release.")
+                checked = bool(self.violation_check and self.violation_check["passed"])
+                if self.enforce_release_check and self.violation_check is None:
+                    self.release_blocks += 1
+                    raise PolicyBlocked(
+                        "Release blocked: check_plan_violations has not been run."
+                    )
+                if self.enforce_release_check and not checked:
+                    self.release_blocks += 1
+                    raise PolicyBlocked(
+                        "Release blocked: validation found a hard violation."
+                    )
+                self.released = True
+                self.released_checked = checked
+                result = {"released": True, "persona_id": self.plan["persona_id"]}
             else:
                 raise ValueError(f"Unknown tool: {name}")
             self._record(name, arguments, ok=True)
             return result
+        except PolicyBlocked as error:
+            self.policy_blocks += 1
+            self._record(name, arguments, ok=False, error=str(error), policy_blocked=True)
+            return {"error": str(error)}
         except Exception as error:
             self._record(name, arguments, ok=False, error=str(error))
             return {"error": str(error)}
 
-    def release_decision(self, *, enforce_check: bool) -> dict[str, Any]:
-        """Apply the application boundary after the model stops."""
+    def release_decision(self) -> dict[str, Any]:
+        """Describe what reached the user after the workflow stopped."""
 
         if self.plan is None:
-            return {"status": "no_plan", "released": False, "reason": "No plan exists."}
-        if not enforce_check:
+            return {"status": "no_plan", "released": False}
+        if self.released:
             return {
-                "status": "released_unchecked",
+                "status": "released" if self.released_checked else "released_unchecked",
                 "released": True,
-                "reason": "Release gate disabled for the ablation.",
             }
-        if self.violation_check is None:
-            return {
-                "status": "blocked_missing_check",
-                "released": False,
-                "reason": "Violation check was not completed.",
-            }
-        if not self.violation_check["passed"]:
-            return {
-                "status": "blocked_violations",
-                "released": False,
-                "reason": "Deterministic validation found a hard violation.",
-            }
-        return {"status": "released", "released": True, "reason": "Validation passed."}
+        if self.release_blocks:
+            return {"status": "blocked_by_gate", "released": False}
+        return {"status": "withheld_by_model", "released": False}

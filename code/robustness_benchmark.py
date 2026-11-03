@@ -99,8 +99,13 @@ def ollama_chat_completion(
     messages: list[dict[str, Any]],
     timeout_seconds: float = 180,
     tools: list[dict[str, Any]] | None = None,
+    max_tokens: int = 160,
 ) -> dict[str, Any]:
-    """Call Ollama through its OpenAI-compatible chat-completions endpoint."""
+    """Call Ollama through its OpenAI-compatible chat-completions endpoint.
+
+    The returned assistant message carries ``finish_reason`` so callers can
+    detect output truncated by ``max_tokens``.
+    """
 
     payload = json.dumps(
         {
@@ -110,7 +115,7 @@ def ollama_chat_completion(
             "tool_choice": "auto",
             "temperature": TEMPERATURE,
             "stream": False,
-            "max_tokens": 160,
+            "max_tokens": max_tokens,
         }
     ).encode("utf-8")
     request = urllib.request.Request(
@@ -127,7 +132,8 @@ def ollama_chat_completion(
         raise RuntimeError(f"Ollama HTTP {error.code}: {detail[:500]}") from error
     except urllib.error.URLError as error:
         raise RuntimeError(f"Ollama connection error: {error.reason}") from error
-    return body["choices"][0]["message"]
+    choice = body["choices"][0]
+    return {**choice["message"], "finish_reason": choice.get("finish_reason")}
 
 
 def clean_ollama_assistant_message(

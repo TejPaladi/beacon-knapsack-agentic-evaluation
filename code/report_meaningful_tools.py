@@ -1,14 +1,34 @@
-"""Build the checked report for the meaningful-tool experiment."""
+"""Build the checked report for the meaningful-tool experiment.
+
+Expected layout under ``--results-dir``::
+
+    <dataset>/deterministic_pipeline.json
+    <dataset>/<architecture>__<model>__r<repetition>.json
+
+where ``<dataset>`` is ``development`` or ``heldout``. Repeated runs are
+summarized per repetition and by a per-case majority vote; gated and ungated
+conditions are compared case by case with an exact McNemar test.
+"""
 
 from __future__ import annotations
 
 import argparse
 import json
+import math
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
 
 EXPECTED_CASES = 42
+DATASETS = ("development", "heldout")
+UNGATED = "meaningful_agent_prompt_only"
+GATED = "meaningful_agent_gated"
+ARCHITECTURE_LABELS = {
+    "deterministic_pipeline": "No-LLM rule pipeline",
+    UNGATED: "No release gate",
+    GATED: "Release gate",
+}
 
 
 def load(path: Path) -> dict[str, Any]:
@@ -19,171 +39,326 @@ def pct(value: float | None) -> str:
     return "—" if value is None else f"{100 * value:.1f}%"
 
 
-def label(result: dict[str, Any]) -> str:
-    provenance = result["provenance"]
-    architecture = provenance["architecture"]
-    model = provenance.get("model")
-    if architecture == "deterministic_pipeline":
-        return "Deterministic pipeline"
-    if architecture == "meaningful_agent_prompt_only":
-        architecture_name = "Prompt-only agent"
-    elif provenance.get("gate_replay"):
-        architecture_name = "Policy-gated agent (paired replay)"
-    else:
-        architecture_name = "Policy-gated agent"
-    return f"{architecture_name} / {model}"
+def wilson(successes: int, total: int, z: float = 1.96) -> tuple[float, float]:
+    if total == 0:
+        return (0.0, 0.0)
+    p = successes / total
+    denominator = 1 + z * z / total
+    centre = (p + z * z / (2 * total)) / denominator
+    half = z * math.sqrt(p * (1 - p) / total + z * z / (4 * total * total)) / denominator
+    return (max(0.0, centre - half), min(1.0, centre + half))
 
 
-def main_row(result: dict[str, Any]) -> str:
-    summary = result["summary"]
-    return (
-        f"| {label(result)} | {summary['passed_cases']}/{summary['cases']} | "
-        f"{pct(summary['tool_path_accuracy'])} | "
-        f"{pct(summary['expected_action_accuracy'])} | "
-        f"{pct(summary['nutrition_selection_accuracy'])} | "
-        f"{pct(summary['exact_knapsack_fidelity'])} | "
-        f"{pct(summary['fault_detection_rate'])} | "
-        f"{summary['unsafe_releases']} | {summary['api_or_loop_failures']} | "
-        f"{summary['mean_latency_ms']:.1f} |"
-    )
+def mcnemar_exact(only_first: int, only_second: int) -> float:
+    """Two-sided exact McNemar p-value from the two discordant counts."""
+
+    n = only_first + only_second
+    if n == 0:
+        return 1.0
+    tail = sum(math.comb(n, k) for k in range(min(only_first, only_second) + 1))
+    return min(1.0, 2 * tail / 2**n)
 
 
-def validate(results: list[dict[str, Any]]) -> None:
-    if not results:
-        raise ValueError("At least one result is required.")
-    if {result["summary"]["cases"] for result in results} != {EXPECTED_CASES}:
-        raise ValueError(f"Every final result must contain {EXPECTED_CASES} cases.")
-    for field in ("dataset_sha256", "tool_schema_sha256", "repository_commit"):
-        values = {result["provenance"].get(field) for result in results}
-        if len(values) != 1:
-            raise ValueError(f"Results do not share one {field}.")
-    if any(result["provenance"].get("worktree_dirty") for result in results):
-        raise ValueError("At least one run used an uncommitted worktree.")
-    architectures = [result["provenance"]["architecture"] for result in results]
-    if architectures.count("deterministic_pipeline") != 1:
-        raise ValueError("Exactly one deterministic baseline is required.")
-    agent_pairs = {
-        (result["provenance"]["model"], result["provenance"]["architecture"])
-        for result in results
-        if result["provenance"]["architecture"] != "deterministic_pipeline"
-    }
-    models = {model for model, _ in agent_pairs}
-    expected_pairs = {
-        (model, architecture)
-        for model in models
-        for architecture in (
-            "meaningful_agent_prompt_only",
-            "meaningful_agent_gated",
+def counts(values: list[int]) -> str:
+    """Show one number when repetitions agree, otherwise every repetition."""
+
+    return str(values[0]) if len(set(values)) == 1 else "/".join(map(str, values))
+
+
+def trace_signature(case: dict[str, Any]) -> list[tuple[str, str, bool]]:
+    return [
+        (
+            str(event["name"]),
+            json.dumps(event.get("arguments"), sort_keys=True),
+            bool(event.get("ok")),
         )
-    }
-    if agent_pairs != expected_pairs:
-        raise ValueError("Each model needs both prompt-only and gated results.")
-
-
-def category_table(results: list[dict[str, Any]]) -> list[str]:
-    categories = sorted(
-        set().union(*(result["summary"]["category_success"] for result in results))
-    )
-    headers = [label(result) for result in results]
-    lines = [
-        "| Request category | " + " | ".join(headers) + " |",
-        "| --- | " + " | ".join("---:" for _ in headers) + " |",
+        for event in case.get("tool_trace", [])
     ]
-    for category in categories:
-        cells = [category.replace("_", " ")]
-        cells.extend(
-            pct(result["summary"]["category_success"].get(category))
-            for result in results
+
+
+def gate_prefix_matches(ungated: dict[str, Any], gated: dict[str, Any]) -> bool:
+    """True when the gated trace equals the ungated one until the first refusal.
+
+    Once the gate refuses a call, the model sees a different tool result, so
+    only the shared prefix is expected to match.
+    """
+
+    gated_trace = gated.get("tool_trace", [])
+    cut = next(
+        (index for index, event in enumerate(gated_trace) if event.get("policy_blocked")),
+        None,
+    )
+    left = trace_signature(ungated)
+    right = trace_signature(gated)
+    if cut is None:
+        return left == right
+    return left[:cut] == right[:cut] and len(left) > cut and left[cut][:2] == right[cut][:2]
+
+
+def collect(results_dir: Path) -> dict[str, dict[str, Any]]:
+    data: dict[str, dict[str, Any]] = {}
+    for dataset in DATASETS:
+        directory = results_dir / dataset
+        baseline_path = directory / "deterministic_pipeline.json"
+        if not baseline_path.is_file():
+            raise ValueError(f"Missing {baseline_path}.")
+        runs: dict[tuple[str, str], dict[int, dict[str, Any]]] = defaultdict(dict)
+        for path in sorted(directory.glob("*__r*.json")):
+            result = load(path)
+            provenance = result["provenance"]
+            key = (str(provenance["model"]), str(provenance["architecture"]))
+            runs[key][int(provenance["repetition"])] = result
+        data[dataset] = {"baseline": load(baseline_path), "runs": dict(runs)}
+    return data
+
+
+def validate(data: dict[str, dict[str, Any]]) -> None:
+    every = [
+        result
+        for dataset in data.values()
+        for result in [dataset["baseline"]]
+        + [run for reps in dataset["runs"].values() for run in reps.values()]
+    ]
+    for field in (
+        "tool_schema_sha256",
+        "system_prompt_sha256",
+        "repository_commit",
+        "beacon_backend_commit",
+    ):
+        values = {result["provenance"].get(field) for result in every}
+        if len(values) != 1:
+            raise ValueError(f"Results do not share one {field}: {values}.")
+    if any(result["provenance"].get("worktree_dirty") for result in every):
+        raise ValueError("At least one run used an uncommitted worktree.")
+    if {result["summary"]["cases"] for result in every} != {EXPECTED_CASES}:
+        raise ValueError(f"Every final result must contain {EXPECTED_CASES} cases.")
+    for name, dataset in data.items():
+        hashes = {dataset["baseline"]["provenance"]["dataset_sha256"]} | {
+            run["provenance"]["dataset_sha256"]
+            for reps in dataset["runs"].values()
+            for run in reps.values()
+        }
+        if len(hashes) != 1:
+            raise ValueError(f"{name} results do not share one dataset.")
+        models = {model for model, _ in dataset["runs"]}
+        repetitions = {tuple(sorted(reps)) for reps in dataset["runs"].values()}
+        if len(repetitions) != 1:
+            raise ValueError(f"{name} conditions have different repetitions.")
+        for model in models:
+            if {(model, UNGATED), (model, GATED)} - set(dataset["runs"]):
+                raise ValueError(f"{name}/{model} needs both release conditions.")
+
+
+def majority(reps: dict[int, dict[str, Any]], field: str) -> dict[str, bool]:
+    votes: dict[str, list[bool]] = defaultdict(list)
+    for run in reps.values():
+        for case in run["cases"]:
+            votes[case["case_id"]].append(bool(case[field]))
+    return {case_id: sum(v) * 2 > len(v) for case_id, v in votes.items()}
+
+
+def condition_rows(dataset: dict[str, Any]) -> list[str]:
+    lines = [
+        "| Condition | Strict pass | 95% CI | Correct outcome | 95% CI | Unsafe releases | Unvalidated releases | Gate refusals | Valid tool path | Knapsack fidelity | API/loop failures | Text-only tool calls | Truncated turns | Mean turns | Mean latency (ms) |",
+        "| --- | ---: | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+
+    def row(name: str, reps: dict[int, dict[str, Any]]) -> str:
+        runs = [reps[key] for key in sorted(reps)]
+        summaries = [run["summary"] for run in runs]
+        strict = majority(reps, "case_pass")
+        outcome = majority(reps, "outcome_correct")
+        strict_ci = wilson(sum(strict.values()), len(strict))
+        outcome_ci = wilson(sum(outcome.values()), len(outcome))
+        mean = lambda key: sum(s[key] for s in summaries) / len(summaries)
+        turns = [s["mean_agent_turns"] for s in summaries if s.get("mean_agent_turns") is not None]
+        turns_text = f"{sum(turns) / len(turns):.2f}" if turns else "—"
+        return (
+            f"| {name} | {counts([s['passed_cases'] for s in summaries])}/{EXPECTED_CASES} | "
+            f"{pct(strict_ci[0])}–{pct(strict_ci[1])} | "
+            f"{counts([s['outcome_correct_cases'] for s in summaries])}/{EXPECTED_CASES} | "
+            f"{pct(outcome_ci[0])}–{pct(outcome_ci[1])} | "
+            f"{counts([s['unsafe_releases'] for s in summaries])} | "
+            f"{counts([s['unvalidated_releases'] for s in summaries])} | "
+            f"{counts([s['release_blocks'] for s in summaries])} | "
+            f"{pct(mean('tool_path_accuracy'))} | {pct(mean('exact_knapsack_fidelity'))} | "
+            f"{counts([s['api_or_loop_failures'] for s in summaries])} | "
+            f"{counts([s.get('text_tool_calls', 0) for s in summaries])} | "
+            f"{counts([s.get('truncated_turns', 0) for s in summaries])} | "
+            f"{turns_text} | {mean('mean_latency_ms'):.1f} |"
         )
-        lines.append("| " + " | ".join(cells) + " |")
+
+    lines.append(row(ARCHITECTURE_LABELS["deterministic_pipeline"], {1: dataset["baseline"]}))
+    for model in sorted({model for model, _ in dataset["runs"]}):
+        for architecture in (UNGATED, GATED):
+            lines.append(
+                row(
+                    f"{model} / {ARCHITECTURE_LABELS[architecture]}",
+                    dataset["runs"][(model, architecture)],
+                )
+            )
     return lines
 
 
-def matched_observations(results: list[dict[str, Any]]) -> list[str]:
-    baseline = next(
-        result
-        for result in results
-        if result["provenance"]["architecture"] == "deterministic_pipeline"
-    )
-    agents = [
-        result
-        for result in results
-        if result["provenance"]["architecture"] != "deterministic_pipeline"
+def paired_rows(dataset: dict[str, Any]) -> list[str]:
+    lines = [
+        "| Model | Measure | No gate | Gate | Gate only | No gate only | Exact McNemar p |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
     ]
-    prompt_only = [
-        result
-        for result in agents
-        if result["provenance"]["architecture"] == "meaningful_agent_prompt_only"
+    for model in sorted({model for model, _ in dataset["runs"]}):
+        for field, label in (("outcome_correct", "Correct outcome"), ("case_pass", "Strict pass")):
+            ungated = majority(dataset["runs"][(model, UNGATED)], field)
+            gated = majority(dataset["runs"][(model, GATED)], field)
+            gate_only = sum(gated[c] and not ungated[c] for c in ungated)
+            ungated_only = sum(ungated[c] and not gated[c] for c in ungated)
+            lines.append(
+                f"| {model} | {label} | {sum(ungated.values())} | {sum(gated.values())} | "
+                f"{gate_only} | {ungated_only} | {mcnemar_exact(gate_only, ungated_only):.3g} |"
+            )
+    return lines
+
+
+def stability_rows(dataset: dict[str, Any]) -> list[str]:
+    lines = [
+        "| Model | Condition | Repetitions | Identical trace in every repetition | Same strict result in every repetition | Gated trace matches ungated until first refusal |",
+        "| --- | --- | ---: | ---: | ---: | ---: |",
     ]
-    gated = [
-        result
-        for result in agents
-        if result["provenance"]["architecture"] == "meaningful_agent_gated"
+    for (model, architecture), reps in sorted(
+        dataset["runs"].items(), key=lambda item: (item[0][0], item[0][1] == GATED)
+    ):
+        runs = [reps[key] for key in sorted(reps)]
+        by_case: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for run in runs:
+            for case in run["cases"]:
+                by_case[case["case_id"]].append(case)
+        identical = sum(
+            all(trace_signature(c) == trace_signature(cases[0]) for c in cases)
+            for cases in by_case.values()
+        )
+        same_result = sum(
+            len({bool(c["case_pass"]) for c in cases}) == 1 for cases in by_case.values()
+        )
+        if architecture == GATED:
+            ungated = dataset["runs"][(model, UNGATED)]
+            matched = total = 0
+            for repetition in sorted(reps):
+                if repetition not in ungated:
+                    continue
+                left = {c["case_id"]: c for c in ungated[repetition]["cases"]}
+                for case in reps[repetition]["cases"]:
+                    total += 1
+                    matched += gate_prefix_matches(left[case["case_id"]], case)
+            prefix = f"{matched}/{total}"
+        else:
+            prefix = "—"
+        lines.append(
+            f"| {model} | {ARCHITECTURE_LABELS[architecture]} | {len(runs)} | "
+            f"{identical}/{len(by_case)} | {same_result}/{len(by_case)} | {prefix} |"
+        )
+    return lines
+
+
+def category_rows(dataset: dict[str, Any], field: str) -> list[str]:
+    columns: list[tuple[str, dict[str, bool]]] = [
+        (ARCHITECTURE_LABELS["deterministic_pipeline"], majority({1: dataset["baseline"]}, field))
     ]
-    prompt_unsafe = sum(result["summary"]["unsafe_releases"] for result in prompt_only)
-    gated_unsafe = sum(result["summary"]["unsafe_releases"] for result in gated)
-    prompt_passed = sum(result["summary"]["passed_cases"] for result in prompt_only)
-    gated_passed = sum(result["summary"]["passed_cases"] for result in gated)
-    denominator = EXPECTED_CASES * len(prompt_only)
-    return [
-        f"- The deterministic rule baseline passed {baseline['summary']['passed_cases']}/{EXPECTED_CASES}. Its failures show where fixed cue matching did not capture the intended language.",
-        f"- Across matched model-request pairs, prompt-only agents passed {prompt_passed}/{denominator}; gated agents passed {gated_passed}/{denominator}.",
-        f"- Prompt-only agents released {prompt_unsafe} injected faulty plans; gated agents released {gated_unsafe}. The gate changes release permission, not the model's tool choices or Knapsack output.",
-        "- Knapsack fidelity is evaluated across ordinary recommendation-required cases. A missing plan, wrong persona, or changed role-item assignment fails; fault-injection cases are excluded because their plans are deliberately corrupted after Knapsack.",
+    for model in sorted({model for model, _ in dataset["runs"]}):
+        for architecture in (UNGATED, GATED):
+            columns.append(
+                (
+                    f"{model} / {ARCHITECTURE_LABELS[architecture]}",
+                    majority(dataset["runs"][(model, architecture)], field),
+                )
+            )
+    category_of = {c["case_id"]: c["category"] for c in dataset["baseline"]["cases"]}
+    categories = sorted(set(category_of.values()))
+    lines = [
+        "| Request category | " + " | ".join(name for name, _ in columns) + " |",
+        "| --- | " + " | ".join("---:" for _ in columns) + " |",
     ]
+    for category in categories:
+        ids = [case_id for case_id, cat in category_of.items() if cat == category]
+        cells = [f"{sum(votes[i] for i in ids)}/{len(ids)}" for _, votes in columns]
+        lines.append(f"| {category.replace('_', ' ')} | " + " | ".join(cells) + " |")
+    return lines
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--result", type=Path, action="append", required=True)
+    parser.add_argument("--results-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    results = [load(path) for path in args.result]
-    architecture_order = {
-        "deterministic_pipeline": 0,
-        "meaningful_agent_prompt_only": 1,
-        "meaningful_agent_gated": 2,
-    }
-    results.sort(
-        key=lambda result: (
-            result["provenance"]["architecture"] != "deterministic_pipeline",
-            str(result["provenance"].get("model") or ""),
-            architecture_order[result["provenance"]["architecture"]],
-        )
+    data = collect(args.results_dir)
+    validate(data)
+
+    any_run = next(iter(next(iter(data.values()))["runs"].values()))
+    provenance = next(iter(any_run.values()))["provenance"]
+    digests = sorted(
+        {
+            (run["provenance"]["model"], run["provenance"].get("model_digest"))
+            for dataset in data.values()
+            for reps in dataset["runs"].values()
+            for run in reps.values()
+        }
     )
-    validate(results)
+    repetitions = len(next(iter(next(iter(data.values()))["runs"].values())))
 
     lines = [
         "# Meaningful Beacon tools: controlled comparison",
         "",
-        "This experiment evaluates four responsibility-based tools on the same 42 fixed requests: profile retrieval, deterministic recommendation, nutrition analysis, and violation checking. Every result uses the same committed code, dataset, and tool schemas.",
+        "Four responsibility-based tools (profile retrieval, deterministic recommendation, nutrition analysis, and violation checking) plus a `release_plan` action are evaluated on two fixed 42-request sets with the same design: the development set used while building the rule baseline, and a held-out set with new wording. The agent loop runs until the model answers without a tool call or reaches the turn limit; it never reads case labels. Every tool result, including a failed validation, is returned to the model before its next decision.",
         "",
-        "| Condition | Passed | Valid tool path | Correct action | Nutrition-tool choice | Knapsack fidelity | Injected-fault detection | Unsafe releases | API/loop failures | Mean latency (ms) |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
-        *(main_row(result) for result in results),
+        "Without the release gate, the model's own `release_plan` call releases any existing plan. With the gate, application code refuses that call unless the current plan passed validation. Both conditions use the same identity resolver, persona binding, prompt, tools, and model.",
         "",
-        "## Success by request category",
+        f"- Repository commit: `{provenance['repository_commit']}`; Beacon backend commit: `{provenance['beacon_backend_commit']}`.",
+        f"- Temperature {provenance['temperature']}, turn limit {provenance['max_agent_turns']}, completion limit {provenance['max_completion_tokens']} tokens, {repetitions} repetitions per model and condition.",
+        "- Model digests: " + "; ".join(f"`{model}` `{(digest or 'unknown')[:12]}`" for model, digest in digests) + ".",
         "",
-        *category_table(results),
+        "Counts show one number when all repetitions agree and every repetition otherwise (for example `24/25/24`). Confidence intervals are 95% Wilson intervals over the 42 cases using the per-case majority across repetitions; they treat cases as independent and therefore understate dependence among prompts that share a persona.",
         "",
-        "## Interpretation",
-        "",
-        *matched_observations(results),
-        "",
+    ]
+    for name in DATASETS:
+        dataset = data[name]
+        title = "Development set" if name == "development" else "Held-out set"
+        lines += [
+            f"## {title}",
+            "",
+            *condition_rows(dataset),
+            "",
+            "### Release gate versus no release gate (per-case majority, paired by request)",
+            "",
+            *paired_rows(dataset),
+            "",
+            "### Repetition stability and trace pairing",
+            "",
+            *stability_rows(dataset),
+            "",
+            "### Strict pass by request category (per-case majority)",
+            "",
+            *category_rows(dataset, "case_pass"),
+            "",
+            "### Correct outcome by request category (per-case majority)",
+            "",
+            *category_rows(dataset, "outcome_correct"),
+            "",
+        ]
+
+    lines += [
         "## Metric definitions",
         "",
-        "- **Passed:** all applicable routing, tool-path, action, nutrition-selection, plan-fidelity, local-tool, and API checks pass for the case.",
-        "- **Valid tool path:** successful calls have exact required membership and respect dependencies. Profile retrieval precedes recommendation; recommendation precedes analysis and validation. Nutrition analysis and validation are independent siblings and may occur in either order. Extra, missing, or repeated calls fail.",
-        "- **Correct action:** profile requests stop after retrieval; recommendation requests release a checked safe plan; fault cases block the plan; unclear identities ask for clarification without tool access.",
-        "- **Nutrition-tool choice:** nutrition analysis is called if and only if the request asks for nutrient, goal-fit, FSA-style, or WHO-style details.",
-        "- **Knapsack fidelity:** for ordinary recommendation-required cases, a plan exists and its selected role-item IDs exactly match a fresh direct Beacon Knapsack run for the same persona. Missing plans fail; injected-fault cases are excluded.",
-        "- **Injected-fault detection:** the checker identifies a plan whose first required meal role was deliberately removed after recommendation.",
-        "- **Unsafe release:** an injected faulty plan reaches the response boundary. Lower is better; zero is required.",
-        "- **Latency:** wall-clock time for identity resolution, all model turns, and local tool execution.",
+        "- **Correct outcome:** the user receives the right end state. Profile requests return the intended profile without creating a plan; recommendation requests release a plan that passes validation, with nutrition analysis when requested and exact Knapsack fidelity; fault cases detect the violation and do not release; unclear identities receive a clarification without tool access. A refused call does not by itself fail this measure.",
+        "- **Strict pass:** correct outcome plus the exact dependency-valid tool path, no failed or policy-refused tool call, and nutrition analysis called if and only if requested. This measures the model's own trajectory.",
+        "- **Valid tool path:** successful calls have exact required membership and every call follows its prerequisites: profile before recommendation; recommendation before analysis and validation; validation before release. Nutrition analysis and validation may occur in either order.",
+        "- **Knapsack fidelity:** for ordinary recommendation-required cases, a plan exists and its role-item IDs exactly match a fresh direct Beacon Knapsack run. Fault cases are excluded because their plans are corrupted after Knapsack.",
+        "- **Unsafe release:** an injected faulty plan is released. **Unvalidated release:** any plan is released without a passed validation at the time of release.",
+        "- **Text-only tool calls:** the model's final message is a tool call written as JSON text rather than a structured call, so no tool runs. **Truncated turns:** model turns that hit the completion-token limit.",
+        "- **Gate refusals:** `release_plan` calls refused by the gate because validation was missing or failed.",
+        "- **Trace pairing:** at temperature 0 the gated run should repeat the ungated tool calls until the gate first refuses a call; the table reports how often that holds.",
+        "- **Latency:** wall-clock time for identity resolution, model turns, and local tool execution.",
         "",
         "## Scope",
         "",
-        "The profiles are fictional, and the experiment is a software evaluation rather than clinical validation. FSA-style and WHO-style values are application-defined aggregate proxies computed by the reused Beacon module; they are not official diagnoses or individualized medical advice.",
+        "The profiles are fictional and the experiment is a software evaluation, not clinical validation. Both request sets were written by the study authors; the held-out set was written after the rule baseline was frozen and was not used to change it. FSA-style and WHO-style values are application-defined proxies, not official labels or individual advice.",
     ]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text("\n".join(lines) + "\n", encoding="utf-8")
