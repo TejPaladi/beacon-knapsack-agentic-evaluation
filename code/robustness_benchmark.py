@@ -98,6 +98,7 @@ def ollama_chat_completion(
     model: str,
     messages: list[dict[str, Any]],
     timeout_seconds: float = 180,
+    tools: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Call Ollama through its OpenAI-compatible chat-completions endpoint."""
 
@@ -105,7 +106,7 @@ def ollama_chat_completion(
         {
             "model": model,
             "messages": messages,
-            "tools": TOOLS,
+            "tools": TOOLS if tools is None else tools,
             "tool_choice": "auto",
             "temperature": TEMPERATURE,
             "stream": False,
