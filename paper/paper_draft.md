@@ -405,7 +405,7 @@ vegan, or gluten-free conditions. Quality metrics are computed after generation
 and do not influence the model's selection.
 
 For Experiment 4, complete-case success requires all applicable checks to pass:
-persona routing, exact ordered tool path, expected terminal action, correct
+persona routing, exact tool membership with dependency-valid order, expected terminal action, correct
 nutrition-tool selection, exact Knapsack fidelity, zero failed tools, and zero
 API or loop errors. A fault case also requires detection and blocked release.
 We separately report unsafe releases and success by request category. The

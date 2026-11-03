@@ -90,7 +90,7 @@ All rates are computed as `passing applicable cases / applicable cases`.
 | --- | --- | --- |
 | Complete-case success | Every applicable routing, path, action, nutrition, fidelity, tool-error, and API check passes. | Correct persona and plan still fail the case if a required nutrition call is omitted. |
 | Persona routing | The retrieved profile ID equals the intended stored persona. | A request for Earl must not retrieve Greg. |
-| Exact tool path | Successful calls exactly equal the required ordered sequence. | Nutrition request: `fetch → recommend → nutrition → check`; an extra call fails. |
+| Valid tool path | Calls have exact required membership and respect dependency order. | `fetch → recommend → nutrition → check` and `fetch → recommend → check → nutrition` are both valid; an extra call fails. |
 | Expected action | Profile request stops after fetch; normal recommendation releases a checked plan; fault case blocks; unclear case clarifies. | A profile question that creates a meal plan fails. |
 | Nutrition-tool selection | Call nutrition analysis if and only if the request asks for it. | “Include calories” requires the call; “no nutrition details” forbids it. |
 | Exact Knapsack fidelity | Returned role-item IDs exactly equal a fresh direct Knapsack run for that persona. | Same foods with one lunch item changed fails. |
@@ -176,7 +176,7 @@ directly operationalized checks are:
 | T1-003, declared task-success rate | Complete-case success over 42 fixed cases. |
 | T1-005, partial completion is failure | Every applicable postcondition must pass together. |
 | T1-013, read-only request performs no write/action tool | Profile-only cases must stop after profile retrieval. |
-| T2-001, prerequisites before dependent tools | Exact ordered tool path and session dependency enforcement. |
+| T2-001, prerequisites before dependent tools | Dependency-valid tool path and session enforcement; independent siblings may swap order. |
 | T5-001, only allowlisted tools | The model receives only four schemas; unknown calls fail at the gateway. |
 | T5-006, bounded tool calls | A fixed maximum agent-turn limit prevents an unbounded loop. |
 | T5-014, policy check before higher-risk action | The violation check must precede plan release. |

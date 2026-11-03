@@ -30,6 +30,7 @@ from meaningful_tools import (  # noqa: E402
 from meaningful_tools_benchmark import (  # noqa: E402
     expected_tools as meaningful_expected_tools,
     load_cases as load_meaningful_cases,
+    valid_tool_path,
 )
 from replay_release_gate import apply_gate  # noqa: E402
 from benchmark import (  # noqa: E402
@@ -65,6 +66,27 @@ from recommendation_source_benchmark import (  # noqa: E402
 
 
 class LocalEvaluationTests(unittest.TestCase):
+    def test_tool_path_allows_independent_nutrition_and_check_order(self):
+        expected = [
+            "fetch_persona_profile",
+            "recommend_meal_plan",
+            "calculate_nutrition_scores",
+            "check_plan_violations",
+        ]
+        self.assertTrue(valid_tool_path(expected, expected))
+        self.assertTrue(
+            valid_tool_path(
+                [
+                    "fetch_persona_profile",
+                    "recommend_meal_plan",
+                    "check_plan_violations",
+                    "calculate_nutrition_scores",
+                ],
+                expected,
+            )
+        )
+        self.assertFalse(valid_tool_path(expected[:-1], expected))
+
     def test_trace_paired_gate_blocks_detected_fault(self):
         case = {
             "architecture": "meaningful_agent_prompt_only",

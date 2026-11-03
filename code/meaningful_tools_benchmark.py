@@ -90,6 +90,20 @@ def expected_tools(case: dict[str, Any]) -> list[str]:
     return tools
 
 
+def valid_tool_path(observed: list[str], expected: list[str]) -> bool:
+    """Check exact membership and dependency order, allowing independent siblings."""
+
+    if len(observed) != len(expected) or set(observed) != set(expected):
+        return False
+    if not expected:
+        return not observed
+    if expected == ["fetch_persona_profile"]:
+        return observed == expected
+    if observed[:2] != ["fetch_persona_profile", "recommend_meal_plan"]:
+        return False
+    return set(observed[2:]) == set(expected[2:])
+
+
 def classify_deterministic_intent(prompt: str) -> tuple[str, bool]:
     """Small declared rule baseline; it does not inspect gold case labels."""
 
@@ -155,7 +169,7 @@ def score_case(
     successful = _successful_names(trace)
     expected = expected_tools(case)
     failed_tool_calls = sum(not event.get("ok", False) for event in trace)
-    tool_set_correct = successful == expected
+    tool_set_correct = valid_tool_path(successful, expected)
 
     intended = case["intended_persona_id"]
     if case["expected_action"] == "clarify":
