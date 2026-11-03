@@ -1,47 +1,32 @@
-# Deterministic, LLM-Only, and Policy-Gated Agentic Meal Recommendation
+# Separating Language Orchestration from Deterministic Control in Agentic Meal Recommendation
 
 **Sai Teja Paladi**  
 CSE 798 Independent Study  
-Working paper draft — October 2026
+Working paper draft — November 2026
 
 ## Abstract
 
 Large language models can translate natural-language requests into tool calls,
-but delegating the complete recommendation process to a model makes it difficult
-to distinguish language-understanding errors from recommendation errors. This
-paper studies a narrower hybrid architecture for meal recommendation. A language
-model interprets a request and orchestrates profile and recommendation tools,
-while the existing BEACON Knapsack method remains the only component that selects
-food. We first compare direct Knapsack execution with an agentic path over six
-fictional personas. The agent reproduces all six deterministic plans with 100%
-exact plan fidelity and required tool-sequence compliance, but increases mean
-latency from 202.4 ms to 5706.4 ms. We then evaluate prompt-only orchestration on
-30 fixed requests covering exact names, paraphrases, first names,
-restriction-override instructions, and unclear personas. Results across five local models show that
-stronger tool use does not guarantee safe clarification: the strongest model
-passes 22/30 cases but runs Knapsack on all six unclear requests. We introduce a
-deterministic identity gate that resolves one persona before model
-execution, locks identity-dependent tool arguments, clarifies unclear identity,
-and renders verified results from application state. Across 150 matched
-model-request pairs per architecture, complete-case passes increase from 49/150
-to 73/150, unclear-request success increases from 6/30 to 30/30, unsafe Knapsack
-executions fall from 10 to zero, and mean latency decreases by 44.9%. Valid
-recommendation workflows remain unchanged at 43/120. The result is therefore a
-system-level safety and efficiency improvement, not an improvement in the
-underlying models. A no-LLM pipeline passes all 30 requests with 146.3 ms mean
-latency per case because
-the current requests need only exact-name matching and a fixed procedure. Thus,
-this dataset does not demonstrate utility from language-model orchestration.
-Finally, we compare Knapsack with direct LLM meal selection
-from the same role-eligible catalog. Knapsack produces six of six safe plans
-with mean Beacon quality 0.860 in 183.5 ms. Granite produces six safe plans but
-lower quality (0.679), lower nutrition fit, repeated foods, and 4.34 s latency.
-Llama produces only three safe plans, makes four dietary violations, and scores
-0.453 quality across all six cases in 4.04 s, although its three safe plans
-average 0.906. The combined results support a division of labor in
-which deterministic components retain constraint-sensitive selection and
-identity handling while models are reserved for language-dependent interaction
-that deterministic matching cannot cover.
+but delegating a complete recommendation process to a model confounds language,
+tool-use, and recommendation errors. We study a hybrid BEACON meal workflow in
+which models interpret requests while deterministic components retain identity
+binding, Knapsack selection, nutrition calculation, and validation. A hosted
+agent first reproduces all six direct Knapsack plans, but is 28 times slower.
+On 30 requests and five local models, an identity gate raises complete passes
+from 49/150 to 73/150 and reduces unsafe unclear-persona executions from ten to
+zero without improving valid tool trajectories; a no-LLM pipeline passes 30/30,
+showing that this request set does not justify model use. In direct meal
+selection, Knapsack produces 6/6 safe plans with mean Beacon quality 0.860;
+Granite produces 6/6 safe plans at 0.679, while Llama produces only 3/6 safe
+plans despite 0.906 mean quality on that safe subset. Finally, a 42-request
+study separates profile retrieval, recommendation, nutrition analysis, and
+violation checking into four tools. The deterministic baseline passes 38/42.
+Across 126 model-request traces, prompt-only agents pass 62 cases and release
+all 18 injected faulty plans; paired deterministic release enforcement raises
+passes to 80 and reduces unsafe releases to zero without changing model traces.
+The results support using models only for language-dependent interaction that
+outperforms a declared no-LLM baseline, while deterministic code retains
+constraint-sensitive computation and release control.
 
 **Keywords:** LLM agents, tool use, meal recommendation, deterministic
 optimization, policy enforcement, clarification
@@ -66,7 +51,7 @@ Knapsack recommender. Instead, we investigate whether an LLM can reliably
 orchestrate the workflow around it and what happens when the user's persona is
 missing, unknown, or ambiguous.
 
-The study asks four research questions:
+The study asks five research questions:
 
 - **RQ1:** Can one hosted LLM complete the required tool trajectory while
   preserving the exact output of direct deterministic Knapsack execution?
@@ -133,7 +118,7 @@ interpretation and valid tool sequencing remain model-driven.
 
 ### 2.3 Evaluating tool-using agents
 
-Tool-use evaluation requires more than judging final prose. τ-bench evaluates
+Tool-use evaluation requires more than judging final prose. $\tau$-bench evaluates
 tool-agent-user interaction using domain policies and final environment state
 [4]. ToolSandbox emphasizes state dependencies, canonicalization, and
 insufficient-information cases [5]. The Berkeley Function-Calling Leaderboard
@@ -293,6 +278,14 @@ lower is better). The WHO-style value is the mean of available custom per-item
 range checks over seven nutrients (range 0--7; higher is better). Coverage is
 reported and missing values are not imputed. Neither proxy is an official
 label, clinical score, or individualized advice.
+
+For example, Earl's deterministic plan contains nine selected catalog entries,
+but only five have the complete fields required by both proxies. The tool
+therefore returns FSA-style 9.8 and WHO-style 3.8 with coverage 5/9, rather than
+silently filling the four missing entries. Its nutrition-goal fit is 0.506: the
+calorie component is 1.000, while carbohydrate, protein, and fiber fits are
+0.307, 0.530, and 0.187. Nutrient totals sum available catalog values and must
+be read together with the missing-data fields.
 
 ## 4. Experimental Method
 
@@ -510,7 +503,41 @@ Both LLMs are more than 20 times slower than direct Knapsack and consume about
 12,900 prompt-plus-completion tokens across six personas, whereas Knapsack uses
 no model tokens.
 
-### 5.4 Model capability versus architecture safety
+### 5.4 Meaningful-tool and fault-containment result
+
+| Model or baseline | Prompt-only | Policy-gated paired replay | Valid tool path | Unsafe releases, prompt → gated | Mean latency |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Deterministic rule pipeline | 38/42 | N/A | 90.5% | 0 → 0 | 264.9 ms |
+| Granite 4 3B | 24/42 | **30/42** | 71.4% | 6 → **0** | 4573.8 ms |
+| Llama 3.2 3B | 19/42 | **25/42** | 61.9% | 6 → **0** | 3630.6 ms |
+| Qwen 3.5 4B | 19/42 | **25/42** | 59.5% | 6 → **0** | 7843.7 ms |
+
+Across the same 126 model-request traces, the release gate increases complete
+passes from 62 to 80 and reduces unsafe release of injected faulty plans from
+18 to zero. Every increase is a fault case whose model called the violation
+checker and detected the missing role but whose prompt-only application would
+still release the plan. Because each trace is replayed rather than regenerated,
+the gate cannot change identity routing, tool selection, Knapsack output,
+model failures, or latency.
+
+The broader workflow remains difficult. Granite has 100% Knapsack fidelity over
+the 24 ordinary recommendation-required cases, but it completes only one of six
+plain recommendation cases and none of six nutrition-analysis cases because it
+usually omits the final violation check. Llama and Qwen have only 41.7% and
+29.2% Knapsack fidelity respectively because they often stop before producing a
+plan or choose an invalid workflow. Llama records 27 failed local calls and two
+turn-limit failures; the other two models have no API or loop failures.
+
+Category results also show why one overall score is insufficient. All three
+agents handle six of six profile-only requests, whereas the keyword baseline
+handles three. Granite passes all restriction-override requests, while Llama
+and Qwen pass none. Nutrition-analysis success is 0/6 for Granite, 2/6 for
+Llama, and 1/6 for Qwen. All unclear-identity cases pass because the application
+resolver clarifies before model execution; this is a system result, not model
+evidence. The deterministic pipeline's 38/42 remains the strongest overall
+result and is 13.7--29.6 times faster than the three agent runs.
+
+### 5.5 Model capability versus architecture safety
 
 The valid-workflow total is exactly 43/120 in both architectures. This is the
 most important interpretation boundary in the study: the gate does not improve
@@ -550,6 +577,13 @@ three safe plans have higher conditional quality. Knapsack is faster,
 token-free, and safe on all six cases. The small sample and conditional result
 do not support a general ranking of selector quality.
 
+**RQ5:** Responsibility-based tools make profile retrieval, recommendation,
+nutrition analysis, and validation separately observable, but none of the three
+models matches the 38/42 deterministic baseline. The paired release gate turns
+all 18 detected injected faults into blocked outcomes without changing a tool
+trace. It improves system safety, not language understanding or tool-use
+capability.
+
 ### 6.2 What is novel
 
 The novelty is the combination of a task-specific architecture and controlled
@@ -565,6 +599,9 @@ evaluation:
 - it compares deterministic and direct LLM selection on the same profiles,
   catalog, roles, and post-hoc evaluators instead of comparing systems on
   incompatible inputs.
+- it evaluates four responsibility-based tools on multiple intents and isolates
+  the release gate's effect with trace-paired fault replay rather than separate
+  model samples.
 
 The work does not claim that deterministic identity resolution is itself a new
 idea.
@@ -598,6 +635,14 @@ estimate variance across sampling, hardware, or model versions. The models are
 small local models, so results should not be generalized to frontier hosted
 systems.
 
+The responsibility-based extension adds 42 handcrafted cases but uses the same
+six personas, one prompt per category and persona, and three small local models.
+Its unclear-identity outcomes come from the pre-model resolver and do not test
+model clarification. Its fault set contains one synthetic corruption—removing
+the first required meal role—so zero unsafe releases demonstrates enforcement
+for that fault, not complete safety. The paired replay isolates the gate's
+effect, but it does not estimate variation across repeated model generations.
+
 The gate's six unclear cases were handcrafted for the resolver's fixed rules,
 so its perfect clarification result is an invariant on this test set rather
 than evidence of generalization. Name matching is identity resolution, not
@@ -621,6 +666,11 @@ constraint. No real personal or protected health information is used.
 Because Knapsack and the BEACON evaluators come from the same system, the
 quality measures are not an independent human judgment and may align with the
 deterministic method's design objectives.
+
+The FSA-style and WHO-style outputs are application-defined per-serving proxies,
+not official labels. In the worked plan, only five of nine selected entries have
+complete inputs, and nutrient totals can be partial when catalog fields are
+missing. Coverage and missing-data fields must accompany every reported value.
 
 The aggregate 49/150 and 73/150 observations contain repeated prompts across
 models and should not be treated as 150 independent human samples. The current
@@ -658,7 +708,10 @@ solves the current 30-case request set faster and without model calls, so the
 present experiment does not establish a need for an LLM. The main lesson is a
 division of responsibility. The direct-selection comparison reinforces this conclusion:
 one LLM sacrifices quality and variety while the other violates stored dietary
-conditions despite a favorable nutrition-fit mean. Use the model for
+conditions despite a favorable nutrition-fit mean. The four-tool extension adds
+a second lesson: all three models detect the injected fault when they reach
+validation, but a deterministic release boundary is required to ensure that the
+detected fault is actually blocked. Use the model for
 language-dependent orchestration only when a harder language benchmark shows a
 benefit, and for bounded soft-preference ranking; retain constraint-sensitive
 recommendation and identity-binding decisions in inspectable
@@ -675,7 +728,7 @@ X. Huang, and Y. Yang. “[RecMind: Large Language Model Powered Agent for Recom
 
 [3] R. Garimella, B. Srivastava, and A. Sheth. “[Doing Less with More: A First-Principles Exploration of the Suitability of Agentic Computing over Alternative Architectural Choices](https://arxiv.org/abs/2610.23921).” 2026.
 
-[4] S. Yao, N. Shinn, P. Razavi, and K. Narasimhan. “[τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains](https://arxiv.org/abs/2406.12045).” 2024.
+[4] S. Yao, N. Shinn, P. Razavi, and K. Narasimhan. “[$\tau$-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains](https://arxiv.org/abs/2406.12045).” 2024.
 
 [5] J. Lu et al. “[ToolSandbox: A Stateful, Conversational, Interactive Evaluation Benchmark for LLM Tool Use Capabilities](https://arxiv.org/abs/2408.04682).” 2024.
 
@@ -700,4 +753,4 @@ A. Davison, and B. Srivastava. “[A Novel Approach to Balance Convenience and N
 
 [14] LangChain. “[Agents](https://docs.langchain.com/oss/python/langchain/agents).” Accessed October 27, 2026.
 
-[15] S. Padmanabhuni. “[Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).” Hugging Face dataset, 110 rows, CC BY 4.0. Accessed November 2, 2026.
+[15] S. Padmanabhuni. “[Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).” Hugging Face dataset, 110 rows, CC BY 4.0. Accessed November 3, 2026.
