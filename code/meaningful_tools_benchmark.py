@@ -26,6 +26,7 @@ try:
     from robustness_benchmark import (
         DEFAULT_BASE_URL,
         MAX_AGENT_TURNS,
+        MAX_COMPLETION_TOKENS,
         SUPPORTED_MODELS,
         clean_ollama_assistant_message,
         git_revision,
@@ -45,6 +46,7 @@ except ModuleNotFoundError:
     from code.robustness_benchmark import (
         DEFAULT_BASE_URL,
         MAX_AGENT_TURNS,
+        MAX_COMPLETION_TOKENS,
         SUPPORTED_MODELS,
         clean_ollama_assistant_message,
         git_revision,
@@ -63,9 +65,6 @@ ARCHITECTURES = (
     "meaningful_agent_gated",
 )
 TEMPERATURE = 0
-# Large enough that Qwen 3.5's reasoning does not exhaust the budget before it
-# answers; the earlier 160-token cap truncated it to empty replies.
-MAX_COMPLETION_TOKENS = 1024
 STOP_RULE = (
     "model returns a message without tool calls, or the turn limit is reached; "
     "case labels are not read during the loop"
