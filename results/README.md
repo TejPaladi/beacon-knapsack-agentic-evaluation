@@ -77,3 +77,16 @@ The JSON schema restricts generated values to the requested role and catalog;
 it does not rank candidates or apply persona-specific dietary filtering. The
 LLM therefore owns the meal choice, while deterministic code is only the
 post-hoc evaluator.
+
+## Meaningful-tool evaluation
+
+[`meaningful_tools_comparison.md`](meaningful_tools_comparison.md) compares a
+deterministic rule pipeline with prompt-only and policy-gated agents on 42
+fixed, multi-intent requests. Raw files in `meaningful_tools/` preserve the
+case-level tool traces and release decisions.
+
+The report generator refuses to compare results unless every arm has all 42
+cases and all files share one dataset hash, tool-schema hash, clean repository
+commit, and matched prompt-only/gated model pair. Metric formulas and examples
+are in
+[`../docs/tool_design_and_metric_dictionary.md`](../docs/tool_design_and_metric_dictionary.md).
