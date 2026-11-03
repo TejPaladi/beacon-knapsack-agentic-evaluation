@@ -205,23 +205,29 @@ quality. Both LLMs were over 20 times slower than direct Knapsack.
 ## Meaningful-tool experiment
 
 The latest experiment replaces implementation-step tools with four distinct
-responsibilities:
+responsibilities and one release action:
 
 1. `fetch_persona_profile` resolves and retrieves one stored fictional profile;
 2. `recommend_meal_plan` runs the unchanged Beacon Knapsack method;
 3. `calculate_nutrition_scores` computes totals, goal fit, and FSA/WHO-style
-   proxies only when the request asks for nutrition detail; and
-4. `check_plan_violations` deterministically decides whether a plan may be
-   released.
+   proxies only when the request asks for nutrition detail;
+4. `check_plan_violations` deterministically reports whether the plan has a
+   hard violation; and
+5. `release_plan` shows the plan to the user.
 
-The fixed benchmark contains 42 requests across profile-only, recommendation,
+Two fixed request sets of 42 cases each cover profile-only, recommendation,
 nutrition-analysis, restriction-override, indirect-intent, unclear-identity,
-and injected-fault categories. It compares a no-LLM rule pipeline with matched
-prompt-only and policy-gated outcomes. Each model trace is generated once and
-replayed through the deterministic release gate, so the comparison changes only
-release permission. The agents choose and sequence tools; application code binds
-the resolved persona and blocks unchecked or invalid plans at the gated response
-boundary.
+and injected-fault categories. The development set is the original one, against
+which the keyword rule baseline was written; the held-out set has the same
+design with new wording and was written after the baseline was frozen.
+
+The model runs until it answers without a tool call or reaches the turn limit;
+the loop never reads case labels. It sees every tool result, including a failed
+validation, before deciding what to do next. Without the release gate, the
+model's own `release_plan` call releases any existing plan. With the gate,
+application code refuses that call unless the current plan passed validation.
+Both conditions use the same identity resolver, persona binding, prompt, tools,
+and model, and each is run three times per model on each request set.
 
 See [the checked comparison](results/meaningful_tools_comparison.md) for the
 completed result and
@@ -236,24 +242,36 @@ release gate raises complete passes to 80 and reduces unsafe releases to zero.
 The gain is fault containment only: routing, tool selection, model failures,
 Knapsack output, and latency are unchanged.
 
-Run one complete condition with:
+Run one condition with:
 
 ```bash
 # No model call.
 "$BEACON_PYTHON" code/meaningful_tools_benchmark.py \
   --architecture deterministic_pipeline \
-  --output results/meaningful_tools/deterministic_pipeline.json
+  --dataset data/meaningful_tool_requests_heldout.json \
+  --output /tmp/beacon_runs/meaningful_tools/heldout/deterministic_pipeline.json
 
-# Local Ollama model, prompt-only release ablation.
+# Local Ollama model without the release gate (use meaningful_agent_gated for the gate).
 "$BEACON_PYTHON" code/meaningful_tools_benchmark.py \
   --architecture meaningful_agent_prompt_only --model granite4:3b \
-  --output results/meaningful_tools/prompt_only__granite4_3b.json
-
-# Apply deterministic release enforcement to that exact trace; no model call.
-"$BEACON_PYTHON" code/replay_release_gate.py \
-  --source results/meaningful_tools/prompt_only__granite4_3b.json \
-  --output results/meaningful_tools/gated__granite4_3b.json
+  --dataset data/meaningful_tool_requests_heldout.json --repetition 1 \
+  --output /tmp/beacon_runs/meaningful_tools/heldout/meaningful_agent_prompt_only__granite4_3b__r1.json
 ```
+
+To reproduce every Experiment 2 and Experiment 4 result from a clean commit,
+run the full matrix (about five hours on a laptop) and then build the report:
+
+```bash
+code/run_full_matrix.sh /tmp/beacon_runs
+cp -R /tmp/beacon_runs/meaningful_tools /tmp/beacon_runs/policy_gate_matrix results/
+python3 code/report_meaningful_tools.py \
+  --results-dir results/meaningful_tools \
+  --output results/meaningful_tools_comparison.md
+```
+
+Outputs are written outside the repository during the run, because a result
+records whether the worktree was clean when it finished and the report refuses
+results from uncommitted code.
 
 These tools use a small native function-calling loop so the experiment can
 score every call directly. MCP or LangChain can expose the same Python

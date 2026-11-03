@@ -87,6 +87,49 @@ def failure_counts(result: dict[str, Any]) -> dict[str, int]:
     return counts
 
 
+def provenance_note(results: list[dict[str, Any]]) -> str:
+    commits = sorted({str(result["provenance"].get("repository_commit")) for result in results})
+    dirty = sum(bool(result["provenance"].get("repository_worktree_dirty")) for result in results)
+    limits = sorted(
+        {
+            str(result["provenance"].get("max_completion_tokens"))
+            for result in results
+            if result["provenance"].get("model")
+        }
+    )
+    truncated = sum(result["summary"].get("truncated_turns", 0) for result in results)
+    return (
+        f"All {len(results)} results record repository commit(s) "
+        + ", ".join(f"`{commit}`" for commit in commits)
+        + f" and one request-dataset hash; {dirty} were produced from an uncommitted "
+        f"worktree. Agent runs use a completion limit of {', '.join(limits)} tokens, and "
+        f"{truncated} model turns reached it."
+    )
+
+
+def paired_valid_note(
+    prompt_only: list[dict[str, Any]], policy_gated: list[dict[str, Any]]
+) -> str:
+    both = gate_only = ungated_only = neither = 0
+    for ungated, gated in zip(prompt_only, policy_gated):
+        gated_cases = {case["case_id"]: case for case in gated["cases"]}
+        for case in ungated["cases"]:
+            if case["expected_action"] != "recommend":
+                continue
+            left, right = bool(case["case_pass"]), bool(gated_cases[case["case_id"]]["case_pass"])
+            both += left and right
+            gate_only += right and not left
+            ungated_only += left and not right
+            neither += not (left or right)
+    return (
+        f"Paired by model and valid request, {both} pass in both architectures, {neither} fail "
+        f"in both, {gate_only} pass only with the gate, and {ungated_only} pass only without it. "
+        "The gate changes invalid identity arguments from backend tool errors into explicit "
+        "policy blocks, and its trusted renderer ends the run once Knapsack succeeds, but it "
+        "does not repair the model's argument or force the required sequence."
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--result", type=Path, action="append", required=True)
@@ -180,7 +223,7 @@ def main() -> None:
         "",
         "## Provenance note",
         "",
-        "The ten agent results record repository commit `c36f7dfff045032d51e32c1fcaffa617c09b25e7`, the same dataset hash, and identical hashes for the original benchmark and identity-gate implementations. Their worktree-dirty flag is true because generated outputs were present while the matrix was running; source identity is fixed by the recorded commit and implementation hashes. The later no-LLM baseline records its own source commit and the same request-dataset hash.",
+        provenance_note(displayed),
         "",
         "## Matched improvement",
         "",
@@ -233,7 +276,7 @@ def main() -> None:
     lines.extend(
         [
             "",
-            "The unchanged 43/120 valid total is explained by paired behavior: the same models fail on the same valid requests in both architectures. The gate changes invalid identity arguments from backend tool errors into explicit policy blocks, but it does not repair the model's argument or force the required sequence.",
+            paired_valid_note(prompt_only, policy_gated),
             "",
             "## Interpretation boundary",
             "",
