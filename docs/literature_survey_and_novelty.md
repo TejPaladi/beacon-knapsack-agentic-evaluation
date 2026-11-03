@@ -46,6 +46,14 @@ environment state.
 Our trace-based metrics follow the same principle: evaluate the executed persona,
 tool order, Knapsack action, and final plan state rather than grading prose alone.
 
+The
+[Agentic AI Test Checklist](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
+provides 110 implementation-oriented checks organized around terminal state,
+dependency order, tool use, security, and state. It is not a meal-agent benchmark,
+so we do not report a score over all 110 rows. We use relevant checklist items to
+define deterministic oracles for complete-task success, dependency order,
+allowlisted tools, bounded calls, and application-level policy enforcement.
+
 ## Clarification is a first-class capability
 
 Ambiguous and underspecified requests should trigger information gathering rather
@@ -116,6 +124,14 @@ recommendation workflow:
 7. compare Knapsack with direct LLM meal selection on the same six profiles,
    role-eligible catalog, and post-hoc Beacon evaluators, separating hard
    violations from nutrition fit and overall quality.
+
+The responsibility-based extension strengthens this contribution with four
+independently testable tools: combined profile resolution/retrieval, deterministic
+recommendation, optional nutrition analysis, and mandatory violation checking.
+It adds multi-intent and injected-fault cases so a model can choose an appropriate
+workflow while deterministic code controls the release boundary. The value is
+the measured boundary between model flexibility and application enforcement,
+not the number of tools.
 
 This is a defensible semester-scale contribution. A conference-strength claim
 would require more personas and linguistic variants, repeated trials, stronger

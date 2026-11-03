@@ -202,6 +202,57 @@ scored 0.453 across all cases. Its three safe plans averaged 0.906, so the
 results do not support claiming that Knapsack has the highest conditional meal
 quality. Both LLMs were over 20 times slower than direct Knapsack.
 
+## Meaningful-tool experiment
+
+The latest experiment replaces implementation-step tools with four distinct
+responsibilities:
+
+1. `fetch_persona_profile` resolves and retrieves one stored fictional profile;
+2. `recommend_meal_plan` runs the unchanged Beacon Knapsack method;
+3. `calculate_nutrition_scores` computes totals, goal fit, and FSA/WHO-style
+   proxies only when the request asks for nutrition detail; and
+4. `check_plan_violations` deterministically decides whether a plan may be
+   released.
+
+The fixed benchmark contains 42 requests across profile-only, recommendation,
+nutrition-analysis, restriction-override, indirect-intent, unclear-identity,
+and injected-fault categories. It compares a no-LLM rule pipeline with matched
+prompt-only and policy-gated outcomes. Each model trace is generated once and
+replayed through the deterministic release gate, so the comparison changes only
+release permission. The agents choose and sequence tools; application code binds
+the resolved persona and blocks unchecked or invalid plans at the gated response
+boundary.
+
+See [the checked comparison](results/meaningful_tools_comparison.md) for the
+completed result and
+[the design and metric dictionary](docs/tool_design_and_metric_dictionary.md)
+for tool contracts, hypotheses, formulas, examples, and the selected Agentic AI
+Checklist mapping.
+
+Run one complete condition with:
+
+```bash
+# No model call.
+"$BEACON_PYTHON" code/meaningful_tools_benchmark.py \
+  --architecture deterministic_pipeline \
+  --output results/meaningful_tools/deterministic_pipeline.json
+
+# Local Ollama model, prompt-only release ablation.
+"$BEACON_PYTHON" code/meaningful_tools_benchmark.py \
+  --architecture meaningful_agent_prompt_only --model granite4:3b \
+  --output results/meaningful_tools/prompt_only__granite4_3b.json
+
+# Apply deterministic release enforcement to that exact trace; no model call.
+"$BEACON_PYTHON" code/replay_release_gate.py \
+  --source results/meaningful_tools/prompt_only__granite4_3b.json \
+  --output results/meaningful_tools/gated__granite4_3b.json
+```
+
+These tools use a small native function-calling loop so the experiment can
+score every call directly. MCP or LangChain can expose the same Python
+functions later; changing transport or agent framework is not expected to
+change the scientific comparison.
+
 ## Setup
 
 ### 1. Obtain the compatible Beacon backend

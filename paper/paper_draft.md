@@ -77,8 +77,11 @@ The study asks four research questions:
 - **RQ4:** How do direct LLM-selected meal plans compare with deterministic
   Knapsack plans on constraint adherence, quality, nutrition fit, variety, and
   latency?
+- **RQ5:** Can responsibility-based tools support multiple user intents, and
+  does deterministic validation prevent a corrupted plan from reaching the
+  response boundary?
 
-The paper makes four bounded contributions:
+The paper makes five bounded contributions:
 
 1. a controlled separation between language-model orchestration and
    deterministic meal selection in the BEACON system.
@@ -91,6 +94,9 @@ The paper makes four bounded contributions:
 4. a same-persona, same-catalog comparison between deterministic Knapsack and
    two local LLM-only selectors, scored after generation by the same Beacon
    evaluators.
+5. a four-tool, multi-intent extension with deterministic nutrition analysis,
+   violation checking, injected-fault evaluation, and a matched release-gate
+   ablation across three local models.
 
 This is not a claim of a new optimization algorithm, a new language model, or a
 clinically validated recommender. It is a controlled systems study of agentic
@@ -135,6 +141,14 @@ also evaluates tool selection, arguments, multi-turn execution, and irrelevant
 or hallucinated calls [6]. Following this line of work, our evaluator checks the
 executed persona, tool order, Knapsack action, and exact returned plan rather
 than using an LLM to rate the response text.
+
+The Agentic AI Test Checklist collects 110 implementation-oriented checks for
+terminal state, dependency ordering, tool allowlists, runtime enforcement, and
+related risks [15]. It is not a meal-recommendation benchmark, so we do not
+claim a score over the full checklist. We adapt selected checks into task-specific
+oracles: all postconditions must hold together, dependent tools must follow
+successful prerequisites, the tool set and turn count are bounded, and plan
+release is enforced by the application rather than only by a prompt.
 
 ### 2.4 Clarification and runtime policy enforcement
 
@@ -248,6 +262,38 @@ This gate does not choose meals and does not complete the valid tool sequence
 for the model. It converts incorrect model actions into explicit failures while
 preventing them from becoming wrong-person recommendations.
 
+### 3.5 Responsibility-based tool extension
+
+The initial three tools expose implementation steps rather than all of the
+responsibilities discussed for a meal agent. The extension uses four tools with
+distinct inputs, outputs, and failure boundaries:
+
+| Tool | Responsibility | Enforced prerequisite |
+| --- | --- | --- |
+| `fetch_persona_profile` | Resolve one ID, full name, or unique first name and return the stored fictional profile. | Application-resolved persona must match. |
+| `recommend_meal_plan` | Run the unchanged deterministic Beacon Knapsack method. | Matching profile was fetched. |
+| `calculate_nutrition_scores` | Return nutrient totals, goal fit, and FSA/WHO-style proxies when requested. | A current plan exists. |
+| `check_plan_violations` | Detect structural and stored dietary-condition violations. | A current plan exists. |
+
+Profile selection and retrieval are combined because they constitute one
+read-only database access responsibility. Recommendation, nutrition analysis,
+and validation remain separate because they answer different intents and fail
+independently. Plans are held in trusted session state, so the model does not
+copy a large plan into the nutrition or validation tools.
+
+For a resolved request, the model still chooses which tools to invoke. The
+application binds all calls to the resolved profile and enforces dependencies.
+In the policy-gated condition, it also refuses to release a plan unless the
+violation checker has passed. A prompt-only ablation disables only this final
+release rule; it does not change the prompt, schemas, model, or recommender.
+
+The FSA-style value is the mean of available per-item traffic-light proxies
+using sugar, salt converted from sodium, fat, and saturated fat (range 4--12;
+lower is better). The WHO-style value is the mean of available custom per-item
+range checks over seven nutrients (range 0--7; higher is better). Coverage is
+reported and missing values are not imputed. Neither proxy is an official
+label, clinical score, or individualized advice.
+
 ## 4. Experimental Method
 
 ### 4.1 Experiment 1: direct versus agentic integration check
@@ -314,7 +360,32 @@ dietary conditions, and the same Beacon evaluators measure goodness, overall
 quality, nutrition fit, repeated foods, exact Knapsack match, tokens, and
 latency.
 
-### 4.4 Scoring
+### 4.4 Experiment 4: meaningful tools and fault containment
+
+Experiment 4 evaluates the four responsibility-based tools on 42 fixed
+non-sensitive requests, six in each of seven categories: profile-only,
+recommendation, nutrition analysis, restriction override, indirect intent,
+unclear identity, and injected fault. Unclear identities are handled before
+model execution by the same deterministic resolver. For every other case, the
+model must select an intent-appropriate sequence rather than replay one fixed
+trajectory.
+
+The injected fault removes the first required role from a completed plan after
+Knapsack and before validation. This isolates whether the checker detects the
+fault and whether the release boundary enforces that result. It does not test
+whether the model can notice the corruption from text because the model never
+receives or edits the plan directly.
+
+Three local Ollama models are used: `granite4:3b`, `qwen3.5:4b`, and
+`llama3.2:3b`. Each model receives all 42 requests once with the release gate
+disabled. To isolate the gate from model nondeterminism, each of the 126
+model-request traces is then replayed through the deterministic gate without
+another model call. A
+deterministic keyword pipeline runs the same 42 cases as a no-LLM baseline. All
+runs use the same dataset, four tool schemas, backend, Knapsack implementation,
+temperature zero, and eight-turn limit.
+
+### 4.5 Scoring
 
 A valid request passes only if it:
 
@@ -333,7 +404,14 @@ with a catalog member and violates none of the stored diabetes, vegetarian,
 vegan, or gluten-free conditions. Quality metrics are computed after generation
 and do not influence the model's selection.
 
-### 4.5 Reproducibility
+For Experiment 4, complete-case success requires all applicable checks to pass:
+persona routing, exact ordered tool path, expected terminal action, correct
+nutrition-tool selection, exact Knapsack fidelity, zero failed tools, and zero
+API or loop errors. A fault case also requires detection and blocked release.
+We separately report unsafe releases and success by request category. The
+metric dictionary gives each denominator and a worked example.
+
+### 4.6 Reproducibility
 
 The benchmark records the dataset hash, prompt hash, source commit, hashes of
 the benchmark and policy-gate implementations, model, temperature, complete tool
@@ -621,3 +699,5 @@ A. Davison, and B. Srivastava. “[A Novel Approach to Balance Convenience and N
 [13] Model Context Protocol. “[Specification](https://modelcontextprotocol.io/specification/).” Accessed October 27, 2026.
 
 [14] LangChain. “[Agents](https://docs.langchain.com/oss/python/langchain/agents).” Accessed October 27, 2026.
+
+[15] S. Padmanabhuni. “[Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).” Hugging Face dataset, 110 rows, CC BY 4.0. Accessed November 2, 2026.

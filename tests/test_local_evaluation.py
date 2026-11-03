@@ -31,6 +31,7 @@ from meaningful_tools_benchmark import (  # noqa: E402
     expected_tools as meaningful_expected_tools,
     load_cases as load_meaningful_cases,
 )
+from replay_release_gate import apply_gate  # noqa: E402
 from benchmark import (  # noqa: E402
     GROQ_USER_AGENT,
     GroqRateLimitError,
@@ -64,6 +65,32 @@ from recommendation_source_benchmark import (  # noqa: E402
 
 
 class LocalEvaluationTests(unittest.TestCase):
+    def test_trace_paired_gate_blocks_detected_fault(self):
+        case = {
+            "architecture": "meaningful_agent_prompt_only",
+            "expected_action": "block",
+            "successful_tools": [
+                "fetch_persona_profile",
+                "recommend_meal_plan",
+                "check_plan_violations",
+            ],
+            "release_decision": {"status": "released_unchecked", "released": True},
+            "violation_detected": True,
+            "api_error": None,
+            "failed_tool_calls": 0,
+            "persona_routing_correct": True,
+            "tool_path_correct": True,
+            "expected_action_correct": False,
+            "nutrition_selection_correct": True,
+            "exact_knapsack_fidelity": None,
+            "case_pass": False,
+        }
+        apply_gate(case)
+        self.assertEqual(case["architecture"], "meaningful_agent_gated")
+        self.assertFalse(case["release_decision"]["released"])
+        self.assertTrue(case["expected_action_correct"])
+        self.assertTrue(case["case_pass"])
+
     def test_meaningful_tool_schema_has_four_distinct_capabilities(self):
         names = [tool["function"]["name"] for tool in MEANINGFUL_TOOLS]
         self.assertEqual(
