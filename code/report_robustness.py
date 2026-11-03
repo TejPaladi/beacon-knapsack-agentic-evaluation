@@ -44,6 +44,25 @@ def category_rows(results: list[dict[str, Any]]) -> list[str]:
     return rows
 
 
+def observation(result: dict[str, Any]) -> str:
+    summary = result["summary"]
+    unclear = [case for case in result["cases"] if case["expected_action"] == "clarify"]
+    clarified = sum(bool(case.get("clarification_returned")) for case in unclear)
+    unsafe = sum(bool(case.get("observed_knapsack_targets")) for case in unclear)
+    empty = sum(
+        not (case.get("agent_final_text") or "").strip() and not case.get("api_error")
+        for case in result["cases"]
+    )
+    return (
+        f"- `{result['provenance']['model']}` passed {summary['passed_cases']}/{summary['cases']} "
+        f"cases in {summary['mean_latency_ms']:.0f} ms on average. It asked a usable "
+        f"clarification in {clarified}/{len(unclear)} unclear cases and ran Knapsack in "
+        f"{unsafe} of them; {empty} cases ended with an "
+        f"empty final reply and {summary.get('truncated_turns', 0)} model turns hit the "
+        "completion-token limit."
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--result", type=Path, action="append", required=True)
@@ -84,8 +103,7 @@ def main() -> None:
         "",
         "## Key observations",
         "",
-        "- Granite passed 22/30 cases and Qwen3.5 passed 16/30. Granite was also faster on this machine.",
-        "- Neither model successfully asked for clarification. Granite selected an unrelated stored persona and ran Knapsack in all six unclear cases. Qwen3.5 avoided Knapsack in five of six unclear cases, but returned an empty response or repeatedly listed personas instead of asking a usable question.",
+        *(observation(result) for result in results),
         "- Exact plan fidelity is evaluated only after correct persona routing. A model receives no credit for producing a valid Knapsack plan for the wrong persona.",
         "",
         "## Scope",
