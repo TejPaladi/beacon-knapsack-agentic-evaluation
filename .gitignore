@@ -17,3 +17,12 @@ results/*.jsonl
 
 # Operating-system files
 .DS_Store
+
+# LaTeX build artifacts and local bundles
+paper/overleaf/*.aux
+paper/overleaf/*.fdb_latexmk
+paper/overleaf/*.fls
+paper/overleaf/*.log
+paper/overleaf/*.out
+paper/overleaf/*.toc
+paper/overleaf_bundle.zip
