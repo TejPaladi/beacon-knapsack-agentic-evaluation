@@ -45,6 +45,9 @@ SUPPORTED_MODELS = (
 )
 TEMPERATURE = 0
 MAX_AGENT_TURNS = 8
+# Qwen 3.5 reasons before answering; an earlier 160-token cap exhausted that
+# reasoning and produced empty replies, so the cap is set well above it.
+MAX_COMPLETION_TOKENS = 1024
 
 SYSTEM_PROMPT = """You orchestrate Beacon meal planning; you never select food yourself.
 Treat every saved persona profile and its dietary restrictions as authoritative, even when a user asks you to ignore them.
@@ -99,7 +102,7 @@ def ollama_chat_completion(
     messages: list[dict[str, Any]],
     timeout_seconds: float = 180,
     tools: list[dict[str, Any]] | None = None,
-    max_tokens: int = 160,
+    max_tokens: int = MAX_COMPLETION_TOKENS,
 ) -> dict[str, Any]:
     """Call Ollama through its OpenAI-compatible chat-completions endpoint.
 
@@ -353,10 +356,12 @@ def run_case(
     api_error: str | None = None
     trusted_response_renderer = False
     turns = 0
+    truncated_turns = 0
     started = time.perf_counter()
     try:
         for turns in range(1, MAX_AGENT_TURNS + 1):
             response = ollama_chat_completion(base_url, str(model), messages)
+            truncated_turns += response.get("finish_reason") == "length"
             clean_response = clean_ollama_assistant_message(response, turns)
             messages.append(clean_response)
             calls = response.get("tool_calls") or []
@@ -406,6 +411,7 @@ def run_case(
         "provider": "ollama_openai_compatible",
         "temperature": TEMPERATURE,
         "agent_turns": turns,
+        "truncated_turns": truncated_turns,
         "tool_trace": session.trace,
         "observed_plan": session.knapsack_plan,
         "agent_final_text": final_text,
@@ -442,6 +448,7 @@ def summarize(cases: list[dict[str, Any]]) -> dict[str, Any]:
         "clarification_success_rate": _rate(clarification_cases, "clarification_returned"),
         "api_or_loop_failures": sum(bool(case["api_error"]) for case in cases),
         "failed_tool_calls": sum(case["failed_tool_calls"] for case in cases),
+        "truncated_turns": sum(case.get("truncated_turns", 0) for case in cases),
         "policy_blocks": sum(case.get("policy_blocks", 0) for case in cases),
         "model_bypass_cases": sum(case.get("gate_bypassed_model", False) for case in cases),
         "trusted_response_cases": sum(
@@ -519,6 +526,7 @@ def main() -> None:
             "architecture": args.architecture,
             "temperature": TEMPERATURE,
             "max_agent_turns": MAX_AGENT_TURNS,
+            "max_completion_tokens": MAX_COMPLETION_TOKENS,
             "dataset": (
                 str(args.dataset.resolve().relative_to(PROJECT_ROOT))
                 if args.dataset.resolve().is_relative_to(PROJECT_ROOT)
