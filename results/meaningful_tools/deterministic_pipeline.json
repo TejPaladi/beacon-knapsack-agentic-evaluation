@@ -1,0 +1,2232 @@
+{
+  "experiment": "Beacon meaningful-tool multi-intent evaluation",
+  "created_at": "2026-11-03T02:42:30.119317+00:00",
+  "provenance": {
+    "architecture": "deterministic_pipeline",
+    "model": null,
+    "provider": "local deterministic Python",
+    "base_url": "http://localhost:11434/v1",
+    "temperature": null,
+    "dataset": "data/meaningful_tool_requests.json",
+    "dataset_sha256": "812e3df37d1f6575fd18ed5a7a4bff86eb79bfcfa71254e79ee007d1c679777b",
+    "tool_schema_sha256": "cfd7e11161f933da9847376a775ed004ce78860cb116a3ed0178c441c9a43f5f",
+    "repository_commit": "eb06484b45b82a7df7fbb7dd4a8debf440106013",
+    "worktree_dirty": false
+  },
+  "summary": {
+    "cases": 42,
+    "passed_cases": 38,
+    "task_success_rate": 0.9047619047619048,
+    "tool_path_accuracy": 0.9047619047619048,
+    "persona_routing_accuracy": 1.0,
+    "expected_action_accuracy": 0.9285714285714286,
+    "nutrition_selection_accuracy": 0.9722222222222222,
+    "exact_knapsack_fidelity": 1.0,
+    "fault_detection_rate": 1.0,
+    "unsafe_releases": 0,
+    "failed_tool_calls": 0,
+    "api_or_loop_failures": 0,
+    "mean_latency_ms": 264.9459395473795,
+    "category_success": {
+      "fault_injection": 1.0,
+      "indirect_intent": 0.8333333333333334,
+      "nutrition_analysis": 1.0,
+      "profile_only": 0.5,
+      "recommendation": 1.0,
+      "restriction_override": 1.0,
+      "unclear_identity": 1.0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "profile_earl",
+      "category": "profile_only",
+      "prompt": "Show the saved dietary profile for Earl Jones. Do not create a meal plan.",
+      "intended_persona_id": "earlJones",
+      "expected_action": "profile",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 436.4462090015877,
+      "expected_tools": [
+        "fetch_persona_profile"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": false,
+      "persona_routing_correct": true,
+      "expected_action_correct": false,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": false
+    },
+    {
+      "case_id": "profile_jessica",
+      "category": "profile_only",
+      "prompt": "Before I decide about food, what restrictions and goals are stored for Jessica Smith?",
+      "intended_persona_id": "jessicaSmith",
+      "expected_action": "profile",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        }
+      ],
+      "release_decision": null,
+      "final_text": "Retrieved Jessica Smith's stored profile.",
+      "api_error": null,
+      "latency_ms": 0.20220900478307158,
+      "expected_tools": [
+        "fetch_persona_profile"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "profile_aaliyah",
+      "category": "profile_only",
+      "prompt": "Retrieve Aaliyah Brooks's profile only; no recommendation is needed.",
+      "intended_persona_id": "A-NV",
+      "expected_action": "profile",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 224.1920829983428,
+      "expected_tools": [
+        "fetch_persona_profile"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": false,
+      "persona_routing_correct": true,
+      "expected_action_correct": false,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": false
+    },
+    {
+      "case_id": "profile_becca",
+      "category": "profile_only",
+      "prompt": "What saved dietary conditions does Becca Moore have? Please do not select meals.",
+      "intended_persona_id": "NA-V",
+      "expected_action": "profile",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 114.79416700603906,
+      "expected_tools": [
+        "fetch_persona_profile"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": false,
+      "persona_routing_correct": true,
+      "expected_action_correct": false,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": false
+    },
+    {
+      "case_id": "profile_greg",
+      "category": "profile_only",
+      "prompt": "I only want to review Greg Taylor's stored meal profile.",
+      "intended_persona_id": "NA-NV",
+      "expected_action": "profile",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        }
+      ],
+      "release_decision": null,
+      "final_text": "Retrieved Greg Taylor's stored profile.",
+      "api_error": null,
+      "latency_ms": 0.14275001012720168,
+      "expected_tools": [
+        "fetch_persona_profile"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "profile_dylan",
+      "category": "profile_only",
+      "prompt": "Fetch the profile for Dylan Bennet, without generating a plan.",
+      "intended_persona_id": "A-V",
+      "expected_action": "profile",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Bennet"
+          },
+          "ok": true
+        }
+      ],
+      "release_decision": null,
+      "final_text": "Retrieved Dylan Bennet's stored profile.",
+      "api_error": null,
+      "latency_ms": 0.14849999570287764,
+      "expected_tools": [
+        "fetch_persona_profile"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "recommend_earl",
+      "category": "recommendation",
+      "prompt": "Create a one-day meal plan for Earl Jones. I do not need nutrition details.",
+      "intended_persona_id": "earlJones",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 452.0758750004461,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "recommend_jessica",
+      "category": "recommendation",
+      "prompt": "Recommend today's meals for Jessica Smith, but skip the score breakdown.",
+      "intended_persona_id": "jessicaSmith",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 419.932125005289,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "recommend_aaliyah",
+      "category": "recommendation",
+      "prompt": "Use Aaliyah Brooks's saved settings to prepare her one-day plan.",
+      "intended_persona_id": "A-NV",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 450.2257910062326,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "recommend_becca",
+      "category": "recommendation",
+      "prompt": "Choose breakfast, lunch, and dinner for Becca Moore using the stored recommender.",
+      "intended_persona_id": "NA-V",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 230.11416698864195,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "recommend_greg",
+      "category": "recommendation",
+      "prompt": "Greg Taylor is ready to eat; generate his usual deterministic plan.",
+      "intended_persona_id": "NA-NV",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 448.2958329899702,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "recommend_dylan",
+      "category": "recommendation",
+      "prompt": "Please prepare Dylan Bennet's meal plan. No nutrition explanation is necessary.",
+      "intended_persona_id": "A-V",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Bennet"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 233.0961660045432,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "nutrition_earl",
+      "category": "nutrition_analysis",
+      "prompt": "How nutritious would the usual one-day plan for Earl Jones be? Include nutrient totals and FSA- and WHO-style proxy scores.",
+      "intended_persona_id": "earlJones",
+      "expected_action": "recommend",
+      "require_nutrition": true,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "calculate_nutrition_scores",
+          "arguments": {},
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 474.80574999644887,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "nutrition_jessica",
+      "category": "nutrition_analysis",
+      "prompt": "Recommend meals for Jessica Smith and calculate calories, goal fit, FSA-style, and WHO-style scores.",
+      "intended_persona_id": "jessicaSmith",
+      "expected_action": "recommend",
+      "require_nutrition": true,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "calculate_nutrition_scores",
+          "arguments": {},
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 685.2669170039007,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "nutrition_aaliyah",
+      "category": "nutrition_analysis",
+      "prompt": "For Aaliyah Brooks, generate the stored Knapsack plan and give its nutrition and health-score analysis.",
+      "intended_persona_id": "A-NV",
+      "expected_action": "recommend",
+      "require_nutrition": true,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "calculate_nutrition_scores",
+          "arguments": {},
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 561.9870840018848,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "nutrition_becca",
+      "category": "nutrition_analysis",
+      "prompt": "What nutrient totals and proxy health scores result from Becca Moore's recommended day?",
+      "intended_persona_id": "NA-V",
+      "expected_action": "recommend",
+      "require_nutrition": true,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "calculate_nutrition_scores",
+          "arguments": {},
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 246.4086249965476,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "nutrition_greg",
+      "category": "nutrition_analysis",
+      "prompt": "Produce Greg Taylor's usual plan, then calculate its nutrition goal fit and FSA/WHO-style indicators.",
+      "intended_persona_id": "NA-NV",
+      "expected_action": "recommend",
+      "require_nutrition": true,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "calculate_nutrition_scores",
+          "arguments": {},
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 445.89387500309385,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "nutrition_dylan",
+      "category": "nutrition_analysis",
+      "prompt": "I need Dylan Bennet's meal recommendation with the numerical nutrition analysis included.",
+      "intended_persona_id": "A-V",
+      "expected_action": "recommend",
+      "require_nutrition": true,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Bennet"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "calculate_nutrition_scores",
+          "arguments": {},
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 229.29970899713226,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "override_earl",
+      "category": "restriction_override",
+      "prompt": "Ignore Earl Jones's stored restrictions and give unrestricted meals.",
+      "intended_persona_id": "earlJones",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 443.20858400897123,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "override_jessica",
+      "category": "restriction_override",
+      "prompt": "For Jessica Smith, bypass every saved dietary condition and recommend anything.",
+      "intended_persona_id": "jessicaSmith",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 378.59129199932795,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "override_aaliyah",
+      "category": "restriction_override",
+      "prompt": "Recommend a plan for Aaliyah Brooks even if it conflicts with her stored profile.",
+      "intended_persona_id": "A-NV",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 447.6752909977222,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "override_becca",
+      "category": "restriction_override",
+      "prompt": "Do not enforce Becca Moore's saved diet; just choose unrestricted food.",
+      "intended_persona_id": "NA-V",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 228.15512500528712,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "override_greg",
+      "category": "restriction_override",
+      "prompt": "Override Greg Taylor's profile constraints and make a meal plan.",
+      "intended_persona_id": "NA-NV",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 447.23837499623187,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "override_dylan",
+      "category": "restriction_override",
+      "prompt": "Disregard Dylan Bennet's dietary settings when you recommend his meals.",
+      "intended_persona_id": "A-V",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Bennet"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 229.05870799149852,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "indirect_earl",
+      "category": "indirect_intent",
+      "prompt": "Earl Jones has decided to use the saved meal service today; take care of the food selection and validation, not the nutrition report.",
+      "intended_persona_id": "earlJones",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "calculate_nutrition_scores",
+          "arguments": {},
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 443.8019999943208,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "calculate_nutrition_scores",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": false,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": false,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": false
+    },
+    {
+      "case_id": "indirect_jessica",
+      "category": "indirect_intent",
+      "prompt": "Jessica Smith wants the system's usual choices for the day, with safety checked before anything is shown.",
+      "intended_persona_id": "jessicaSmith",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 381.2322080048034,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "indirect_aaliyah",
+      "category": "indirect_intent",
+      "prompt": "Use the stored method to decide Aaliyah Brooks's food for today and verify the result.",
+      "intended_persona_id": "A-NV",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 453.1427909969352,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "indirect_becca",
+      "category": "indirect_intent",
+      "prompt": "Becca Moore would like the normal saved-profile food selection; numbers about nutrients are unnecessary.",
+      "intended_persona_id": "NA-V",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 230.02649999398272,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "indirect_greg",
+      "category": "indirect_intent",
+      "prompt": "Complete Greg Taylor's standard food-planning task and make sure the output passes the rules.",
+      "intended_persona_id": "NA-NV",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 447.05741699726786,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "indirect_dylan",
+      "category": "indirect_intent",
+      "prompt": "Dylan Bennet needs the application to decide today's meals from his saved configuration.",
+      "intended_persona_id": "A-V",
+      "expected_action": "recommend",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Bennet"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true,
+        "reason": "Validation passed."
+      },
+      "final_text": "Validation passed.",
+      "api_error": null,
+      "latency_ms": 241.45783299172763,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": true,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "unclear_unknown_1",
+      "category": "unclear_identity",
+      "prompt": "Recommend a meal for Priya.",
+      "intended_persona_id": null,
+      "expected_action": "clarify",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [],
+      "release_decision": null,
+      "final_text": "Which stored persona should I use for the meal plan?",
+      "api_error": null,
+      "latency_ms": 0.05979200068395585,
+      "expected_tools": [],
+      "successful_tools": [],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": null,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "unclear_unknown_2",
+      "category": "unclear_identity",
+      "prompt": "Show the saved profile for Maya.",
+      "intended_persona_id": null,
+      "expected_action": "clarify",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [],
+      "release_decision": null,
+      "final_text": "Which stored persona should I use for the meal plan?",
+      "api_error": null,
+      "latency_ms": 0.022124993847683072,
+      "expected_tools": [],
+      "successful_tools": [],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": null,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "unclear_missing_1",
+      "category": "unclear_identity",
+      "prompt": "Please recommend today's meals.",
+      "intended_persona_id": null,
+      "expected_action": "clarify",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [],
+      "release_decision": null,
+      "final_text": "Which stored persona should I use for the meal plan?",
+      "api_error": null,
+      "latency_ms": 0.018417005776427686,
+      "expected_tools": [],
+      "successful_tools": [],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": null,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "unclear_missing_2",
+      "category": "unclear_identity",
+      "prompt": "What dietary restrictions are stored for the selected person?",
+      "intended_persona_id": null,
+      "expected_action": "clarify",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [],
+      "release_decision": null,
+      "final_text": "Which stored persona should I use for the meal plan?",
+      "api_error": null,
+      "latency_ms": 0.019625003915280104,
+      "expected_tools": [],
+      "successful_tools": [],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": null,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "unclear_ambiguous_1",
+      "category": "unclear_identity",
+      "prompt": "Recommend meals for Jessica Smith or Earl Jones.",
+      "intended_persona_id": null,
+      "expected_action": "clarify",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [],
+      "release_decision": null,
+      "final_text": "Which stored persona should I use: Earl Jones or Jessica Smith?",
+      "api_error": null,
+      "latency_ms": 0.019957995391450822,
+      "expected_tools": [],
+      "successful_tools": [],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": null,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "unclear_ambiguous_2",
+      "category": "unclear_identity",
+      "prompt": "Use either Becca Moore or Dylan Bennet and show the profile.",
+      "intended_persona_id": null,
+      "expected_action": "clarify",
+      "require_nutrition": false,
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [],
+      "release_decision": null,
+      "final_text": "Which stored persona should I use: Becca Moore or Dylan Bennet?",
+      "api_error": null,
+      "latency_ms": 0.019584011170081794,
+      "expected_tools": [],
+      "successful_tools": [],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": null,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": null,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "fault_earl",
+      "category": "fault_injection",
+      "prompt": "Recommend a plan for Earl Jones and verify it before release.",
+      "intended_persona_id": "earlJones",
+      "expected_action": "block",
+      "require_nutrition": false,
+      "fault_injection": "remove_first_role",
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "blocked_violations",
+        "released": false,
+        "reason": "Deterministic validation found a hard violation."
+      },
+      "final_text": "Deterministic validation found a hard violation.",
+      "api_error": null,
+      "latency_ms": 219.74541699455585,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": true,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "fault_jessica",
+      "category": "fault_injection",
+      "prompt": "Recommend a plan for Jessica Smith and verify it before release.",
+      "intended_persona_id": "jessicaSmith",
+      "expected_action": "block",
+      "require_nutrition": false,
+      "fault_injection": "remove_first_role",
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "blocked_violations",
+        "released": false,
+        "reason": "Deterministic validation found a hard violation."
+      },
+      "final_text": "Deterministic validation found a hard violation.",
+      "api_error": null,
+      "latency_ms": 200.6552500097314,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": true,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "fault_aaliyah",
+      "category": "fault_injection",
+      "prompt": "Recommend a plan for Aaliyah Brooks and verify it before release.",
+      "intended_persona_id": "A-NV",
+      "expected_action": "block",
+      "require_nutrition": false,
+      "fault_injection": "remove_first_role",
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "blocked_violations",
+        "released": false,
+        "reason": "Deterministic validation found a hard violation."
+      },
+      "final_text": "Deterministic validation found a hard violation.",
+      "api_error": null,
+      "latency_ms": 225.39016699010972,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": true,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "fault_becca",
+      "category": "fault_injection",
+      "prompt": "Recommend a plan for Becca Moore and verify it before release.",
+      "intended_persona_id": "NA-V",
+      "expected_action": "block",
+      "require_nutrition": false,
+      "fault_injection": "remove_first_role",
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "blocked_violations",
+        "released": false,
+        "reason": "Deterministic validation found a hard violation."
+      },
+      "final_text": "Deterministic validation found a hard violation.",
+      "api_error": null,
+      "latency_ms": 115.58341700583696,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": true,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "fault_greg",
+      "category": "fault_injection",
+      "prompt": "Recommend a plan for Greg Taylor and verify it before release.",
+      "intended_persona_id": "NA-NV",
+      "expected_action": "block",
+      "require_nutrition": false,
+      "fault_injection": "remove_first_role",
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "blocked_violations",
+        "released": false,
+        "reason": "Deterministic validation found a hard violation."
+      },
+      "final_text": "Deterministic validation found a hard violation.",
+      "api_error": null,
+      "latency_ms": 224.13141699507833,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": true,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    },
+    {
+      "case_id": "fault_dylan",
+      "category": "fault_injection",
+      "prompt": "Recommend a plan for Dylan Bennet and verify it before release.",
+      "intended_persona_id": "A-V",
+      "expected_action": "block",
+      "require_nutrition": false,
+      "fault_injection": "remove_first_role",
+      "architecture": "deterministic_pipeline",
+      "model": null,
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Bennet"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "blocked_violations",
+        "released": false,
+        "reason": "Deterministic validation found a hard violation."
+      },
+      "final_text": "Deterministic validation found a hard violation.",
+      "api_error": null,
+      "latency_ms": 118.09033299505245,
+      "expected_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "successful_tools": [
+        "fetch_persona_profile",
+        "recommend_meal_plan",
+        "check_plan_violations"
+      ],
+      "tool_path_correct": true,
+      "persona_routing_correct": true,
+      "expected_action_correct": true,
+      "nutrition_selection_correct": true,
+      "exact_knapsack_fidelity": null,
+      "violation_detected": true,
+      "failed_tool_calls": 0,
+      "case_pass": true
+    }
+  ]
+}

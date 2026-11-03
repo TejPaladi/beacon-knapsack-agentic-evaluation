@@ -229,6 +229,13 @@ completed result and
 for tool contracts, hypotheses, formulas, examples, and the selected Agentic AI
 Checklist mapping.
 
+The deterministic rule pipeline passes 38/42 cases. Across 126 fixed
+model-request traces, prompt-only agents pass 62 cases and release all 18
+injected faulty plans; replaying those exact traces through the deterministic
+release gate raises complete passes to 80 and reduces unsafe releases to zero.
+The gain is fault containment only: routing, tool selection, model failures,
+Knapsack output, and latency are unchanged.
+
 Run one complete condition with:
 
 ```bash

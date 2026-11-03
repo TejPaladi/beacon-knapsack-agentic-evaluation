@@ -129,7 +129,7 @@ def matched_observations(results: list[dict[str, Any]]) -> list[str]:
         f"- The deterministic rule baseline passed {baseline['summary']['passed_cases']}/{EXPECTED_CASES}. Its failures show where fixed cue matching did not capture the intended language.",
         f"- Across matched model-request pairs, prompt-only agents passed {prompt_passed}/{denominator}; gated agents passed {gated_passed}/{denominator}.",
         f"- Prompt-only agents released {prompt_unsafe} injected faulty plans; gated agents released {gated_unsafe}. The gate changes release permission, not the model's tool choices or Knapsack output.",
-        "- Exact Knapsack fidelity is conditional on reaching the correct recommendation path. It does not give credit for choosing the wrong action or omitting required analysis.",
+        "- Knapsack fidelity is evaluated across ordinary recommendation-required cases. A missing plan, wrong persona, or changed role-item assignment fails; fault-injection cases are excluded because their plans are deliberately corrupted after Knapsack.",
     ]
 
 
@@ -176,7 +176,7 @@ def main() -> None:
         "- **Valid tool path:** successful calls have exact required membership and respect dependencies. Profile retrieval precedes recommendation; recommendation precedes analysis and validation. Nutrition analysis and validation are independent siblings and may occur in either order. Extra, missing, or repeated calls fail.",
         "- **Correct action:** profile requests stop after retrieval; recommendation requests release a checked safe plan; fault cases block the plan; unclear identities ask for clarification without tool access.",
         "- **Nutrition-tool choice:** nutrition analysis is called if and only if the request asks for nutrient, goal-fit, FSA-style, or WHO-style details.",
-        "- **Knapsack fidelity:** for ordinary recommendation cases, selected role-item IDs exactly match a fresh direct Beacon Knapsack run for the same persona.",
+        "- **Knapsack fidelity:** for ordinary recommendation-required cases, a plan exists and its selected role-item IDs exactly match a fresh direct Beacon Knapsack run for the same persona. Missing plans fail; injected-fault cases are excluded.",
         "- **Injected-fault detection:** the checker identifies a plan whose first required meal role was deliberately removed after recommendation.",
         "- **Unsafe release:** an injected faulty plan reaches the response boundary. Lower is better; zero is required.",
         "- **Latency:** wall-clock time for identity resolution, all model turns, and local tool execution.",

@@ -93,15 +93,17 @@ All rates are computed as `passing applicable cases / applicable cases`.
 | Valid tool path | Calls have exact required membership and respect dependency order. | `fetch → recommend → nutrition → check` and `fetch → recommend → check → nutrition` are both valid; an extra call fails. |
 | Expected action | Profile request stops after fetch; normal recommendation releases a checked plan; fault case blocks; unclear case clarifies. | A profile question that creates a meal plan fails. |
 | Nutrition-tool selection | Call nutrition analysis if and only if the request asks for it. | “Include calories” requires the call; “no nutrition details” forbids it. |
-| Exact Knapsack fidelity | Returned role-item IDs exactly equal a fresh direct Knapsack run for that persona. | Same foods with one lunch item changed fails. |
+| Exact Knapsack fidelity | For ordinary recommendation-required cases, a plan exists and its role-item IDs equal a fresh direct Knapsack run. | A missing plan or one changed lunch item fails; injected-fault cases are excluded. |
 | Injected-fault detection | The checker reports at least one hard violation for the corrupted plan. | Removing breakfast's first required role must be detected. |
 | Unsafe releases | Count of injected faulty plans released to the response boundary. | Six released fault cases means `6`; the required value is `0`. |
 | Tool/API failures | Count failed local calls separately from model API or turn-limit failures. | Calling nutrition before recommendation is a failed tool call. |
 | Mean latency | Mean wall-clock milliseconds from request start through model turns and tools. | Includes identity resolution, local computation, and model inference. |
 
-Exact fidelity is conditional: it answers whether a reached Knapsack workflow
-was preserved. Complete-case success remains the main metric because it also
-penalizes choosing the wrong workflow.
+Exact fidelity is evaluated over ordinary cases that require a recommendation,
+so a missing plan receives no credit. Injected-fault cases are excluded because
+their plans are deliberately changed after Knapsack. Complete-case success
+remains the main metric because it also requires the correct tools and terminal
+action.
 
 ## Meal-quality metrics reused from Beacon
 
@@ -163,6 +165,22 @@ The plan value is the mean over items with complete inputs.
 
 This is a custom WHO-style comparison score, not an official WHO score,
 diagnosis, or personalized medical recommendation.
+
+### Worked output from Earl's deterministic plan
+
+The current plan contains nine selected catalog entries. Five have complete
+inputs for both proxies, so the tool reports:
+
+| Output | Value | How to read it |
+| --- | ---: | --- |
+| Nutrition-goal fit | 0.506 | Mean of calories 1.000, carbohydrates 0.307, protein 0.530, and fiber 0.187. |
+| FSA-style proxy | 9.8 | Mean over five scorable items; range 4--12 and lower is better. |
+| WHO-style proxy | 3.8 | Mean over five scorable items; range 0--7 and higher is better. |
+| Proxy coverage | 5/9 | Four selected entries lack required catalog nutrients and are listed explicitly. |
+
+Nutrient totals sum available values. If an item lacks a nutrient field, the
+tool records the missing item rather than imputing zero; totals and proxy means
+must therefore always be presented with coverage and missing-data information.
 
 ## Selected Agentic AI Checklist coverage
 
