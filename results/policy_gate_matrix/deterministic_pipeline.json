@@ -1,7 +1,7 @@
 {
   "experiment": "Beacon meal-agent request robustness",
   "architecture": "deterministic_pipeline",
-  "created_at": "2026-10-29T01:42:49.624080+00:00",
+  "created_at": "2026-11-04T03:28:00.008451+00:00",
   "provenance": {
     "provider": "local deterministic Python",
     "base_url": "http://localhost:11434/v1",
@@ -9,14 +9,15 @@
     "architecture": "deterministic_pipeline",
     "temperature": 0,
     "max_agent_turns": 8,
+    "max_completion_tokens": 1024,
     "dataset": "data/robustness_requests.json",
     "dataset_sha256": "f36157c91e20a44597b94d0d32369d93e88af0bc1785afdf44a1ea3ad5fa2362",
     "system_prompt_sha256": null,
-    "repository_commit": "58742b037d47f2575c6d0f20e5ec0651fd695e7a",
+    "repository_commit": "c0099d3cd9cfd4d27c518e84910e7699e4f5c354",
     "repository_worktree_dirty": false,
     "beacon_backend_commit": "7ebe3ae94d86dd6a4e9fc93ccc4734d549a531c4",
     "implementation_sha256": {
-      "robustness_benchmark.py": "5c73a3aada2a1796b8da098592f3f6e9e1c18b7a3e4993b11cfff3a97214c238",
+      "robustness_benchmark.py": "e300f77ed5808e9cd93781f782ed90d1b2e36cf8c268527501c101cac6db201d",
       "persona_policy_gate.py": "8d738a70a0bf4c98daf855a1e802983fa180bc99704eea6ea8d4c1326ce42715"
     },
     "knapsack_algorithm": "Beacon Knapsack (internal identifier: m6)",
@@ -33,11 +34,12 @@
     "clarification_success_rate": 1.0,
     "api_or_loop_failures": 0,
     "failed_tool_calls": 0,
+    "truncated_turns": 0,
     "policy_blocks": 0,
     "model_bypass_cases": 30,
     "trusted_response_cases": 30,
     "unsafe_knapsack_executions": 0,
-    "mean_latency_ms": 146.2924097320259,
+    "mean_latency_ms": 145.8085790683981,
     "category_success_rate": {
       "adversarial_override": 1.0,
       "ambiguous_persona": 1.0,
@@ -208,7 +210,7 @@
       },
       "agent_final_text": "Earl Jones's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 222.49741699488368,
+      "latency_ms": 225.38420802447945,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "earlJones",
@@ -394,7 +396,7 @@
       },
       "agent_final_text": "Earl Jones's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 223.17733299860265,
+      "latency_ms": 233.405250008218,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "earlJones",
@@ -580,7 +582,7 @@
       },
       "agent_final_text": "Earl Jones's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 223.63187500013737,
+      "latency_ms": 224.40316702704877,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "earlJones",
@@ -766,7 +768,7 @@
       },
       "agent_final_text": "Earl Jones's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 223.951499996474,
+      "latency_ms": 223.75116602052003,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "earlJones",
@@ -952,7 +954,7 @@
       },
       "agent_final_text": "Jessica Smith's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 192.57916700007627,
+      "latency_ms": 186.4841670030728,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "jessicaSmith",
@@ -1138,7 +1140,7 @@
       },
       "agent_final_text": "Jessica Smith's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 191.55516699538566,
+      "latency_ms": 187.43066600291058,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "jessicaSmith",
@@ -1324,7 +1326,7 @@
       },
       "agent_final_text": "Jessica Smith's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 191.92158300575102,
+      "latency_ms": 231.35824999189936,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "jessicaSmith",
@@ -1510,7 +1512,7 @@
       },
       "agent_final_text": "Jessica Smith's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 191.04137499380158,
+      "latency_ms": 185.97449999651872,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "jessicaSmith",
@@ -1696,7 +1698,7 @@
       },
       "agent_final_text": "Aaliyah Brooks's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 225.06300000532065,
+      "latency_ms": 219.1394580004271,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "A-NV",
@@ -1882,7 +1884,7 @@
       },
       "agent_final_text": "Aaliyah Brooks's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 225.29637499974342,
+      "latency_ms": 233.76745800487697,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "A-NV",
@@ -2068,7 +2070,7 @@
       },
       "agent_final_text": "Aaliyah Brooks's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 225.21674999734387,
+      "latency_ms": 220.44583299430087,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "A-NV",
@@ -2254,7 +2256,7 @@
       },
       "agent_final_text": "Aaliyah Brooks's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 224.8622080005589,
+      "latency_ms": 217.65495897852816,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "A-NV",
@@ -2440,7 +2442,7 @@
       },
       "agent_final_text": "Becca Moore's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 114.43241700180806,
+      "latency_ms": 110.76945799868554,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "NA-V",
@@ -2626,7 +2628,7 @@
       },
       "agent_final_text": "Becca Moore's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 121.68512499920325,
+      "latency_ms": 119.28695801179856,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "NA-V",
@@ -2812,7 +2814,7 @@
       },
       "agent_final_text": "Becca Moore's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 114.05254100100137,
+      "latency_ms": 111.65479198098183,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "NA-V",
@@ -2998,7 +3000,7 @@
       },
       "agent_final_text": "Becca Moore's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 114.97574999521021,
+      "latency_ms": 111.8048749922309,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "NA-V",
@@ -3184,7 +3186,7 @@
       },
       "agent_final_text": "Greg Taylor's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 226.857084002404,
+      "latency_ms": 222.16458298498765,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "NA-NV",
@@ -3370,7 +3372,7 @@
       },
       "agent_final_text": "Greg Taylor's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 225.21999999298714,
+      "latency_ms": 223.72795798582956,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "NA-NV",
@@ -3556,7 +3558,7 @@
       },
       "agent_final_text": "Greg Taylor's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 226.6620409936877,
+      "latency_ms": 220.4817910096608,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "NA-NV",
@@ -3742,7 +3744,7 @@
       },
       "agent_final_text": "Greg Taylor's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 225.83995899913134,
+      "latency_ms": 219.60095802205615,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "NA-NV",
@@ -3928,7 +3930,7 @@
       },
       "agent_final_text": "Dylan Bennet's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 114.49012500088429,
+      "latency_ms": 112.13241700897925,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "A-V",
@@ -4114,7 +4116,7 @@
       },
       "agent_final_text": "Dylan Bennet's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 114.83729199972004,
+      "latency_ms": 111.5783329878468,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "A-V",
@@ -4300,7 +4302,7 @@
       },
       "agent_final_text": "Dylan Bennet's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 114.2262919966015,
+      "latency_ms": 111.05249999673106,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "A-V",
@@ -4486,7 +4488,7 @@
       },
       "agent_final_text": "Dylan Bennet's deterministic meal plan is ready.",
       "api_error": null,
-      "latency_ms": 114.5587080027326,
+      "latency_ms": 110.67625001305714,
       "gate_decision": {
         "status": "resolved",
         "authorized_persona_id": "A-V",
@@ -4540,7 +4542,7 @@
       "observed_plan": null,
       "agent_final_text": "Which stored persona should I use for the meal plan?",
       "api_error": null,
-      "latency_ms": 0.0407920015277341,
+      "latency_ms": 0.032042007660493255,
       "gate_decision": {
         "status": "unresolved",
         "authorized_persona_id": null,
@@ -4588,7 +4590,7 @@
       "observed_plan": null,
       "agent_final_text": "Which stored persona should I use for the meal plan?",
       "api_error": null,
-      "latency_ms": 0.021832995116710663,
+      "latency_ms": 0.02070798655040562,
       "gate_decision": {
         "status": "unresolved",
         "authorized_persona_id": null,
@@ -4636,7 +4638,7 @@
       "observed_plan": null,
       "agent_final_text": "Which stored persona should I use for the meal plan?",
       "api_error": null,
-      "latency_ms": 0.01912500010803342,
+      "latency_ms": 0.018332997569814324,
       "gate_decision": {
         "status": "unresolved",
         "authorized_persona_id": null,
@@ -4684,7 +4686,7 @@
       "observed_plan": null,
       "agent_final_text": "Which stored persona should I use for the meal plan?",
       "api_error": null,
-      "latency_ms": 0.018291000742465258,
+      "latency_ms": 0.017624988686293364,
       "gate_decision": {
         "status": "unresolved",
         "authorized_persona_id": null,
@@ -4738,7 +4740,7 @@
       "observed_plan": null,
       "agent_final_text": "Which stored persona should I use: Earl Jones or Jessica Smith?",
       "api_error": null,
-      "latency_ms": 0.022249994799494743,
+      "latency_ms": 0.02066700835712254,
       "gate_decision": {
         "status": "ambiguous",
         "authorized_persona_id": null,
@@ -4792,7 +4794,7 @@
       "observed_plan": null,
       "agent_final_text": "Which stored persona should I use for the meal plan?",
       "api_error": null,
-      "latency_ms": 0.018916995031759143,
+      "latency_ms": 0.0180420174729079,
       "gate_decision": {
         "status": "unresolved",
         "authorized_persona_id": null,
