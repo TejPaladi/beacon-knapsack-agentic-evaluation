@@ -4,8 +4,8 @@ This matched study gives each local model the same 30 requests and the same thre
 
 | Model | Passed cases | Persona routing | Correct Knapsack action | Exact Knapsack fidelity | Tool-sequence compliance | Clarification success | API/loop failures | Failed tool calls | Mean latency (ms) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `granite4:3b` | 22/30 | 91.7% | 73.3% | 91.7% | 73.3% | 0.0% | 0 | 4 | 8582.9 |
-| `qwen3.5:4b` | 16/30 | 66.7% | 70.0% | 66.7% | 53.3% | 0.0% | 1 | 0 | 16350.7 |
+| `granite4:3b` | 22/30 | 91.7% | 73.3% | 91.7% | 73.3% | 0.0% | 0 | 4 | 8510.9 |
+| `qwen3.5:4b` | 26/30 | 91.7% | 90.0% | 91.7% | 86.7% | 66.7% | 1 | 0 | 22630.0 |
 
 A successful recommendation must route to the intended stored persona, follow `list → profile → Knapsack`, and exactly match the deterministic reference plan. A successful invalid, missing, or ambiguous case must ask for clarification without running Knapsack.
 
@@ -13,20 +13,20 @@ A successful recommendation must route to the intended stored persona, follow `l
 
 | Request category | `granite4:3b` | `qwen3.5:4b` |
 | --- | ---: | ---: |
-| `adversarial_override` | 66.7% | 0.0% |
-| `ambiguous_persona` | 0.0% | 0.0% |
-| `exact_name` | 100.0% | 66.7% |
+| `adversarial_override` | 66.7% | 66.7% |
+| `ambiguous_persona` | 0.0% | 50.0% |
+| `exact_name` | 100.0% | 100.0% |
 | `first_name` | 100.0% | 100.0% |
-| `missing_persona` | 0.0% | 0.0% |
+| `missing_persona` | 0.0% | 100.0% |
 | `paraphrase` | 100.0% | 100.0% |
-| `unknown_persona` | 0.0% | 0.0% |
+| `unknown_persona` | 0.0% | 50.0% |
 
 The restriction-override cases ask the agent to ignore stored restrictions. Passing means the agent still invokes Knapsack for the intended stored profile and returns the unchanged deterministic plan. These are policy-compliance checks, not general adversarial attacks.
 
 ## Key observations
 
-- Granite passed 22/30 cases and Qwen3.5 passed 16/30. Granite was also faster on this machine.
-- Neither model successfully asked for clarification. Granite selected an unrelated stored persona and ran Knapsack in all six unclear cases. Qwen3.5 avoided Knapsack in five of six unclear cases, but returned an empty response or repeatedly listed personas instead of asking a usable question.
+- `granite4:3b` passed 22/30 cases in 8511 ms on average. It asked a usable clarification in 0/6 unclear cases and ran Knapsack in 6 of them; 0 cases ended with an empty final reply and 0 model turns hit the completion-token limit.
+- `qwen3.5:4b` passed 26/30 cases in 22630 ms on average. It asked a usable clarification in 4/6 unclear cases and ran Knapsack in 1 of them; 1 cases ended with an empty final reply and 1 model turns hit the completion-token limit.
 - Exact plan fidelity is evaluated only after correct persona routing. A model receives no credit for producing a valid Knapsack plan for the wrong persona.
 
 ## Scope
