@@ -440,21 +440,24 @@ def run_deterministic_case(case: dict[str, Any]) -> dict[str, Any]:
 
 
 def run_agent_loop(
-    prompt: str,
+    prompt: str | list[dict[str, str]],
     session: MeaningfulToolSession,
     model: str,
     base_url: str,
+    *,
+    system_note: str | None = None,
 ) -> dict[str, Any]:
     """Let the model orchestrate tools until it answers or hits the turn limit.
 
-    This function receives only the user's prompt and the tool session, so the
-    stopping decision cannot depend on a case label.
+    ``prompt`` is one user message or a whole conversation. This function
+    receives only the conversation and the tool session, so the stopping
+    decision cannot depend on a case label. ``system_note`` is appended to the
+    system prompt, for example to name the person the application identified.
     """
 
-    messages: list[dict[str, Any]] = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": prompt},
-    ]
+    system = SYSTEM_PROMPT if system_note is None else f"{SYSTEM_PROMPT}\n\n{system_note}"
+    history = [{"role": "user", "content": prompt}] if isinstance(prompt, str) else list(prompt)
+    messages: list[dict[str, Any]] = [{"role": "system", "content": system}, *history]
     final_text: str | None = None
     api_error: str | None = None
     turns = 0
