@@ -10,23 +10,24 @@ Large language models can translate natural-language requests into tool calls,
 but delegating a complete recommendation process to a model confounds language,
 tool-use, and recommendation errors. We study a hybrid BEACON meal workflow in
 which models interpret requests while deterministic components retain identity
-binding, Knapsack selection, nutrition calculation, and validation. A hosted
-agent first reproduces all six direct Knapsack plans, but is 28 times slower.
-On 30 requests and five local models, an identity gate raises complete passes
-from 49/150 to 73/150 and reduces unsafe unclear-persona executions from ten to
-zero without improving valid tool trajectories; a no-LLM pipeline passes 30/30,
-showing that this request set does not justify model use. In direct meal
-selection, Knapsack produces 6/6 safe plans with mean Beacon quality 0.860;
-Granite produces 6/6 safe plans at 0.679, while Llama produces only 3/6 safe
-plans despite 0.906 mean quality on that safe subset. Finally, a 42-request
-study separates profile retrieval, recommendation, nutrition analysis, and
-violation checking into four tools. The deterministic baseline passes 38/42.
-Across 126 model-request traces, prompt-only agents pass 62 cases and release
-all 18 injected faulty plans; paired deterministic release enforcement raises
-passes to 80 and reduces unsafe releases to zero without changing model traces.
-The results support using models only for language-dependent interaction that
-outperforms a declared no-LLM baseline, while deterministic code retains
-constraint-sensitive computation and release control.
+binding, Knapsack selection, nutrition calculation, validation, and release
+control. A hosted agent reproduces all six direct Knapsack plans but is 28 times
+slower. On 30 requests and five local models, an identity gate raises complete
+passes from 59/150 to 79/150 and removes all ten recommender executions for
+unidentifiable users, while valid-workflow passes stay at 49/120 with no
+request changing result; a no-LLM pipeline passes 30/30. When small models
+select meals directly, one loses quality and variety and the other violates
+stored dietary conditions for half of the personas. Finally, five
+responsibility-based tools make the release decision an explicit model action.
+Over two 42-request sets with three identical repetitions, two of three models
+release plans their own validation call rejected; a release gate reduces such
+releases to zero and raises correct outcomes by up to six cases without
+changing any model's strict trajectory score. A keyword baseline leads on the
+development wording but not on held-out wording, where the two stronger gated
+agents are comparable to it, and models' final replies sometimes contradict the
+recorded state. The results support using models only where language
+understanding outperforms a declared no-LLM baseline, while deterministic code
+retains constraint-sensitive computation and release control.
 
 **Keywords:** LLM agents, tool use, meal recommendation, deterministic
 optimization, policy enforcement, clarification
@@ -234,7 +235,7 @@ for the same persona, their expected role-item assignments are identical.
 The agent receives three logical tools:
 
 | Tool | Purpose | State effect |
-| --- | --- | --- |
+| ------------------------------------------ | ------------------------------ | ---------------------- |
 | `list_personas()` | Return stored persona identifiers and names. | Read only |
 | `get_persona(persona_id)` | Retrieve one stored profile. | Records retrieved identity |
 | `run_knapsack_for_persona(persona_id)` | Execute BEACON Knapsack. | Produces the meal plan |
@@ -317,7 +318,7 @@ The request categories make every tool selective (✓ required, ✗ must not be
 called):
 
 | Request category | Profile | Recommend | Nutrition | Validate | Release |
-| --- | :---: | :---: | :---: | :---: | :---: |
+| ---------------------------------- | :-----: | :-----: | :-----: | :-----: | :-----: |
 | Profile only | ✓ | ✗ | ✗ | ✗ | ✗ |
 | Recommendation, override, indirect | ✓ | ✓ | ✗ | ✓ | ✓ |
 | Nutrition analysis | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -401,7 +402,9 @@ empty replies. We reproduced the effect directly (the same request ends with
 `finish_reason = length` and no output at 160 tokens, and with a correct tool
 call after 281 tokens at 1,024) and re-ran all five models at 1,024 tokens so
 every model uses the same setting. The runner now records every turn that
-reaches the limit.
+reaches the limit. At 1,024 tokens, 32 model turns still reach it: 30 from
+Llama 3.2 1B, which produces long, incoherent replies rather than reasoning,
+and two from Qwen.
 
 ### 4.3 Experiment 3: deterministic versus LLM-only selection
 
@@ -554,32 +557,47 @@ is 1747.2 ms, still about 8.6 times the direct baseline.
 
 | Model | Architecture | Overall | Valid requests | Unclear requests | Unsafe executions | Mean latency |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| None | No-LLM pipeline | **30/30** | **24/24** | **6/6** | **0** | **146.3 ms** |
-| Granite 4 3B | Prompt-only | 22/30 | 22/24 | 0/6 | 6 | 9815.1 ms |
-| Granite 4 3B | Identity-gated | **28/30** | 22/24 | **6/6** | **0** | **3154.7 ms** |
-| Llama 3.2 1B | Prompt-only | 0/30 | 0/24 | 0/6 | 0 | 3596.2 ms |
-| Llama 3.2 1B | Identity-gated | **6/30** | 0/24 | **6/6** | 0 | **2150.2 ms** |
-| Llama 3.2 3B | Prompt-only | 5/30 | 5/24 | 0/6 | 3 | 3868.7 ms |
-| Llama 3.2 3B | Identity-gated | **11/30** | 5/24 | **6/6** | **0** | **2809.4 ms** |
-| Phi-4 Mini 3.8B | Prompt-only | 6/30 | 0/24 | 6/6 | 0 | **1992.8 ms** |
-| Phi-4 Mini 3.8B | Identity-gated | 6/30 | 0/24 | 6/6 | 0 | 2001.4 ms |
-| Qwen 3.5 4B | Prompt-only | 16/30 | 16/24 | 0/6 | 1 | 15351.0 ms |
-| Qwen 3.5 4B | Identity-gated | **22/30** | 16/24 | **6/6** | **0** | **8953.8 ms** |
+| None | No-LLM pipeline | **30/30** | **24/24** | **6/6** | **0** | **145.8 ms** |
+| Granite 4 3B | Prompt-only | 22/30 | 22/24 | 0/6 | 6 | 8510.9 ms |
+| Granite 4 3B | Identity-gated | **28/30** | 22/24 | **6/6** | **0** | **2529.4 ms** |
+| Llama 3.2 1B | Prompt-only | 0/30 | 0/24 | 0/6 | 0 | 16247.8 ms |
+| Llama 3.2 1B | Identity-gated | **6/30** | 0/24 | **6/6** | 0 | **6836.6 ms** |
+| Llama 3.2 3B | Prompt-only | 5/30 | 5/24 | 0/6 | 3 | 4611.2 ms |
+| Llama 3.2 3B | Identity-gated | **11/30** | 5/24 | **6/6** | **0** | **2596.7 ms** |
+| Phi-4 Mini 3.8B | Prompt-only | 6/30 | 0/24 | 6/6 | 0 | 2458.1 ms |
+| Phi-4 Mini 3.8B | Identity-gated | 6/30 | 0/24 | 6/6 | 0 | **2027.1 ms** |
+| Qwen 3.5 4B | Prompt-only | 26/30 | 22/24 | 4/6 | 1 | 22630.0 ms |
+| Qwen 3.5 4B | Identity-gated | **28/30** | 22/24 | **6/6** | **0** | **12857.4 ms** |
 
 Aggregating the matched runs gives the following result:
 
 | Measure | Prompt-only | Identity-gated |
 | --- | ---: | ---: |
-| Complete-case passes | 49/150 | **73/150** |
-| Valid workflow passes | 43/120 | 43/120 |
-| Unclear-request passes | 6/30 | **30/30** |
+| Complete-case passes | 59/150 | **79/150** |
+| Valid workflow passes | 49/120 | 49/120 |
+| Unclear-request passes | 10/30 | **30/30** |
 | Unsafe unclear-case Knapsack executions | 10 | **0** |
-| Mean latency per case | 6924.8 ms | **3813.9 ms** |
+| Mean latency per case | 10891.6 ms | **5369.4 ms** |
 
-The policy gate improves all 24 unclear cases that were not already complete
-passes and introduces no matched pass-to-fail regressions. The 44.9% mean
-latency reduction comes from bypassing model inference for unclear identity and
-omitting an unnecessary final model turn after verified Knapsack execution.
+**H2 is supported.** The gate completes all 20 unclear cases that were not
+already passing and introduces no regression. Paired by model and valid
+request, 49 requests pass in both architectures, 71 fail in both, and none
+changes result. The 50.7% latency reduction comes from skipping model inference
+for unclear identity and omitting a final model turn after verified Knapsack
+execution.
+
+**H1 is supported.** Valid-workflow success ranges from 0/24 (Llama 3.2 1B and
+Phi-4 Mini) to 22/24 (Granite and Qwen), and no model combines high
+valid-workflow success with complete clarification. Granite and Qwen complete
+22 of 24 valid workflows but clarify only 0 and 4 of the six unclear requests;
+Phi-4 Mini clarifies all six and completes no valid workflow.
+
+The completion limit changed one model's result substantially. At 160 tokens,
+Qwen completed 16 of 24 valid workflows, and most of its failures were empty
+replies. At 1,024 tokens it completes 22, matching Granite, at a mean of 22.6 s
+per request without the gate. The other four models' valid-workflow counts are
+unchanged. The earlier ranking therefore partly measured a harness limit rather
+than the model.
 
 The no-LLM pipeline is both faster and more accurate on this dataset. Every
 valid request contains an exact full name or unique first name, every unclear
@@ -589,12 +607,12 @@ important negative result: these 30 cases do not show that an LLM is needed.
 Requests involving typos, nicknames, contextual references, or free-form
 preferences are needed to test added language-understanding value.
 
-The 43/120 valid-workflow total is identical because the same valid requests
+The 49/120 valid-workflow total is identical because the same valid requests
 fail in matched prompt-only and gated runs. Across the five prompt-only runs,
-43 cases pass, 41 fail in backend tool calls because the model supplies an
-invalid persona argument, and 36 never make a successful Knapsack call. In the
+49 cases pass, 41 fail in backend tool calls because the model supplies an
+invalid persona argument, and 30 never make a successful Knapsack call. In the
 gated runs, the 41 backend errors become 41 explicit policy blocks; the other
-36 still lack a successful call. The gate contains invalid arguments but does
+30 still lack a successful call. The gate contains invalid arguments but does
 not repair the model's action or force the sequence.
 
 ### 5.3 Deterministic versus LLM-only selection
@@ -626,51 +644,99 @@ no model tokens.
 
 ### 5.4 Meaningful-tool and fault-containment result
 
-| Model or baseline | Prompt-only | Policy-gated paired replay | Valid tool path | Unsafe releases, prompt → gated | Mean latency |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Deterministic rule pipeline | 38/42 | N/A | 90.5% | 0 → 0 | 264.9 ms |
-| Granite 4 3B | 24/42 | **30/42** | 71.4% | 6 → **0** | 4573.8 ms |
-| Llama 3.2 3B | 19/42 | **25/42** | 61.9% | 6 → **0** | 3630.6 ms |
-| Qwen 3.5 4B | 19/42 | **25/42** | 59.5% | 6 → **0** | 7843.7 ms |
+| Condition | Development strict | Development outcome | Held-out strict | Held-out outcome |
+| --- | ---: | ---: | ---: | ---: |
+| No-LLM rule pipeline | **38/42** | **39/42** | **33/42** | 34/42 |
+| Granite 4 3B, no gate | 29/42 | 30/42 | 31/42 | 32/42 |
+| Granite 4 3B, release gate | 29/42 | 36/42 | 31/42 | **36/42** |
+| Llama 3.2 3B, no gate | 28/42 | 29/42 | 18/42 | 19/42 |
+| Llama 3.2 3B, release gate | 28/42 | 29/42 | 18/42 | 19/42 |
+| Qwen 3.5 4B, no gate | 19/42 | 29/42 | 24/42 | 30/42 |
+| Qwen 3.5 4B, release gate | 19/42 | 35/42 | 24/42 | **36/42** |
 
-Across the same 126 model-request traces, the release gate increases complete
-passes from 62 to 80 and reduces unsafe release of injected faulty plans from
-18 to zero. Every increase is a fault case whose model called the violation
-checker and detected the missing role but whose prompt-only application would
-still release the plan. Because each trace is replayed rather than regenerated,
-the gate cannot change identity routing, tool selection, Knapsack output,
-model failures, or latency.
+All three repetitions produced identical tool traces for every case, model,
+condition, and set, so each count holds in every repetition. Each gated trace
+equals its ungated counterpart up to the gate's first refusal in 126 of 126
+runs per model and set, except Qwen on the development set (123 of 126). The
+two conditions therefore differ only at the gate.
 
-The broader workflow remains difficult. Granite has 100% Knapsack fidelity over
-the 24 ordinary recommendation-required cases, but it completes only one of six
-plain recommendation cases and none of six nutrition-analysis cases because it
-usually omits the final violation check. Llama and Qwen have only 41.7% and
-29.2% Knapsack fidelity respectively because they often stop before producing a
-plan or choose an invalid workflow. Llama records 27 failed local calls and two
-turn-limit failures; the other two models have no API or loop failures.
+**H3c is supported.** Without the gate, Qwen releases all six faulty plans on
+both sets and Granite releases all six on the development set and four on the
+held-out set, each after its own validation call reported the missing meal
+role. On the development set Granite releases every plan it validates,
+whatever the result. With the gate, unsafe releases are zero for every model on
+both sets. Correct outcomes rise by six cases for Granite and Qwen on the
+development set (exact McNemar p = 0.031 for each), and by four for Granite
+(p = 0.125) and six for Qwen (p = 0.031) on the held-out set. No model's strict
+pass changes for any case (p = 1). Llama never releases a faulty plan, but it
+also withholds 6 of the 17 development-set plans that passed validation, so its
+caution is partly a failure to finish the workflow.
 
-Category results also show why one overall score is insufficient. All three
-agents handle six of six profile-only requests, whereas the keyword baseline
-handles three. Granite passes all restriction-override requests, while Llama
-and Qwen pass none. Nutrition-analysis success is 0/6 for Granite, 2/6 for
-Llama, and 1/6 for Qwen. All unclear-identity cases pass because the application
-resolver clarifies before model execution; this is a system result, not model
-evidence. The deterministic pipeline's 38/42 remains the strongest overall
-result and is 13.7--29.6 times faster than the three agent runs.
+**H3b is supported.** All 558 plans released outside the fault cases exactly
+match the direct Knapsack plan. Llama's lower Knapsack fidelity (70.8% on the
+development set and 41.7% on the held-out set) reflects requests for which no
+plan was produced, not altered plans.
+
+**H3a is not supported.** On indirect-intent requests, the baseline and Granite
+both pass 5/6 strictly on the development set and 6/6 on the held-out set;
+Llama (4/6, then 0/6) and Qwen (2/6 on both) do worse. Models differ, but none
+interprets indirect wording better than the keyword baseline.
+
+The held-out set changes the comparison with the rule baseline. The baseline
+falls from 38 to 33 strict passes and from 39 to 34 correct outcomes, mostly on
+profile-only requests (3/6 to 1/6) and nutrition requests (6/6 to 3/6), where
+its keywords no longer match. Granite and Qwen do not fall: with the release
+gate both reach 36/42 correct outcomes on the held-out set (95% Wilson interval
+72.2–93.3%), compared with the baseline's 34/42 (66.7–90.0%). The intervals
+overlap substantially, so on new wording the two gated models are comparable to
+the baseline rather than better. Llama falls from 28 to 18 strict passes.
+
+Category results show where each approach fails. All three models handle every
+profile-only request on both sets, where the baseline manages 3/6 and then 1/6.
+Granite completes none of the 12 nutrition-analysis requests: it calculates
+nutrition and then answers without validating or releasing. Much of Qwen's
+lower strict score comes from extra calls, such as a second `release_plan` or
+an unrequested nutrition analysis; on the development set it reaches the
+correct outcome on all six restriction-override requests but passes none
+strictly. The agents take 7.5 to 36.5 s per request against about 0.25 s for
+the baseline, 29 to 142 times slower.
+
+**Reply–state consistency (exploratory).** Final replies often contradict the
+recorded state, and the gate does not correct them. Without the gate, Granite
+asserts that validation passed when it failed or never ran in six
+development-set and four held-out cases, and in three per set with the gate.
+After releasing a plan its validator had rejected, for example, it replies "The
+meal plan for Becca Moore has been successfully validated and released." Qwen
+states the opposite of what it did in three held-out cases, for instance saying
+that a plan "cannot be released" after releasing it. On the held-out set, Llama
+writes its own meal plan in prose in 12 cases where Knapsack never ran; all six
+such plans for the vegetarian personas Becca and Dylan include chicken and
+salmon. Because scoring uses recorded state, none of these replies earns
+credit, but a user reading them would be misled. The released report lists
+every flag with its triggering sentence.
+
+**Paraphrase consistency (exploratory).** Pairing each development case with
+its held-out rewording, the baseline is correct on six pairs only in the
+development wording. Gated Granite is correct on 30 pairs in both wordings and
+on no pair in only one. Llama is correct on 13 pairs only in the development
+wording and attempts the same set of tools in only 14 of 36 pairs.
 
 ### 5.5 Model capability versus architecture safety
 
-The valid-workflow total is exactly 43/120 in both architectures. This is the
-most important interpretation boundary in the study: the gate does not improve
-the model's ability to select tools. Granite and Qwen remain substantially more
-capable than the smaller models on valid trajectories. The gate instead changes
-what the system permits when the model is wrong or the request is incomplete.
+The valid-workflow total is exactly 49/120 in both Experiment 2 architectures,
+and every model's strict pass in Experiment 4 is identical with and without the
+release gate. This is the most important interpretation boundary in the study:
+neither gate improves the model's ability to select tools. Both change what
+the system permits when the model is wrong or the request is incomplete.
 
 Phi-4 Mini illustrates the distinction. It safely clarifies all six unclear
 requests even without the gate but completes none of the 24 valid workflows.
 Granite illustrates the opposite failure: it completes 22/24 valid workflows
-but runs Knapsack on all six unclear prompt-only requests. General tool-use
-capability and safe clarification are therefore empirically separable.
+but runs Knapsack on all six unclear prompt-only requests. In Experiment 4 the
+same separation appears within one model: Granite has the best trajectory of
+the three models on the held-out set, yet releases plans its own validation
+rejected. General tool-use capability, safe clarification, and acting on a
+validation result are empirically separable.
 
 ## 6. Discussion
 
@@ -679,16 +745,33 @@ capability and safe clarification are therefore empirically separable.
 Each answer states whether its hypothesis is supported, using the criteria in
 the metric dictionary.
 
-**RQ1 / H1.** [Pending the 1,024-token Experiment 2 re-run.]
+**RQ1 / H1 — supported.** Without the identity gate, small models vary from
+0/24 to 22/24 on valid workflows, and none combines high valid-workflow
+success with safe handling of unclear identity. The two strongest models
+complete 22/24 valid workflows but run the recommender for unidentifiable
+users or fail to clarify, while the safest clarifier completes no valid
+workflow.
 
-**RQ2 / H2.** [Pending the 1,024-token Experiment 2 re-run.]
+**RQ2 / H2 — supported.** The deterministic gate clarifies all 30 unclear
+model-request pairs, eliminates all ten unsafe executions, and halves mean
+latency, while no valid request changes result for any model. It improves the
+system, not the underlying models.
 
-**RQ3 / H3a–H3c.** [Pending the remaining held-out repetitions. On the complete
-development set, Granite and Qwen release all six faulty plans without the gate
-and none with it, with strict passes unchanged, as H3c predicts; Llama releases
-none in either condition.]
+**RQ3 / H3 — H3b and H3c supported, H3a not supported.** Responsibility-based
+tools make each decision observable. Plans that reach the user always match
+Knapsack exactly. Two of three models release plans their own validation call
+rejected; the release gate removes every such release on both request sets
+without changing any model's strict trajectory score. No model interprets
+indirect wording better than the keyword baseline.
 
-**RQ4 / H4.** [Pending the final runs.]
+**RQ4 / H4 — supported; no evidence that a model is needed.** Every agent is
+slower than the no-LLM pipeline: 2.0–22.6 s against 0.15 s per request in
+Experiment 2, and 7.5–36.5 s against 0.25 s in Experiment 4. The pipeline is
+also more accurate on Experiment 2 and on the Experiment 4 development set. On
+held-out wording its lead disappears, and the two stronger gated agents reach
+comparable correct outcomes. Neither request set shows a model adding value
+beyond what deterministic rules achieve; that requires a harder language
+benchmark.
 
 Experiments 1 and 3 have no hypothesis. In Experiment 1, one hosted model
 completes all six required tool trajectories and preserves the Knapsack output
@@ -713,9 +796,11 @@ evaluation:
 - it compares deterministic and direct LLM selection on the same profiles,
   catalog, roles, and post-hoc evaluators instead of comparing systems on
   incompatible inputs.
-- it evaluates four responsibility-based tools on multiple intents and isolates
-  the release gate's effect with trace-paired fault replay rather than separate
-  model samples.
+- it makes release an explicit model action, so a model's decision to show a
+  plan its own validator rejected is observed directly, and compares
+  release-gated and ungated runs on development and held-out wording with
+  repeated runs, paired tests, and a check that the two conditions' traces
+  agree up to the gate's first refusal.
 
 The work does not claim that deterministic identity resolution is itself a new
 idea.
@@ -744,8 +829,9 @@ catalog and hoping a prompt will preserve every condition.
 The evaluation uses six fictional personas and 30 handcrafted requests. Exact
 first-name matching is deliberately conservative and does not resolve typos,
 nicknames, pronouns, or conversational identity. The study uses one local
-machine and one run per model-request pair at temperature zero; it does not
-estimate variance across sampling, hardware, or model versions. The models are
+machine at temperature zero, with one run per model-request pair in
+Experiment 2 and three identical runs in Experiment 4; it does not estimate
+variance across sampling, hardware, or model versions. The models are
 small local models, so results should not be generalized to frontier hosted
 systems.
 
@@ -755,8 +841,11 @@ Its unclear-identity outcomes come from the pre-model resolver and do not test
 model clarification. Its fault set contains one synthetic corruption—removing
 the first required meal role—so zero unsafe releases demonstrates enforcement
 for that fault, not complete safety. Repetitions at temperature 0 on one
-machine measure run-to-run stability, not sampling variance. As the checklist
-screen records, the study does not test authorisation, injected text inside
+machine measure run-to-run stability, not sampling variance. The held-out set
+was written by the same authors as the development set, so it tests new
+wording rather than independently authored requests. The reply–state check is
+keyword-based; its flags were audited by hand, but it can miss contradictions
+phrased in other ways. As the checklist screen records, the study does not test authorisation, injected text inside
 tool outputs or documents, or state carried across conversation turns.
 
 The gate's six unclear cases were handcrafted for the resolver's fixed rules,
@@ -764,8 +853,8 @@ so its perfect clarification result is an invariant on this test set rather
 than evidence of generalization. Name matching is identity resolution, not
 authentication: anyone can type another persona's name. A stronger prompt-only
 baseline with few-shot examples or an explicit `ask_clarification` tool was not
-tested. Those baselines, repeated trials, and language-dependent requests are
-required before claiming that the gate is preferable to the strongest prompting
+tested. Those baselines and language-dependent requests are required before
+claiming that the gate is preferable to the strongest prompting
 or that an LLM adds value over the no-LLM pipeline.
 
 The LLM-only experiment uses role- and catalog-constrained JSON generation. It
@@ -788,8 +877,10 @@ not official labels. In the worked plan, only five of nine selected entries have
 complete inputs, and nutrient totals can be partial when catalog fields are
 missing. Coverage and missing-data fields must accompany every reported value.
 
-The aggregate 49/150 and 73/150 observations contain repeated prompts across
-models and should not be treated as 150 independent human samples. The current
+The aggregate 59/150 and 79/150 observations contain repeated prompts across
+models and should not be treated as 150 independent human samples. Wilson
+intervals in Experiment 4 treat the 42 cases as independent and therefore
+understate dependence among prompts that share a persona or category. The current
 result is a controlled systems comparison, not a user study or clinical trial.
 
 ## 8. Next Experiment: Constrained Hybrid Reranking
@@ -814,25 +905,29 @@ change is not confused with a routing failure.
 
 ## 9. Conclusion
 
-This study demonstrates that an LLM can correctly orchestrate an existing
-deterministic meal recommender, but success on clear requests does not ensure
-safe behavior when identity is insufficient. Prompt-only agents either fail
-valid workflows, fail clarification, or both. A small deterministic policy gate
-eliminates observed wrong-person Knapsack executions and reduces latency while
-preserving the models' valid-request performance. However, the no-LLM pipeline
-solves the current 30-case request set faster and without model calls, so the
-present experiment does not establish a need for an LLM. The main lesson is a
-division of responsibility. The direct-selection comparison reinforces this conclusion:
-one LLM sacrifices quality and variety while the other violates stored dietary
-conditions despite a favorable nutrition-fit mean. The four-tool extension adds
-a second lesson: all three models detect the injected fault when they reach
-validation, but a deterministic release boundary is required to ensure that the
-detected fault is actually blocked. Use the model for
-language-dependent orchestration only when a harder language benchmark shows a
-benefit, and for bounded soft-preference ranking; retain constraint-sensitive
-recommendation and identity-binding decisions in inspectable
-deterministic components; and evaluate both the trajectory and the resulting
-state.
+An LLM can correctly orchestrate an existing deterministic meal recommender,
+but success on clear requests does not ensure safe behavior. Prompt-only agents
+fail valid workflows, fail to clarify unclear identity, or both. A small
+identity gate removes every recommendation for an unidentifiable user and halves
+latency without changing any valid result. When validation is a separate tool
+and release is the model's own decision, two of three small models release
+plans their validator rejected, and one describes them as validated. A
+deterministic release gate blocks every such release, but it does not make the
+model act correctly or report truthfully, so the evaluation must score the
+model's trajectory and the resulting state separately and must not trust the
+model's description of what it did.
+
+The no-LLM pipeline solves the 30-case set and leads on the development wording
+of the 42-case set. On held-out wording its advantage disappears but does not
+reverse, so no experiment here establishes that a language model is needed.
+The direct-selection comparison reinforces the division of responsibility: one
+LLM sacrifices quality and variety while the other violates stored dietary
+conditions, and an agent that bypasses Knapsack writes the same kind of unsafe
+plan in prose. Use the model for language-dependent orchestration only when a
+harder language benchmark shows a benefit, and for bounded soft-preference
+ranking; keep constraint-sensitive recommendation, identity binding, and
+release decisions in inspectable deterministic components; and evaluate both
+the trajectory and the resulting state.
 
 ## References
 
