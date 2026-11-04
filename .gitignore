@@ -26,3 +26,10 @@ paper/overleaf/*.log
 paper/overleaf/*.out
 paper/overleaf/*.toc
 paper/overleaf_bundle.zip
+paper/meeting_summary/*.aux
+paper/meeting_summary/*.fdb_latexmk
+paper/meeting_summary/*.fls
+paper/meeting_summary/*.log
+paper/meeting_summary/*.out
+paper/meeting_summary/*.toc
+paper/meeting_summary/*.zip
