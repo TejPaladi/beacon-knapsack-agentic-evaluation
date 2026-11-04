@@ -46,6 +46,7 @@ from hard_wording_benchmark import (  # noqa: E402
     score as score_hard,
 )
 from report_hard_wording import full_name_persona  # noqa: E402
+from rule_reranker import choose as rerank_with_rules, detect as detect_preference  # noqa: E402
 from benchmark import (  # noqa: E402
     GROQ_USER_AGENT,
     GroqRateLimitError,
@@ -441,6 +442,26 @@ class LocalEvaluationTests(unittest.TestCase):
             full_name_persona(turns("Plan for Greg Taylor.", "I meant Aaliyah Brooks, not Greg.")),
             "A-NV",
         )
+
+    def test_rule_reranker_detects_nutrient_and_direction(self):
+        self.assertEqual(detect_preference("Give me the plan with more protein."), ("protein", 1))
+        self.assertEqual(detect_preference("I want fewer calories today."), ("kcal", -1))
+        self.assertEqual(detect_preference("I am trying to gain weight."), ("kcal", 1))
+        self.assertEqual(detect_preference("I'm trying to lose weight."), ("kcal", -1))
+        self.assertEqual(detect_preference("Please keep the carbs low."), ("carbs", -1))
+        self.assertEqual(detect_preference("High fibre, please."), ("fiber", 1))
+        self.assertIsNone(detect_preference("Surprise me today."))
+
+    def test_rule_reranker_picks_best_candidate_or_default(self):
+        candidates = [
+            {"number": 1, "totals": {"kcal": 2000, "carbs": 300, "protein": 60, "fiber": 20}},
+            {"number": 2, "totals": {"kcal": 1800, "carbs": 250, "protein": 80, "fiber": 20}},
+            {"number": 3, "totals": {"kcal": 2200, "carbs": 350, "protein": 50, "fiber": 30}},
+        ]
+        self.assertEqual(rerank_with_rules("More protein please.", candidates), 2)
+        self.assertEqual(rerank_with_rules("Lowest calories.", candidates), 2)
+        self.assertEqual(rerank_with_rules("Lots of fiber.", candidates), 3)
+        self.assertEqual(rerank_with_rules("Anything is fine.", candidates), 1)
 
     def test_text_tool_call_detector_accepts_malformed_calls_to_known_tools(self):
         self.assertTrue(
