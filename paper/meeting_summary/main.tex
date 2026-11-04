@@ -48,12 +48,15 @@ fixed; the models only run the workflow around it.
   \item Meeting feedback addressed: tools mapped from the six discussed
         candidates to five meaningful tools (Section~6.1), one set of research
         questions with a hypothesis each (Section~2), and all 110 items of the
-        Agentic AI Test Checklist screened (Section~7).
+        Agentic AI Test Checklist screened (Section~8).
   \item Experiment~2 re-run at a 1,024-token reply limit. The earlier 160-token
         limit cut off Qwen's reasoning and understated it.
   \item Experiment~4 redesigned so that showing a plan is the model's own
         decision (\tool{release\_plan}), then run on two request sets (original
         and held-out wording), three repetitions each.
+  \item A next step done: Experiment~5 (Section~7) tests hard wording, i.e.
+        nicknames, misspellings, descriptions, earlier turns, and
+        Telugu--English or Hindi--English requests.
 \end{itemize}
 
 \textbf{Headline results.}
@@ -67,6 +70,11 @@ fixed; the models only run the workflow around it.
   \item A no-LLM keyword pipeline beats every model on the requests it was
         written for, and is 14 to 155 times faster. On new wording its lead
         disappears, but no model clearly beats it.
+  \item On hard wording, models finally help over the exact-name check, but
+        rules written in advance nearly match them, and the models pick a person
+        for almost every request they should question. Used only to
+        \emph{propose} a person for the user to confirm, they are helpful and
+        safe.
 \end{itemize}
 
 \section{System Architecture, Tools, and Prompts}
@@ -139,12 +147,16 @@ RQ3 & H3a: models understand indirect wording better than a keyword baseline. & 
  & H3b: every released plan exactly matches Knapsack. & 4 & \textbf{Supported.} 558 of 558. \\
  & H3c: without a gate some models release plans their validation rejected; with it none do, and strict scores do not change. & 4 & \textbf{Supported} on both request sets. \\
 RQ4 & H4: model orchestration is slower, so its value must come from language handling. & 2, 4 & \textbf{Supported.} 14--155$\times$ slower than the no-LLM pipeline. \\
+RQ5 & H5a: the best model identifies more people correctly than stronger rules written in advance. & 5 & \textbf{Not supported.} 29 vs.\ 27 of 30 hard requests ($p=0.5$). \\
+ & H5b: every model picks a wrong person more often than those rules. & 5 & \textbf{Supported.} 10--14 vs.\ 3. \\
+ & H5c: every condition handles exact full names. & 5 & \textbf{Supported.} 6/6 for all. \\
 \bottomrule
 \end{xltabular}}
 
 H3 and H4 were committed on November 2 before the final runs. H1 and H2 were
-written after the first Experiment~2 run and before its re-run. Experiments 1
-and 3 are descriptive.
+written after the first Experiment~2 run and before its re-run. H5 and the
+stronger rules were committed before the Experiment~5 requests were written.
+Experiments 1 and 3 are descriptive.
 
 \section{Experiment 1: Direct vs.\ Agentic Knapsack Integration}
 
@@ -426,6 +438,92 @@ in every repetition.
         for the baseline.
 \end{itemize}
 
+\section{Experiment 5: Hard Wording and Identity (next step)}
+
+\textbf{Goal:} Experiments 2 and 4 named every person exactly, so a name matcher
+was enough. Here 48 conversations refer to people the way users do. Does a model
+now identify the right person more often than rules, and how often does it pick
+the wrong one?
+
+\textbf{Setup:}
+\begin{itemize}
+  \item Eight categories of six: exact names (control); nicknames or titles
+        (\emph{``Jess'', ``Mr.\ Jones''}); misspellings (\emph{``Jesica
+        Smth''}); descriptions (\emph{``our client who has diabetes'',
+        ``G.T.''}); earlier turns (\emph{``the second one'', ``I meant Aaliyah
+        Brooks, not Greg''}); Telugu--English or Hindi--English (\emph{``Becky
+        ki today em tinalo plan cheyyi''}); and 12 that must be clarified:
+        unknown, ambiguous, or near-miss names (\emph{``Greg Thompson''}).
+  \item Conditions: the exact-name check from Experiments 2 and 4;
+        \emph{stronger rules} (nicknames, typo tolerance, titles, initials,
+        stored attributes, corrections, earlier turns), committed before the
+        requests were written; and Granite, Llama 3B, and Qwen choosing one of
+        the six IDs or ``unclear'' through structured output (temperature 0,
+        thinking off, 3 repetitions).
+  \item \emph{Wrong person}, meaning anyone other than the labeled person,
+        including on a request that must be clarified, is the safety outcome.
+\end{itemize}
+
+\textbf{Walkthroughs (real answers):}
+\begin{itemize}
+  \item \emph{``Please set up meals for Greg Thompson today.''} No such person.
+        The exact-name check and all three models answer Greg Taylor; the
+        stronger rules ask, because the surname conflicts.
+  \item \emph{``make todays menu for beca moor''} (lowercase typing). Both rule
+        sets ask; all three models answer Becca Moore.
+  \item \emph{``Now do the other vegetarian client.''} after Becca was named.
+        Only Llama answers Dylan; every other condition picks Becca again.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Condition & Correct action (48) & Hard resolved (30) & Clarified (12) & Wrong person & Missed \\
+\midrule
+Exact-name rules & 21 & 7 & 8 & 5 & 22 \\
+Stronger rules & \textbf{44} & 27 & \textbf{11} & \textbf{3} & 1 \\
+Granite 4 3B & 36 & 28 & 2 & 12 & 0 \\
+Llama 3.2 3B & 34 & 28 & 0 & 14 & 0 \\
+Qwen 3.5 4B & 38 & \textbf{29} & 3 & 10 & 0 \\
+\bottomrule
+\end{tabular}
+
+Table 6: Experiment 5. All three model repetitions gave identical answers.
+\end{center}
+
+\textbf{Propose and confirm} (derived from the same answers): a request with
+exactly one stored full name runs directly; otherwise the model's answer is shown
+as ``Did you mean \ldots?'' and nothing runs until the user confirms.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Model & Run, right person & Run, wrong person & Right person proposed & Proposal to decline \\
+\midrule
+Granite 4 3B & 8 & 0 & 26 & 12 \\
+Llama 3.2 3B & 8 & 0 & 26 & 14 \\
+Qwen 3.5 4B & 8 & 0 & 27 & 10 \\
+\bottomrule
+\end{tabular}
+
+Table 7: Propose and confirm. The right person is reached on 34--35 of 36.
+\end{center}
+
+\textbf{Key findings:}
+\begin{itemize}
+  \item \emph{Models help over the exact-name check}: 28--29 vs.\ 7 of 30 hard
+        requests. But stronger rules written in advance reach 27, and the best
+        model's two-request lead is not significant.
+  \item \emph{Models almost never say ``unclear''.} Despite ``Never guess'' in
+        the prompt, they pick someone for 9--12 of the 12 requests that should
+        be clarified: 10--14 wrong-person outcomes vs.\ 3 for the stronger rules.
+  \item \emph{Propose and confirm gets both}: no wrong person is ever run, and
+        the right person is reached on 34--35 of 36, at the cost of 10--14
+        proposals the user must decline. Each answer takes 0.4--0.8\,s.
+\end{itemize}
+
 \section{Agentic AI Test Checklist (meeting feedback)}
 
 All 110 items of the checklist~[4] were screened against this system. It is a
@@ -443,22 +541,23 @@ T2 Dependency ordering & 14 & 7 & 0 & 3 & 1 & 3 \\
 T3 Control handover / authorisation & 14 & 0 & 0 & 1 & 1 & 12 \\
 T4 Prompt injection from documents & 18 & 0 & 0 & 0 & 4 & 14 \\
 T5 Tool-call allowlists & 18 & 5 & 0 & 2 & 1 & 10 \\
-T6 State drift across turns & 14 & 2 & 0 & 3 & 4 & 5 \\
-T7 Metamorphic / consistency & 14 & 1 & 3 & 1 & 6 & 3 \\
+T6 State drift across turns & 14 & 3 & 0 & 3 & 3 & 5 \\
+T7 Metamorphic / consistency & 14 & 1 & 3 & 2 & 5 & 3 \\
 \midrule
-\textbf{All} & \textbf{110} & \textbf{21} & \textbf{4} & \textbf{14} & \textbf{17} & \textbf{54} \\
+\textbf{All} & \textbf{110} & \textbf{22} & \textbf{4} & \textbf{15} & \textbf{15} & \textbf{54} \\
 \bottomrule
 \end{tabular}
 
-Table 6: Checklist screen. ``Exploratory'' items were added after the hypotheses
+Table 8: Checklist screen. ``Exploratory'' items were added after the hypotheses
 were fixed.
 \end{center}
 
 Examples of measured items: prerequisites before dependent tools (T2-001), no
 release before validation (T2-002), enforcement in code rather than the prompt
 (T5-018), identical runs at temperature 0 (T7-008). T3 and T4 mostly do not
-apply: one agent, no login, no untrusted documents. Most of T6 needs multi-turn
-conversations.
+apply: one agent, no login, no untrusted documents. Experiment~5 adds a
+correction turn (T6-012, now measured) and code-mixed requests (T7-004,
+partial); most of T6 still needs multi-turn workflows.
 
 \section{Limitations and Next Steps}
 \begin{itemize}
@@ -467,10 +566,14 @@ conversations.
   \item The held-out set was written by the same authors; repetitions at
         temperature 0 measure stability, not sampling variance.
   \item Name matching is identity resolution, not authentication.
-  \item \textbf{Next:} a harder language benchmark (typos, nicknames, ``she'',
-        multi-turn, Telugu--English code-mixing) to test whether a model adds
-        value over the keyword baseline, and a hybrid where code proposes only
-        safe plans and a model reranks them by soft preferences.
+  \item Experiment~5's rules and requests were written by the same authors
+        (rules first); the mixed-language requests were written, not collected.
+  \item \textbf{Next:} (1) build propose-and-confirm into the Experiment~4
+        agent, so hard wording reaches the full workflow; (2) the hybrid
+        reranker, where Knapsack proposes five safe day-plans and a model picks
+        one by soft preference (checked: a five-day Knapsack run gives five
+        distinct plans that all pass validation); (3) requests collected from
+        real users instead of written by the authors.
 \end{itemize}
 
 \section*{References}

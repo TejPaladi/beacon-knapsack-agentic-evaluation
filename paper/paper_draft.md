@@ -25,9 +25,15 @@ releases to zero and raises correct outcomes by up to six cases without
 changing any model's strict trajectory score. A keyword baseline leads on the
 development wording but not on held-out wording, where the two stronger gated
 agents are comparable to it, and models' final replies sometimes contradict the
-recorded state. The results support using models only where language
-understanding outperforms a declared no-LLM baseline, while deterministic code
-retains constraint-sensitive computation and release control.
+recorded state. On 48 conversations that use nicknames, misspellings,
+descriptions, earlier turns, and mixed Telugu–English or Hindi–English, models
+resolve 28–29 of 30 hard requests against 27 for rules written in advance, but
+pick a person for 9–12 of the 12 requests that should be clarified; using a
+model only to propose a person for the user to confirm executes no wrong
+person. The results support using models only where language understanding
+outperforms a declared no-LLM baseline, and then as proposers, while
+deterministic code retains identity, constraint-sensitive computation, and
+release control.
 
 **Keywords:** LLM agents, tool use, meal recommendation, deterministic
 optimization, policy enforcement, clarification
@@ -71,6 +77,10 @@ the workflow around it:
 - **RQ4:** Do these request sets require a language model at all? How does a
   declared no-LLM pipeline compare, including on held-out wording that was not
   used to build it?
+- **RQ5:** When requests refer to a person the way users do, with nicknames,
+  misspellings, descriptions, earlier turns, or mixed languages, does a model
+  identify the right person more often than deterministic rules, and how often
+  does it pick the wrong person?
 
 Each question has a stated hypothesis:
 
@@ -88,12 +98,17 @@ Each question has a stated hypothesis:
   model's strict trajectory success does not improve.
 - **H4 (RQ4):** model orchestration is slower than the no-LLM pipeline, so any
   value it adds must come from language handling rather than computation.
+- **H5 (RQ5):** (a) the best model identifies more people correctly than a
+  stronger rule resolver; (b) every model picks a wrong person more often than
+  those rules; (c) every condition handles exact full names.
 
 H3 and H4 were committed before the final runs and before the held-out set was
 written. H1 and H2 were written after a first Experiment 2 run and before its
-re-run, so they predict a replication. Experiments 1 and 3 are descriptive.
+re-run, so they predict a replication. H5 and the stronger rule resolver were
+committed before the Experiment 5 requests were written. Experiments 1 and 3
+are descriptive.
 
-The paper makes five bounded contributions:
+The paper makes six bounded contributions:
 
 1. a controlled separation between language-model orchestration and
    deterministic meal selection in the BEACON system, with an integration check
@@ -111,6 +126,11 @@ The paper makes five bounded contributions:
 5. a same-persona, same-catalog comparison between deterministic Knapsack and
    two local LLM-only selectors, scored after generation by the same Beacon
    evaluators.
+6. a hard-wording identity benchmark that compares the exact-name gate, a
+   stronger rule resolver frozen before the requests were written, and three
+   local models on nicknames, misspellings, descriptions, earlier turns, and
+   romanized Telugu–English and Hindi–English requests, with wrong-person
+   identification as the safety outcome.
 
 This is not a claim of a new optimization algorithm, a new language model, or a
 clinically validated recommender. It is a controlled systems study of agentic
@@ -166,8 +186,8 @@ claim a score over the full checklist. We adapt selected checks into task-specif
 oracles: all postconditions must hold together, dependent tools must follow
 successful prerequisites, the tool set and turn count are bounded, and plan
 release is enforced by the application rather than only by a prompt. We
-screened all 110 items against this system: 21 are measured by a scored oracle,
-4 are computed as exploratory measures, 14 are approximated, 17 are relevant
+screened all 110 items against this system: 22 are measured by a scored oracle,
+4 are computed as exploratory measures, 15 are approximated, 15 are relevant
 but need new requests (mostly multi-turn and multilingual cases), and 54 do not
 apply to a single-agent system with no authentication, stored records, or
 untrusted documents. The item-by-item screen is released with the code.
@@ -524,7 +544,43 @@ produced identical tool traces, and how often the gated trace equals the
 ungated trace up to the gate's first refusal, which is the expected behaviour
 at temperature 0 if the two conditions differ only at the gate.
 
-### 4.6 Reproducibility
+### 4.6 Experiment 5: hard wording and identity resolution
+
+Experiment 5 tests RQ5. Experiments 2 and 4 named every person exactly, so a
+name matcher sufficed. Here 48 conversations refer to people the way users do,
+six in each of eight categories: exact-name controls; nicknames, formal names,
+or a title with a surname; misspellings; descriptions using stored attributes
+or initials; references to earlier turns (pronouns, ordinals, corrections);
+romanized Telugu–English and Hindi–English requests; unknown or ambiguous
+references; and near-miss names, such as a stored first name with a different
+surname. Thirty-six are resolvable (six per persona) and twelve must be
+clarified. A request is labeled resolvable only when exactly one stored
+persona is consistent with every cue in the conversation.
+
+Identity is studied on its own because it is where Experiments 2 and 4 found
+the most dangerous failure, and because a correct identification leads to the
+deterministic Knapsack plan already evaluated. Five conditions are compared.
+The **exact-name rules** are the identity gate from Experiments 2 and 4. The
+**stronger rules** are a deterministic resolver with common nicknames, spelling
+tolerance for capitalized names, titles and capitalized surnames, initials,
+stored attributes (diabetes, vegetarian, calorie goal), corrections, ordinals,
+and earlier user turns; it never guesses. It and the hypotheses were committed
+before any Experiment 5 request was written. In the **model** conditions,
+Granite 4 3B, Llama 3.2 3B, and Qwen 3.5 4B see the conversation and the stored
+directory (ID, name, diabetes and vegetarian flags, calorie goal), and Ollama
+structured output restricts the answer to the six IDs or `unclear`. Runs use
+temperature 0, three repetitions, and thinking disabled: with thinking enabled,
+a trial Qwen call used the whole 1,024-token budget without answering. A
+**propose-and-confirm** condition is derived from these runs without new model
+calls: a request whose latest message contains exactly one stored full name is
+executed; otherwise the model's answer is shown as a question for the user to
+confirm, and nothing runs.
+
+The safety outcome is a **wrong person**: any persona other than the labeled
+one, including any persona on a request that must be clarified. A **missed
+resolution** (a clarification on a resolvable request) is safe but unhelpful.
+
+### 4.7 Reproducibility
 
 Each result records the dataset, tool-schema, and system-prompt hashes; the
 repository and BEACON backend commits; the local model digest; temperature,
@@ -738,6 +794,49 @@ the three models on the held-out set, yet releases plans its own validation
 rejected. General tool-use capability, safe clarification, and acting on a
 validation result are empirically separable.
 
+### 5.6 Hard wording and identity resolution
+
+| Condition | Correct action | Hard requests resolved | Correct clarifications | Wrong person | Missed resolutions | Mean latency |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Exact-name rules | 21/48 | 7/30 | 8/12 | 5 | 22 | < 1 ms |
+| Stronger rules | **44/48** | 27/30 | **11/12** | **3** | 1 | < 1 ms |
+| Granite 4 3B | 36/48 | 28/30 | 2/12 | 12 | 0 | 480 ms |
+| Llama 3.2 3B | 34/48 | 28/30 | 0/12 | 14 | 0 | 417 ms |
+| Qwen 3.5 4B | 38/48 | **29/30** | 3/12 | 10 | 0 | 762 ms |
+
+Every model gave the same answer in all three repetitions for every request,
+and no answer was invalid or truncated. **H5c is supported:** every condition
+resolves the six exact full names.
+
+**H5a is not supported.** The models are good at finding a plausible person:
+Qwen resolves 29 of the 30 hard requests, and Granite and Llama 28, against 27
+for the stronger rules and 7 for the exact-name gate. The best model's lead
+over the stronger rules is two requests, both resolved only by the model
+(exact McNemar p = 0.5). The rules miss a misspelling typed in lowercase
+("beca moor"), a description phrased "isn't vegetarian", and a request for
+"the other vegetarian client" after Becca had been named.
+
+**H5b is supported, and it is the main result.** The models rarely decline.
+Granite, Llama, and Qwen clarify only 2, 0, and 3 of the 12 requests that must
+be clarified, and pick a person for the rest despite an explicit instruction
+not to guess. Asked for "Greg Thompson", "Jessica Brown", "Earl Johnson", or
+"Dylan Thomas", all three return the stored person with the same first name;
+asked for "Megan Taylor", all three return Greg Taylor; asked for "our
+vegetarian client", for whichever of two named people "is easier", or for
+"her" with no earlier referent, they choose someone. Llama assigns the unknown
+"Priyanka Rao" to Greg Taylor. Wrong-person outcomes total 12, 14, and 10 for
+the models, against 3 for the stronger rules and 5 for the exact-name gate,
+whose unique-first-name rule maps four near-miss names to stored people.
+
+Propose and confirm keeps the models' strength without their risk. Executing
+only requests whose latest message contains exactly one stored full name, and
+otherwise showing the model's answer as a question for the user to confirm,
+executes no wrong person for any model. It executes eight requests directly
+and puts the right person in front of the user on 26 or 27 more, so 34 or 35
+of the 36 resolvable requests reach the right person. The cost is 10 to 14
+proposals the user must decline, one for each request the model should have
+clarified. Model inference adds 0.4 to 0.8 s per request.
+
 ## 6. Discussion
 
 ### 6.1 Answering the research questions
@@ -770,8 +869,17 @@ Experiment 2, and 7.5–36.5 s against 0.25 s in Experiment 4. The pipeline is
 also more accurate on Experiment 2 and on the Experiment 4 development set. On
 held-out wording its lead disappears, and the two stronger gated agents reach
 comparable correct outcomes. Neither request set shows a model adding value
-beyond what deterministic rules achieve; that requires a harder language
-benchmark.
+beyond what deterministic rules achieve; Experiment 5 tests harder wording.
+
+**RQ5 / H5 — H5b and H5c supported, H5a not supported.** On hard wording,
+models do add value over the exact-name gate, resolving 21 or 22 more of the
+30 hard requests. A rule resolver written in advance recovers almost all of
+that value, though, trailing the best model by two requests. The models'
+weakness is the opposite decision: they pick a person for nearly every request
+that should be clarified, so a model should not be the authority on identity.
+Used only to propose a person for the user to confirm, the same models reach
+the right person on 34 or 35 of 36 resolvable requests without executing a
+wrong one.
 
 Experiments 1 and 3 have no hypothesis. In Experiment 1, one hosted model
 completes all six required tool trajectories and preserves the Knapsack output
@@ -846,7 +954,17 @@ was written by the same authors as the development set, so it tests new
 wording rather than independently authored requests. The reply–state check is
 keyword-based; its flags were audited by hand, but it can miss contradictions
 phrased in other ways. As the checklist screen records, the study does not test authorisation, injected text inside
-tool outputs or documents, or state carried across conversation turns.
+tool outputs or documents, or state carried across conversation turns beyond
+the identity references of Experiment 5.
+
+Experiment 5's requests and its stronger rules were written by the same
+authors. The rules were committed before the requests, but knowing the
+categories in advance may still favor them, and with 30 hard requests the
+two-request difference from the best model is not significant. The romanized
+Telugu–English and Hindi–English requests were written by the authors, not
+collected from users. Models ran with thinking disabled, and the
+propose-and-confirm condition is derived from the same answers rather than
+tested with users.
 
 The gate's six unclear cases were handcrafted for the resolver's fixed rules,
 so its perfect clarification result is an invariant on this test set rather
@@ -919,15 +1037,20 @@ model's description of what it did.
 
 The no-LLM pipeline solves the 30-case set and leads on the development wording
 of the 42-case set. On held-out wording its advantage disappears but does not
-reverse, so no experiment here establishes that a language model is needed.
+reverse. With harder wording, models finally help: they resolve nicknames,
+misspellings, and references that the exact-name gate cannot. A rule resolver
+written in advance comes within two requests of the best model, however, and
+the models guess where they should ask, so no experiment here shows a model
+beating carefully written rules.
 The direct-selection comparison reinforces the division of responsibility: one
 LLM sacrifices quality and variety while the other violates stored dietary
 conditions, and an agent that bypasses Knapsack writes the same kind of unsafe
-plan in prose. Use the model for language-dependent orchestration only when a
-harder language benchmark shows a benefit, and for bounded soft-preference
-ranking; keep constraint-sensitive recommendation, identity binding, and
-release decisions in inspectable deterministic components; and evaluate both
-the trajectory and the resulting state.
+plan in prose. Use the model for language-dependent steps only where it beats
+a declared rule baseline, and for bounded soft-preference ranking. Where a
+model interprets language, let it propose and let the user or deterministic
+code decide; keep constraint-sensitive recommendation,
+identity binding, and release decisions in inspectable deterministic
+components; and evaluate both the trajectory and the resulting state.
 
 ## References
 
