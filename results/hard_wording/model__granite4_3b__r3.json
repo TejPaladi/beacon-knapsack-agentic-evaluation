@@ -1,0 +1,1153 @@
+{
+  "experiment": "hard_wording_identity_resolution",
+  "generated_at": "2026-11-04T05:24:42.332154+00:00",
+  "provenance": {
+    "resolver": "model",
+    "model": "granite4:3b",
+    "model_digest": "89962fcc75239ac434cdebceb6b7e0669397f92eaef9c487774b718bc36a3e5f",
+    "provider": "Ollama native chat API",
+    "temperature": 0,
+    "thinking": false,
+    "max_completion_tokens": 1024,
+    "repetition": 3,
+    "dataset": "data/hard_wording_requests.json",
+    "dataset_sha256": "a79e994b5da38fb26d7e443f8d5e14a8ecdabf3a7966234ff87a73227f6ef04b",
+    "system_prompt_sha256": "5c62e070a0023c23a6c916256c1771594f1a9e98bcc2b02ec709f3f636b14bde",
+    "answer_schema_sha256": "5cf31ef4a84321388f4263ecd88c215fa4a9c9f3ef43150de4b4b424c6ee4d26",
+    "rule_resolver_sha256": "da452a6db3c198ca3bafa1a334cc5e90677ed8e38767965ac6eafa4460af6e7f",
+    "repository_commit": "dc447ebfe97dfd3a59f4273996c92bd41b4f1d95",
+    "worktree_dirty": false,
+    "beacon_backend_commit": "7ebe3ae94d86dd6a4e9fc93ccc4734d549a531c4"
+  },
+  "summary": {
+    "cases": 48,
+    "correct_actions": 36,
+    "correct_resolutions": 34,
+    "resolvable_cases": 36,
+    "hard_correct_resolutions": 28,
+    "hard_resolvable_cases": 30,
+    "correct_clarifications": 2,
+    "clarify_cases": 12,
+    "wrong_person": 12,
+    "missed_resolutions": 0,
+    "invalid_answers": 0,
+    "truncated_answers": 0,
+    "category_correct_actions": {
+      "exact_control": 6,
+      "nickname": 6,
+      "misspelling": 6,
+      "description": 5,
+      "earlier_turns": 5,
+      "mixed_language": 6,
+      "unknown_or_ambiguous": 2,
+      "near_miss": 0
+    },
+    "mean_latency_ms": 476.9
+  },
+  "cases": [
+    {
+      "case_id": "exact_earl",
+      "category": "exact_control",
+      "expected_action": "resolve",
+      "expected_persona_id": "earlJones",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please put together today's meal plan for Earl Jones."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"earlJones\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 286,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "earlJones",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 3242.4
+    },
+    {
+      "case_id": "exact_jessica",
+      "category": "exact_control",
+      "expected_action": "resolve",
+      "expected_persona_id": "jessicaSmith",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need a one-day meal plan for Jessica Smith."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"jessicaSmith\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 286,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "jessicaSmith",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 406.8
+    },
+    {
+      "case_id": "exact_aaliyah",
+      "category": "exact_control",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you generate meals for Aaliyah Brooks for today?"
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"A-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 287,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 405.2
+    },
+    {
+      "case_id": "exact_becca",
+      "category": "exact_control",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Becca Moore would like her meal plan for the day."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 287,
+      "completion_tokens": 11,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 379.7
+    },
+    {
+      "case_id": "exact_greg",
+      "category": "exact_control",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Set up today's breakfast, lunch and dinner for Greg Taylor."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"NA-NV\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 288,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 431.0
+    },
+    {
+      "case_id": "exact_dylan",
+      "category": "exact_control",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Recommend a day of meals for Dylan Bennet."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"A-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 285,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 385.4
+    },
+    {
+      "case_id": "nickname_jessica",
+      "category": "nickname",
+      "expected_action": "resolve",
+      "expected_persona_id": "jessicaSmith",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you sort out what Jess should eat today?"
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"jessicaSmith\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 285,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "jessicaSmith",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 388.0
+    },
+    {
+      "case_id": "nickname_becca",
+      "category": "nickname",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Becky Moore asked me to set up her meals for today."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 289,
+      "completion_tokens": 11,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 373.3
+    },
+    {
+      "case_id": "nickname_greg",
+      "category": "nickname",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Gregory needs his meal plan for today."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 284,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 375.6
+    },
+    {
+      "case_id": "nickname_earl",
+      "category": "nickname",
+      "expected_action": "resolve",
+      "expected_persona_id": "earlJones",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please plan today's meals for Mr. Jones."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"earlJones\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 285,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "earlJones",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 366.6
+    },
+    {
+      "case_id": "nickname_aaliyah",
+      "category": "nickname",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Ms. Brooks is asking for her usual daily menu."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"A-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 286,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 414.4
+    },
+    {
+      "case_id": "nickname_dylan",
+      "category": "nickname",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Bennet wants today's food sorted, can you do it?"
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"A-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 289,
+      "completion_tokens": 11,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 390.6
+    },
+    {
+      "case_id": "typo_jessica",
+      "category": "misspelling",
+      "expected_action": "resolve",
+      "expected_persona_id": "jessicaSmith",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Pls make a meal plan for Jesica Smth"
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"jessicaSmith\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 286,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "jessicaSmith",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 386.1
+    },
+    {
+      "case_id": "typo_aaliyah",
+      "category": "misspelling",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Aliyah Brooks needs meals planned for today."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"A-NV\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 284,
+      "completion_tokens": 14,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 409.0
+    },
+    {
+      "case_id": "typo_dylan",
+      "category": "misspelling",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you do today's meals for Dillon Bennett?"
+        }
+      ],
+      "raw_answer": "{\"persona_id\": \"A-V\"}",
+      "done_reason": "stop",
+      "prompt_tokens": 285,
+      "completion_tokens": 10,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 337.6
+    },
+    {
+      "case_id": "typo_greg",
+      "category": "misspelling",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Greg Talyor wants his food plan for today."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 286,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 360.5
+    },
+    {
+      "case_id": "typo_becca",
+      "category": "misspelling",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "make todays menu for beca moor"
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 284,
+      "completion_tokens": 11,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 329.2
+    },
+    {
+      "case_id": "typo_earl",
+      "category": "misspelling",
+      "expected_action": "resolve",
+      "expected_persona_id": "earlJones",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Plan the day's meals for Erl Jonse."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"earlJones\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 285,
+      "completion_tokens": 14,
+      "invalid_answer": false,
+      "predicted_persona_id": "earlJones",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 420.0
+    },
+    {
+      "case_id": "description_jessica",
+      "category": "description",
+      "expected_action": "resolve",
+      "expected_persona_id": "jessicaSmith",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Plan today's meals for our client who has diabetes."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"jessicaSmith\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 286,
+      "completion_tokens": 15,
+      "invalid_answer": false,
+      "predicted_persona_id": "jessicaSmith",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 453.3
+    },
+    {
+      "case_id": "description_earl",
+      "category": "description",
+      "expected_action": "resolve",
+      "expected_persona_id": "earlJones",
+      "messages": [
+        {
+          "role": "user",
+          "content": "The client with the 2,400-calorie goal needs a plan for today."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"earlJones\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 292,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "earlJones",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 427.8
+    },
+    {
+      "case_id": "description_dylan",
+      "category": "description",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please plan for the vegetarian on our list who needs 3,500 calories a day."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"A-V\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 293,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 434.7
+    },
+    {
+      "case_id": "description_greg",
+      "category": "description",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "G.T. asked for his meal plan today."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 285,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 419.0
+    },
+    {
+      "case_id": "description_aaliyah",
+      "category": "description",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Our only client who isn't vegetarian and eats 3,500 calories a day wants a plan."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 295,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 412.8
+    },
+    {
+      "case_id": "description_becca",
+      "category": "description",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "The vegetarian client on the 2,000-calorie target needs today's menu."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 292,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 394.2
+    },
+    {
+      "case_id": "context_jessica",
+      "category": "earlier_turns",
+      "expected_action": "resolve",
+      "expected_persona_id": "jessicaSmith",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm the dietitian working with Jessica Smith this month."
+        },
+        {
+          "role": "assistant",
+          "content": "Great, how can I help with Jessica's meals?"
+        },
+        {
+          "role": "user",
+          "content": "Could you prepare her plan for today?"
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"jessicaSmith\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 316,
+      "completion_tokens": 15,
+      "invalid_answer": false,
+      "predicted_persona_id": "jessicaSmith",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 549.7
+    },
+    {
+      "case_id": "context_greg",
+      "category": "earlier_turns",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm handling meals for Earl Jones and Greg Taylor."
+        },
+        {
+          "role": "assistant",
+          "content": "Understood. Who should I start with?"
+        },
+        {
+          "role": "user",
+          "content": "Let's do the second one first."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"NA-NV\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 313,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 499.2
+    },
+    {
+      "case_id": "context_aaliyah",
+      "category": "earlier_turns",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Make today's meal plan for Greg Taylor."
+        },
+        {
+          "role": "assistant",
+          "content": "Sure, preparing Greg Taylor's plan."
+        },
+        {
+          "role": "user",
+          "content": "Wait, sorry, I meant Aaliyah Brooks, not Greg."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"A-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 316,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 509.0
+    },
+    {
+      "case_id": "context_becca",
+      "category": "earlier_turns",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Two of my clients today are Becca Moore and Earl Jones."
+        },
+        {
+          "role": "assistant",
+          "content": "Got it."
+        },
+        {
+          "role": "user",
+          "content": "Begin with the one who's vegetarian."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 309,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 483.7
+    },
+    {
+      "case_id": "context_dylan",
+      "category": "earlier_turns",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Earlier I planned meals for Becca Moore."
+        },
+        {
+          "role": "assistant",
+          "content": "Yes, Becca's plan is done."
+        },
+        {
+          "role": "user",
+          "content": "Now do the other vegetarian client."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 310,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-V",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 480.6
+    },
+    {
+      "case_id": "context_earl",
+      "category": "earlier_turns",
+      "expected_action": "resolve",
+      "expected_persona_id": "earlJones",
+      "messages": [
+        {
+          "role": "user",
+          "content": "My grandfather is Earl Jones; he's one of your stored profiles."
+        },
+        {
+          "role": "assistant",
+          "content": "Thanks, I see Earl Jones in the list."
+        },
+        {
+          "role": "user",
+          "content": "What should he eat today?"
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"earlJones\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 315,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "earlJones",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 497.7
+    },
+    {
+      "case_id": "mixed_earl",
+      "category": "mixed_language",
+      "expected_action": "resolve",
+      "expected_persona_id": "earlJones",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Earl garu ki ee roju meal plan cheyyandi."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"earlJones\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 289,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "earlJones",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 429.0
+    },
+    {
+      "case_id": "mixed_becca",
+      "category": "mixed_language",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Becky ki today em tinalo plan cheyyi."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"NA-V\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 289,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 429.3
+    },
+    {
+      "case_id": "mixed_greg",
+      "category": "mixed_language",
+      "expected_action": "resolve",
+      "expected_persona_id": "NA-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Greg Taylor kosam ee roju food plan ivvandi please."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 289,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 406.6
+    },
+    {
+      "case_id": "mixed_aaliyah",
+      "category": "mixed_language",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-NV",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Aaliyah ke liye aaj ka meal plan bana do."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"A-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 290,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-NV",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 430.8
+    },
+    {
+      "case_id": "mixed_dylan",
+      "category": "mixed_language",
+      "expected_action": "resolve",
+      "expected_persona_id": "A-V",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Dylan bhaiya ka aaj ka khana plan kar do."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"A-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 290,
+      "completion_tokens": 11,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-V",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 379.6
+    },
+    {
+      "case_id": "mixed_jessica",
+      "category": "mixed_language",
+      "expected_action": "resolve",
+      "expected_persona_id": "jessicaSmith",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Jo client diabetic hai, unke liye aaj ka diet plan chahiye."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"jessicaSmith\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 293,
+      "completion_tokens": 14,
+      "invalid_answer": false,
+      "predicted_persona_id": "jessicaSmith",
+      "outcome": "correct_resolution",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 428.2
+    },
+    {
+      "case_id": "unclear_unknown",
+      "category": "unknown_or_ambiguous",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please plan today's meals for Priyanka Rao."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"unclear\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 286,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": null,
+      "outcome": "correct_clarification",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 401.7
+    },
+    {
+      "case_id": "unclear_vegetarian",
+      "category": "unknown_or_ambiguous",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Make a plan for our vegetarian client."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 283,
+      "completion_tokens": 11,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-V",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 325.7
+    },
+    {
+      "case_id": "unclear_no_person",
+      "category": "unknown_or_ambiguous",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "What should be on the menu today?"
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"unclear\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 283,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": null,
+      "outcome": "correct_clarification",
+      "correct_action": true,
+      "wrong_person": false,
+      "latency_ms": 365.5
+    },
+    {
+      "case_id": "unclear_pronoun",
+      "category": "unknown_or_ambiguous",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you make her plan for today?"
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"A-NV\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 283,
+      "completion_tokens": 14,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-NV",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 414.9
+    },
+    {
+      "case_id": "unclear_two_people",
+      "category": "unknown_or_ambiguous",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Plan one day of meals for either Becca Moore or Greg Taylor, whoever is easier."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 293,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 394.1
+    },
+    {
+      "case_id": "unclear_calories",
+      "category": "unknown_or_ambiguous",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Our client on 3,500 calories wants today's plan."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"A-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 288,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-NV",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 454.1
+    },
+    {
+      "case_id": "near_greg",
+      "category": "near_miss",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please set up meals for Greg Thompson today."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"NA-NV\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 284,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 373.7
+    },
+    {
+      "case_id": "near_jessica",
+      "category": "near_miss",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Jessica Brown needs a meal plan for today."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"jessicaSmith\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 284,
+      "completion_tokens": 15,
+      "invalid_answer": false,
+      "predicted_persona_id": "jessicaSmith",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 479.4
+    },
+    {
+      "case_id": "near_earl",
+      "category": "near_miss",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Make today's plan for Earl Johnson."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"earlJones\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 283,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "earlJones",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 400.3
+    },
+    {
+      "case_id": "near_becca",
+      "category": "near_miss",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Rebecca Morales would like a plan for today."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"NA-V\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 285,
+      "completion_tokens": 13,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-V",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 459.3
+    },
+    {
+      "case_id": "near_dylan",
+      "category": "near_miss",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Dylan Thomas asked for today's meal plan."
+        }
+      ],
+      "raw_answer": "{ \"persona_id\": \"A-V\" }",
+      "done_reason": "stop",
+      "prompt_tokens": 285,
+      "completion_tokens": 12,
+      "invalid_answer": false,
+      "predicted_persona_id": "A-V",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 458.6
+    },
+    {
+      "case_id": "near_taylor",
+      "category": "near_miss",
+      "expected_action": "clarify",
+      "expected_persona_id": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Megan Taylor wants her plan for today."
+        }
+      ],
+      "raw_answer": "{\n  \"persona_id\": \"NA-NV\"\n}",
+      "done_reason": "stop",
+      "prompt_tokens": 284,
+      "completion_tokens": 14,
+      "invalid_answer": false,
+      "predicted_persona_id": "NA-NV",
+      "outcome": "wrong_person",
+      "correct_action": false,
+      "wrong_person": true,
+      "latency_ms": 498.4
+    }
+  ]
+}
