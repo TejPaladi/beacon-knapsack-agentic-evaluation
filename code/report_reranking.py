@@ -21,9 +21,11 @@ from typing import Any
 try:
     from report_hard_wording import modal
     from report_meaningful_tools import counts, mcnemar_exact, pct, wilson
+    from rule_reranker import detect
 except ModuleNotFoundError:
     from code.report_hard_wording import modal
     from code.report_meaningful_tools import counts, mcnemar_exact, pct, wilson
+    from code.rule_reranker import detect
 
 
 LABELS = {"default": "Knapsack default", "rules": "Keyword reranker"}
@@ -132,6 +134,30 @@ def hypothesis_lines(conditions: dict[str, dict[int, dict[str, Any]]]) -> list[s
     ]
 
 
+def fallback_rows(conditions: dict[str, dict[int, dict[str, Any]]]) -> list[str]:
+    """Exploratory: the keyword reranker when it detects a cue, otherwise the model."""
+
+    rules = per_case(conditions[LABELS["rules"]])
+    no_cue = {cid for cid, v in rules.items() if detect(v["request"]) is None}
+    lines = [
+        f"The keyword reranker detects no cue in {len(no_cue)} requests and then keeps the Knapsack default.",
+        "",
+        "| Model | Satisfied (48) | Implicit (24) | Model satisfied on no-cue requests |",
+        "| --- | ---: | ---: | ---: |",
+    ]
+    for name, reps in conditions.items():
+        if name in LABELS.values():
+            continue
+        model = per_case(reps)
+        chosen = {cid: (model if cid in no_cue else rules)[cid] for cid in rules}
+        implicit = sum(v["satisfied"] for v in chosen.values() if v["wording"] == "implicit")
+        lines.append(
+            f"| {name} | {sum(v['satisfied'] for v in chosen.values())} | {implicit} | "
+            f"{sum(model[cid]['satisfied'] for cid in no_cue)}/{len(no_cue)} |"
+        )
+    return lines
+
+
 def miss_rows(conditions: dict[str, dict[int, dict[str, Any]]]) -> list[str]:
     lines = ["| Condition | Request | Wording | Chose | Best |", "| --- | --- | --- | ---: | --- |"]
     for name, reps in conditions.items():
@@ -177,6 +203,12 @@ def main() -> None:
         "## Hypotheses (per-case majority)",
         "",
         *hypothesis_lines(conditions),
+        "",
+        "## Exploratory: keyword reranker with a model fallback (per-case majority)",
+        "",
+        "This combination was defined after the results were seen, so it is not a test of H7.",
+        "",
+        *fallback_rows(conditions),
         "",
         "## Unsatisfied requests (per-case majority)",
         "",

@@ -65,3 +65,14 @@ Fixed on 4 November 2026, before the request set was written.
 - The same on the subset where the default is not already a best candidate,
   where a reranker can add value.
 - 95% Wilson intervals, exact McNemar tests, repetition stability, latency.
+
+## Results
+
+The runs, the report, and the verdicts are in
+[results/reranking_comparison.md](../results/reranking_comparison.md): H7b and
+H7c are supported and H7a is not (Qwen 18/24 vs. keyword reranker 15/24 on
+goal-style wording, exact McNemar p = 0.55). The report also includes an
+exploratory combination, defined after the results were seen, in which the
+keyword reranker decides when it detects a cue and the model decides
+otherwise. The sections above are unchanged since they were committed before
+the requests were written.
