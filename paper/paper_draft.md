@@ -51,37 +51,65 @@ Knapsack recommender. Instead, we investigate whether an LLM can reliably
 orchestrate the workflow around it and what happens when the user's persona is
 missing, unknown, or ambiguous.
 
-The study asks five research questions:
+A preliminary comparison motivates keeping meal selection deterministic: when
+small models select meals directly from the same catalog, one violates stored
+dietary conditions and the other loses quality and variety (Section 5.3). The
+main study therefore holds Knapsack fixed and asks four research questions about
+the workflow around it:
 
-- **RQ1:** Can one hosted LLM complete the required tool trajectory while
-  preserving the exact output of direct deterministic Knapsack execution?
-- **RQ2:** How robust is prompt-only orchestration across natural-language,
-  restriction-override, missing, unknown, and ambiguous-persona requests?
-- **RQ3:** Can a deterministic identity gate improve
-  clarification safety without changing the recommender?
-- **RQ4:** How do direct LLM-selected meal plans compare with deterministic
-  Knapsack plans on constraint adherence, quality, nutrition fit, variety, and
-  latency?
-- **RQ5:** Can responsibility-based tools support multiple user intents, and
-  does deterministic validation prevent a corrupted plan from reaching the
-  response boundary?
+- **RQ1:** How reliably do small tool-calling models orchestrate a fixed
+  deterministic recommender, and do they ask for clarification when the persona
+  is missing, unknown, or ambiguous?
+- **RQ2:** Does a deterministic identity gate make the system safe on those
+  requests without changing what the model itself can do?
+- **RQ3:** With tools organized by responsibility (profile retrieval,
+  recommendation, nutrition analysis, validation, and release), do models choose
+  intent-appropriate workflows, and do they withhold a plan that their own
+  validation call reports as faulty? Does an application-level release gate
+  change what reaches the user?
+- **RQ4:** Do these request sets require a language model at all? How does a
+  declared no-LLM pipeline compare, including on held-out wording that was not
+  used to build it?
+
+Each question has a stated hypothesis:
+
+- **H1 (RQ1):** without the identity gate, success on valid workflows differs
+  widely across models, and no model both completes most valid workflows and
+  clarifies every unclear request.
+- **H2 (RQ2):** with the gate, unclear requests produce no recommender
+  executions and are all clarified, while each model's valid-workflow passes
+  are unchanged.
+- **H3 (RQ3):** (a) an LLM interprets indirect language better than a fixed
+  keyword baseline, but performance differs by model; (b) successful
+  recommendation paths preserve the Knapsack output exactly, because the model
+  never selects food; (c) without the release gate, some models release plans
+  that failed validation, and with it unsafe releases are zero while the
+  model's strict trajectory success does not improve.
+- **H4 (RQ4):** model orchestration is slower than the no-LLM pipeline, so any
+  value it adds must come from language handling rather than computation.
+
+H3 and H4 were committed before the final runs and before the held-out set was
+written. H1 and H2 were written after a first Experiment 2 run and before its
+re-run, so they predict a replication. Experiments 1 and 3 are descriptive.
 
 The paper makes five bounded contributions:
 
 1. a controlled separation between language-model orchestration and
-   deterministic meal selection in the BEACON system.
+   deterministic meal selection in the BEACON system, with an integration check
+   showing exact plan preservation.
 2. an identity-gated hybrid architecture that resolves a persona
    outside the model, constrains identity-dependent tool calls, and renders
-   verified results without a final generative step.
-3. a trace-based, five-model evaluation that measures exact plan fidelity,
-   tool order, clarification, unsafe execution, failures, and latency without an
-   LLM judge.
-4. a same-persona, same-catalog comparison between deterministic Knapsack and
+   verified results without a final generative step, evaluated against the
+   same agent without the gate across five local models.
+3. a responsibility-based tool design in which release is an explicit model
+   action, so the evaluation can observe whether a model withholds a plan its
+   own validation rejected, and a matched release-gate comparison on development
+   and held-out request sets with repeated runs and paired statistics.
+4. a two-level, trace-based scoring scheme that separates the end state the user
+   receives from the model's own trajectory, without an LLM judge.
+5. a same-persona, same-catalog comparison between deterministic Knapsack and
    two local LLM-only selectors, scored after generation by the same Beacon
    evaluators.
-5. a four-tool, multi-intent extension with deterministic nutrition analysis,
-   violation checking, injected-fault evaluation, and a matched release-gate
-   ablation across three local models.
 
 This is not a claim of a new optimization algorithm, a new language model, or a
 clinically validated recommender. It is a controlled systems study of agentic
@@ -125,7 +153,10 @@ insufficient-information cases [5]. The Berkeley Function-Calling Leaderboard
 also evaluates tool selection, arguments, multi-turn execution, and irrelevant
 or hallucinated calls [6]. Following this line of work, our evaluator checks the
 executed persona, tool order, Knapsack action, and exact returned plan rather
-than using an LLM to rate the response text.
+than using an LLM to rate the response text. Like $\tau$-bench, we score the
+final state the user receives; we additionally score the model's trajectory
+separately, because an application control can repair the final state without
+the model having acted correctly.
 
 The Agentic AI Test Checklist collects 110 implementation-oriented checks for
 terminal state, dependency ordering, tool allowlists, runtime enforcement, and
@@ -133,7 +164,12 @@ related risks [15]. It is not a meal-recommendation benchmark, so we do not
 claim a score over the full checklist. We adapt selected checks into task-specific
 oracles: all postconditions must hold together, dependent tools must follow
 successful prerequisites, the tool set and turn count are bounded, and plan
-release is enforced by the application rather than only by a prompt.
+release is enforced by the application rather than only by a prompt. We
+screened all 110 items against this system: 21 are measured by a scored oracle,
+4 are computed as exploratory measures, 14 are approximated, 17 are relevant
+but need new requests (mostly multi-turn and multilingual cases), and 54 do not
+apply to a single-agent system with no authentication, stored records, or
+untrusted documents. The item-by-item screen is released with the code.
 
 ### 2.4 Clarification and runtime policy enforcement
 
@@ -250,8 +286,12 @@ preventing them from becoming wrong-person recommendations.
 ### 3.5 Responsibility-based tool extension
 
 The initial three tools expose implementation steps rather than all of the
-responsibilities discussed for a meal agent. The extension uses four tools with
-distinct inputs, outputs, and failure boundaries:
+responsibilities discussed for a meal agent: no user asks to list personas. We
+therefore keep a tool only if it is meaningful by four criteria: it has one
+responsibility a domain expert would name; some request type requires it; some
+other request type must not use it, so calling it is a decision that can be
+scored; and it has its own inputs, outputs, and failure behaviour. The
+extension uses four such tools plus an explicit release action:
 
 | Tool | Responsibility | Enforced prerequisite |
 | --- | --- | --- |
@@ -259,18 +299,44 @@ distinct inputs, outputs, and failure boundaries:
 | `recommend_meal_plan` | Run the unchanged deterministic Beacon Knapsack method. | Matching profile was fetched. |
 | `calculate_nutrition_scores` | Return nutrient totals, goal fit, and FSA/WHO-style proxies when requested. | A current plan exists. |
 | `check_plan_violations` | Detect structural and stored dietary-condition violations. | A current plan exists. |
+| `release_plan` | Show the current plan to the user. | A current plan exists; with the release gate, it must also have passed validation. |
 
-Profile selection and retrieval are combined because they constitute one
-read-only database access responsibility. Recommendation, nutrition analysis,
-and validation remain separate because they answer different intents and fail
-independently. Plans are held in trusted session state, so the model does not
-copy a large plan into the nutrition or validation tools.
+The design began from six candidate tools: a database fetch, a persona
+selector, a persona retriever, a recommender, a nutrition calculator, and a
+violation checker. The first three are merged into `fetch_persona_profile`,
+because choosing a person and returning that person's record form one
+read-only responsibility; separate tools would add a call without a new
+capability, plus a new failure (select one person, retrieve another).
+Recommendation, nutrition analysis, and validation remain separate because they
+answer different intents and fail independently. `release_plan` is added so the
+release decision is observable. Plans are held in trusted session state, so the
+model does not copy a large plan into the nutrition, validation, or release
+tools.
 
-For a resolved request, the model still chooses which tools to invoke. The
-application binds all calls to the resolved profile and enforces dependencies.
-In the policy-gated condition, it also refuses to release a plan unless the
-violation checker has passed. A prompt-only ablation disables only this final
-release rule; it does not change the prompt, schemas, model, or recommender.
+The request categories make every tool selective (✓ required, ✗ must not be
+called):
+
+| Request category | Profile | Recommend | Nutrition | Validate | Release |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| Profile only | ✓ | ✗ | ✗ | ✗ | ✗ |
+| Recommendation, override, indirect | ✓ | ✓ | ✗ | ✓ | ✓ |
+| Nutrition analysis | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Injected fault | ✓ | ✓ | ✗ | ✓ | ✗ |
+| Unclear identity | ✗ | ✗ | ✗ | ✗ | ✗ |
+
+Identity for unclear requests is resolved by application code before the model
+runs, rather than by a model-selected tool, because Experiment 2 shows that a
+model that uses tools well can still run the recommender for a person it could
+not identify.
+
+Release is a separate action so that the model's decision to show a plan is an
+observable event. The model receives every tool result, including a failed
+validation, and then decides whether to call `release_plan`. For a resolved
+request, the application binds all calls to the resolved profile and enforces
+dependencies in both conditions. In the release-gated condition, it also refuses
+`release_plan` unless the current plan passed validation. The ungated condition
+leaves that decision to the model; it does not change the prompt, schemas,
+model, or recommender.
 
 The FSA-style value is the mean of available per-item traffic-light proxies
 using sugar, salt converted from sodium, fat, and saturated fat (range 4--12;
@@ -289,29 +355,24 @@ be read together with the missing-data fields.
 
 ## 4. Experimental Method
 
-### 4.1 Experiment 1: direct versus agentic integration check
+### 4.1 Experiment 1: integration check
 
-Experiment 1 is an integration and tool-compliance check for RQ1 using the six
-fictional BEACON personas. The direct
-condition receives a selected persona identifier and invokes Knapsack. The
-agentic condition receives a natural-language request, uses hosted
-`openai/gpt-oss-20b` through Groq at temperature zero, and must complete the three-tool
-trajectory. Both conditions use the same backend, catalog, fixed date, and
-reference plans. Because Knapsack is deterministic, identical meal output is
-expected whenever the model supplies the correct persona identifier; the
-nontrivial measurement is whether this one hosted model completes the required
-tool trajectory.
-
-The metrics are requested-role coverage, exact role-item fidelity to direct
-Knapsack, required tool-sequence compliance, BEACON's original goodness,
-BEACON's newer quality score, post-hoc nutrition-goal fit, failures, retries,
-and end-to-end latency. Nutrition fit is evaluated after generation; the tested
-Knapsack implementation does not optimize the numeric calorie, carbohydrate,
-protein, and fiber targets directly.
+Experiment 1 checks that the agentic path preserves the deterministic output
+before any robustness study. A direct condition receives a persona identifier
+and invokes Knapsack for each of the six fictional BEACON personas. An agentic
+condition receives a natural-language request, uses hosted
+`openai/gpt-oss-20b` through Groq at temperature zero, and must complete the
+three-tool trajectory. Because Knapsack is deterministic, identical plans are
+expected whenever the model supplies the correct identifier, so this is a
+correctness check of the integration rather than a research result. We report
+exact role-item fidelity, tool-sequence compliance, BEACON's goodness and
+quality scores, post-hoc nutrition-goal fit, and latency. The tested Knapsack
+implementation does not optimize the numeric calorie, carbohydrate, protein,
+and fiber targets; nutrition fit is observed alignment.
 
 ### 4.2 Experiment 2: request robustness
 
-Experiment 2 tests RQ2 and RQ3 with 30 fixed requests over the same six stored
+Experiment 2 tests RQ1 and RQ2 with 30 fixed requests over the same six stored
 personas. Twenty-four requests require recommendation: six each use an exact
 full name, a paraphrase, a unique first name, or a restriction-override request
 that asks the system to ignore saved restrictions. Six requests require
@@ -329,13 +390,23 @@ Five local Ollama models are evaluated:
 Each model receives every request in both the prompt-only and identity-gated
 architectures, producing 300 case-level executions. A no-LLM pipeline also
 applies the same name resolver and then runs Knapsack directly. Runs are
-sequential to avoid
-local memory contention. Temperature is zero, the turn limit is eight, and the
-same tool schemas, backend, reference plans, and scoring rules are used.
+sequential to avoid local memory contention. Temperature is zero, the turn
+limit is eight, each model turn may generate up to 1,024 tokens, and the same
+tool schemas, backend, reference plans, and scoring rules are used.
+
+An earlier version of this experiment capped each model turn at 160 tokens.
+Qwen 3.5 reasons before answering, and that cap exhausted its reasoning budget
+before it produced an answer or tool call: most of its recorded failures were
+empty replies. We reproduced the effect directly (the same request ends with
+`finish_reason = length` and no output at 160 tokens, and with a correct tool
+call after 281 tokens at 1,024) and re-ran all five models at 1,024 tokens so
+every model uses the same setting. The runner now records every turn that
+reaches the limit.
 
 ### 4.3 Experiment 3: deterministic versus LLM-only selection
 
-Experiment 3 tests RQ4 using the same six personas and local Beacon catalog.
+Experiment 3 is the motivating comparison for keeping selection deterministic.
+It uses the same six personas and local Beacon catalog.
 The deterministic condition runs Knapsack. In each LLM-only condition, the
 model receives the stored profile and all 124 unique candidates eligible for
 the requested main-course, side, or beverage roles (145 role memberships) in
@@ -355,28 +426,38 @@ latency.
 
 ### 4.4 Experiment 4: meaningful tools and fault containment
 
-Experiment 4 evaluates the four responsibility-based tools on 42 fixed
-non-sensitive requests, six in each of seven categories: profile-only,
-recommendation, nutrition analysis, restriction override, indirect intent,
-unclear identity, and injected fault. Unclear identities are handled before
-model execution by the same deterministic resolver. For every other case, the
-model must select an intent-appropriate sequence rather than replay one fixed
-trajectory.
+Experiment 4 tests RQ3 and RQ4 with the responsibility-based tools on two
+request sets of 42 non-sensitive cases each. Both sets contain six cases in each
+of seven categories: profile-only, recommendation, nutrition analysis,
+restriction override, indirect intent, unclear identity, and injected fault.
+The **development set** is the original one. The keyword rule baseline was
+written while developing against it, so that set favours the baseline. The
+**held-out set** has the same category, persona, and label for every case but
+new wording, and was written after the baseline was frozen; it was not used to
+change the baseline, prompt, or tools. Fault-case prompts in the held-out set
+vary in whether they mention validation, so a model cannot rely on that hint.
+
+Unclear identities are handled before model execution by the same
+deterministic resolver used in Experiment 2, in both conditions. For every other
+case, the model must select an intent-appropriate sequence. The loop runs until
+the model answers without a tool call or reaches the eight-turn limit; it never
+reads case labels, so a model that keeps calling tools after a profile-only
+request is observed doing so. Each turn may generate up to 1,024 tokens.
 
 The injected fault removes the first required role from a completed plan after
-Knapsack and before validation. This isolates whether the checker detects the
-fault and whether the release boundary enforces that result. It does not test
-whether the model can notice the corruption from text because the model never
-receives or edits the plan directly.
+Knapsack and before validation. The validator reports the missing role to the
+model, which must then decide not to call `release_plan`. Without the release
+gate, a call releases the faulty plan; with the gate, the application refuses
+it. The model never receives or edits the plan's contents, so the test measures
+whether the model acts on the validator's report, not whether it can notice the
+corruption itself.
 
 Three local Ollama models are used: `granite4:3b`, `qwen3.5:4b`, and
-`llama3.2:3b`. Each model receives all 42 requests once with the release gate
-disabled. To isolate the gate from model nondeterminism, each of the 126
-model-request traces is then replayed through the deterministic gate without
-another model call. A
-deterministic keyword pipeline runs the same 42 cases as a no-LLM baseline. All
-runs use the same dataset, four tool schemas, backend, Knapsack implementation,
-temperature zero, and eight-turn limit.
+`llama3.2:3b`. Each model runs every request in both conditions three times on
+each request set, giving 1,512 model-condition-request executions in total. A
+deterministic keyword pipeline runs both sets as a no-LLM baseline. All runs
+use the same tool schemas, system prompt, backend, Knapsack implementation, and
+temperature zero.
 
 ### 4.5 Scoring
 
@@ -397,19 +478,59 @@ with a catalog member and violates none of the stored diabetes, vegetarian,
 vegan, or gluten-free conditions. Quality metrics are computed after generation
 and do not influence the model's selection.
 
-For Experiment 4, complete-case success requires all applicable checks to pass:
-persona routing, exact tool membership with dependency-valid order, expected terminal action, correct
-nutrition-tool selection, exact Knapsack fidelity, zero failed tools, and zero
-API or loop errors. A fault case also requires detection and blocked release.
-We separately report unsafe releases and success by request category. The
-metric dictionary gives each denominator and a worked example.
+Experiment 4 scores each case at two levels:
+
+- **Correct outcome** asks whether the user received the right end state. A
+  profile request must return the intended profile without creating a plan. A
+  recommendation request must release a plan that passes validation, with
+  nutrition analysis when requested and exact Knapsack fidelity. A fault case
+  must detect the violation and not release the plan. An unclear request must
+  receive a clarification without tool access.
+- **Strict pass** additionally requires the model's own trajectory to be
+  correct: exact tool membership in dependency-valid order (profile before
+  recommendation, recommendation before analysis and validation, validation
+  before release), no failed or policy-refused call, nutrition analysis called
+  if and only if requested, and no API or loop error.
+
+A gate refusal therefore cannot turn a model error into a strict pass; it can
+only change the outcome. We also count unsafe releases (a faulty plan
+released), unvalidated releases (any plan released before a passed validation),
+gate refusals, turns that reached the token limit, and tool calls written as
+plain text instead of structured calls. The metric dictionary gives each
+denominator and a worked example.
+
+Two exploratory measures were added after the hypotheses were fixed and are not
+used to decide them. **Reply–state consistency** compares the model's final
+reply with the recorded state and flags three contradictions: asserting that
+validation passed when it failed or never ran, a release claim opposite to the
+recorded release, and a meal plan written out in prose when Knapsack produced
+none. It is a keyword check, so every flag is listed with its triggering
+sentence for audit. **Paraphrase consistency** pairs each development case with
+its held-out rewording and asks whether the release decision, the set of tools
+attempted, and the correct outcome are the same. They correspond to checklist
+items T1-002, T7-009, T7-001, and T7-006.
+
+Repetitions at temperature 0 measure run-to-run stability of local inference
+rather than sampling variance. We report each repetition's count and use the
+per-case majority across the three repetitions for interval estimates and
+paired tests: 95% Wilson intervals over the 42 cases of a set, and an exact
+McNemar test comparing the two conditions case by case. The intervals treat
+cases as independent and therefore understate dependence among prompts that
+share a persona or category. We also report how often all three repetitions
+produced identical tool traces, and how often the gated trace equals the
+ungated trace up to the gate's first refusal, which is the expected behaviour
+at temperature 0 if the two conditions differ only at the gate.
 
 ### 4.6 Reproducibility
 
-The benchmark records the dataset hash, prompt hash, source commit, hashes of
-the benchmark and policy-gate implementations, model, temperature, complete tool
-trace, application errors, and latency. All profiles are fictional and all food
-sources are local to the compatible BEACON checkout.
+Each result records the dataset, tool-schema, and system-prompt hashes; the
+repository and BEACON backend commits; the local model digest; temperature,
+turn limit, and token limit; the complete tool trace and every assistant
+message; application errors; and latency. All final runs of Experiments 2 and 4
+were executed from one committed source revision in a separate worktree, with
+outputs written outside it, and the report generators refuse results from an
+uncommitted worktree. All profiles are fictional and all food sources are local
+to the compatible BEACON checkout.
 
 ## 5. Results
 
@@ -555,34 +676,27 @@ capability and safe clarification are therefore empirically separable.
 
 ### 6.1 Answering the research questions
 
-**RQ1:** One hosted model completes all six required tool trajectories and
-preserves the fixed Knapsack output. This is a small integration result. It adds
-substantial latency and does not test whether language understanding is useful.
+Each answer states whether its hypothesis is supported, using the criteria in
+the metric dictionary.
 
-**RQ2:** Prompt-only robustness varies widely by model. No tested model combines
-high valid-workflow completion with consistently safe unclear-persona handling.
-The strongest prompt-only model completes 22/24 valid cases but executes the
-recommender in all six cases where clarification is required.
+**RQ1 / H1.** [Pending the 1,024-token Experiment 2 re-run.]
 
-**RQ3:** The deterministic gate produces complete safe clarification for all 30
-unclear model-request pairs, eliminates ten unsafe executions, and reduces mean
-latency without changing valid-workflow performance. It improves the system,
-not the underlying models. The no-LLM baseline's 30/30 result further shows that
-the present request set does not require a model.
+**RQ2 / H2.** [Pending the 1,024-token Experiment 2 re-run.]
 
-**RQ4:** In this preliminary controlled comparison, Granite preserves dietary
+**RQ3 / H3a–H3c.** [Pending the remaining held-out repetitions. On the complete
+development set, Granite and Qwen release all six faulty plans without the gate
+and none with it, with strict passes unchanged, as H3c predicts; Llama releases
+none in either condition.]
+
+**RQ4 / H4.** [Pending the final runs.]
+
+Experiments 1 and 3 have no hypothesis. In Experiment 1, one hosted model
+completes all six required tool trajectories and preserves the Knapsack output
+at substantial latency cost. In Experiment 3, Granite preserves dietary
 constraints but has lower all-case quality, nutrition fit, and variety than
-Knapsack. Llama violates hard conditions in half of the personas, although its
-three safe plans have higher conditional quality. Knapsack is faster,
-token-free, and safe on all six cases. The small sample and conditional result
-do not support a general ranking of selector quality.
-
-**RQ5:** Responsibility-based tools make profile retrieval, recommendation,
-nutrition analysis, and validation separately observable, but none of the three
-models matches the 38/42 deterministic baseline. The paired release gate turns
-all 18 detected injected faults into blocked outcomes without changing a tool
-trace. It improves system safety, not language understanding or tool-use
-capability.
+Knapsack, while Llama violates hard conditions for half of the personas,
+although its three safe plans have higher conditional quality. The small sample
+does not support a general ranking of selector quality.
 
 ### 6.2 What is novel
 
@@ -640,8 +754,10 @@ six personas, one prompt per category and persona, and three small local models.
 Its unclear-identity outcomes come from the pre-model resolver and do not test
 model clarification. Its fault set contains one synthetic corruption—removing
 the first required meal role—so zero unsafe releases demonstrates enforcement
-for that fault, not complete safety. The paired replay isolates the gate's
-effect, but it does not estimate variation across repeated model generations.
+for that fault, not complete safety. Repetitions at temperature 0 on one
+machine measure run-to-run stability, not sampling variance. As the checklist
+screen records, the study does not test authorisation, injected text inside
+tool outputs or documents, or state carried across conversation turns.
 
 The gate's six unclear cases were handcrafted for the resolver's fixed rules,
 so its perfect clarification result is an invariant on this test set rather
