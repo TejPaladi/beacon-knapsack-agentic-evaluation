@@ -142,10 +142,16 @@ recorded state. On 48 conversations that use nicknames, misspellings,
 descriptions, earlier turns, and mixed Telugu--English or
 Hindi--English, models resolve 28--29 of 30 hard requests against 27 for
 rules written in advance, but pick a person for 9--12 of the 12 requests
-that should be clarified; using a model only to propose a person for the
-user to confirm executes no wrong person. The results support using
-models only where language understanding outperforms a declared no-LLM
-baseline, and then as proposers, while deterministic code retains
+that should be clarified. Carried through the full release-gated
+workflow, letting a model decide releases up to nine wrong-person plans,
+because the release gate checks the plan rather than the person, while
+using the model only to propose a person for the user to confirm
+releases none. When Knapsack proposes five validated plans, the best
+model matches a keyword rule on explicit preferences and leads it on
+goal-style wording, 18 to 15 of 24 (not significant), with no constraint
+violations. The results support using models only where language
+understanding outperforms a declared no-LLM baseline, and then as
+proposers or bounded selectors, while deterministic code retains
 identity, constraint-sensitive computation, and release control.\\
 \textbf{Keywords:} LLM agents, tool use, meal recommendation,
 deterministic optimization, policy enforcement, clarification
@@ -176,7 +182,8 @@ A preliminary comparison motivates keeping meal selection deterministic:
 when small models select meals directly from the same catalog, one
 violates stored dietary conditions and the other loses quality and
 variety (Section 5.3). The main study therefore holds Knapsack fixed and
-asks four research questions about the workflow around it:
+asks seven research questions about the workflow around it and about a
+bounded role for the model in selection:
 
 \begin{itemize}
 \tightlist
@@ -202,6 +209,16 @@ asks four research questions about the workflow around it:
   nicknames, misspellings, descriptions, earlier turns, or mixed
   languages, does a model identify the right person more often than
   deterministic rules, and how often does it pick the wrong person?
+\item
+  \textbf{RQ6:} When identification feeds the full release-gated
+  workflow, does letting a model propose a person for the user to
+  confirm deliver the right plan more often than the exact-name gate,
+  and does any identification method let a plan for the wrong person
+  reach the user?
+\item
+  \textbf{RQ7:} When Knapsack proposes several safe plans, does a model
+  match a stated soft preference better than a keyword rule, and do the
+  chosen plans stay safe?
 \end{itemize}
 
 Each question has a stated hypothesis:
@@ -233,15 +250,26 @@ Each question has a stated hypothesis:
   than a stronger rule resolver; (b) every model picks a wrong person
   more often than those rules; (c) every condition handles exact full
   names.
+\item
+  \textbf{H6 (RQ6):} (a) propose and confirm delivers the right person's
+  validated plan more often than the exact-name gate; (b) it releases no
+  plan for a wrong person, while letting the model decide alone does.
+\item
+  \textbf{H7 (RQ7):} (a) on preferences stated as goals rather than
+  nutrients, the best model satisfies more than a keyword reranker; (b)
+  on explicitly stated preferences, the keyword reranker does at least
+  as well; (c) every chosen plan passes validation.
 \end{itemize}
 
 H3 and H4 were committed before the final runs and before the held-out
 set was written. H1 and H2 were written after a first Experiment 2 run
 and before its re-run, so they predict a replication. H5 and the
 stronger rule resolver were committed before the Experiment 5 requests
-were written. Experiments 1 and 3 are descriptive.
+were written; H6, H7, and the keyword reranker were committed before any
+Experiment 6 run or Experiment 7 request. Experiments 1 and 3 are
+descriptive.
 
-The paper makes six bounded contributions:
+The paper makes eight bounded contributions:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -275,6 +303,14 @@ The paper makes six bounded contributions:
   three local models on nicknames, misspellings, descriptions, earlier
   turns, and romanized Telugu--English and Hindi--English requests, with
   wrong-person identification as the safety outcome.
+\item
+  an end-to-end evaluation in which the model only proposes a person for
+  the user to confirm before the release-gated workflow runs, compared
+  with rule-based and model-only identification.
+\item
+  a constrained hybrid reranking study in which Knapsack proposes only
+  safe plans and a model or keyword rule selects one for a stated
+  preference.
 \end{enumerate}
 
 This is not a claim of a new optimization algorithm, a new language
@@ -878,7 +914,49 @@ the labeled one, including any persona on a request that must be
 clarified. A \textbf{missed resolution} (a clarification on a resolvable
 request) is safe but unhelpful.
 
-\subsubsection{4.7 Reproducibility}\label{reproducibility}
+\subsubsection{4.7 Experiment 6: propose and confirm end to
+end}\label{experiment-6-propose-and-confirm-end-to-end}
+
+Experiment 6 tests RQ6 by joining Experiments 5 and 4. Each of the 48
+Experiment 5 conversations is identified by four methods: the exact-name
+gate, the stronger rules, the model deciding alone, and propose and
+confirm, in which a latest message containing exactly one stored full
+name is used directly and otherwise the model's answer is shown to the
+user as ``Did you mean \ldots?''. A simulated user confirms only the
+labeled person; a declined or missing proposal ends in a clarification.
+Every identified person is handed to the release-gated Experiment 4
+agent run by the same model, which receives the whole conversation and
+one added system line naming the person; identity-dependent tools are
+bound to that person. A resolvable conversation succeeds only when the
+labeled person's plan is released, passes validation, and matches
+Knapsack; a conversation that must be clarified succeeds only when no
+plan is released. Because an agent run depends only on the conversation
+and the person, one run is shared by every method that identifies the
+same person in a repetition. Granite 4 3B, Llama 3.2 3B, and Qwen 3.5 4B
+each run three repetitions. The simulated user never confirms a wrong
+suggestion, so propose-and-confirm safety is an upper bound.
+
+\subsubsection{4.8 Experiment 7: constrained hybrid
+reranking}\label{experiment-7-constrained-hybrid-reranking}
+
+Experiment 7 tests RQ7, the hybrid proposed after Experiment 3. For each
+persona, Knapsack plans five consecutive days with the usual
+constraints; identical days are removed, every remaining candidate must
+pass validation, and candidate 1 is the plan Knapsack returns for a
+single day. Personas with identical constraints share candidates.
+Forty-eight requests, eight per persona, each state one preference: more
+protein, fewer calories, more fiber, or fewer carbohydrates, once
+explicitly (``the plan with the most fiber'') and once as a goal or
+situation (``I've been a bit backed up lately''). A choice satisfies the
+request when its total for that nutrient is the best among the
+candidates; ties count. Three selectors are compared: the Knapsack
+default, a keyword reranker with common synonyms committed before the
+requests were written, and the three models, which see the request and
+every candidate's items and totals and answer with a candidate number
+through structured output (temperature 0, thinking disabled, three
+repetitions).
+
+\subsubsection{4.9 Reproducibility}\label{reproducibility}
 
 Each result records the dataset, tool-schema, and system-prompt hashes;
 the repository and BEACON backend commits; the local model digest;
@@ -886,9 +964,11 @@ temperature, turn limit, and token limit; the complete tool trace and
 every assistant message; application errors; and latency. All final runs
 of Experiments 2 and 4 were executed from one committed source revision
 in a separate worktree, with outputs written outside it, and the report
-generators refuse results from an uncommitted worktree. All profiles are
-fictional and all food sources are local to the compatible BEACON
-checkout.
+generators refuse results from an uncommitted worktree. Experiments 5,
+6, and 7 follow the same procedure, each from its own pinned commit, and
+their results additionally record the hashes of the rule resolver, the
+keyword reranker, and the candidate plans. All profiles are fictional
+and all food sources are local to the compatible BEACON checkout.
 
 \subsection{5. Results}\label{results}
 
@@ -1324,6 +1404,134 @@ right person. The cost is 10 to 14 proposals the user must decline, one
 for each request the model should have clarified. Model inference adds
 0.4 to 0.8 s per request.
 
+\subsubsection{5.7 Propose and confirm end to
+end}\label{propose-and-confirm-end-to-end}
+
+\begin{longtable}[]{@{}lrrr@{}}
+\toprule\noalign{}
+Identification & Granite 4 3B & Llama 3.2 3B & Qwen 3.5 4B \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Exact-name gate & 13 / 0 & 3 / 0 & 13 / 4 \\
+Stronger rules & 27 / 1 & 6 / 0 & 33 / 2 \\
+Model decides & 28 / 5 & 6 / 1 & 35 / 9 \\
+Propose and confirm & \textbf{28 / 0} & \textbf{6 / 0} & \textbf{35 /
+0} \\
+\end{longtable}
+
+Each cell shows right plans delivered on the 36 resolvable conversations
+and wrong-person releases on all 48. All three repetitions produced the
+same outcome for every model, method, and conversation.
+
+\textbf{H6b is supported.} Propose and confirm releases no plan for a
+wrong person with any model, while letting the model decide releases 5,
+1, and 9. Those releases are the Experiment 5 guesses carried through
+the workflow: the model names someone for ``our vegetarian client'' or
+for a near-miss name, the agent produces that person's plan, and the
+release gate passes it because the plan is valid. The gate checks the
+plan, not whether it is for the person the user meant.
+
+\textbf{H6a is not supported as pre-registered,} because it required a
+significant gain for every model. Propose and confirm delivers 28 right
+plans against 13 for the exact-name gate with Granite (exact McNemar p
+\textless{} 0.001) and 35 against 13 with Qwen (p \textless{} 0.001); in
+no conversation does the gate succeed where propose and confirm fails.
+With Llama the gain is 6 against 3 (p = 0.25). Llama is handed the right
+person in 34 of 36 conversations but releases a valid plan in only six:
+its runs mostly stop after fetching the profile (20 of 28 undelivered
+runs, three of them with a tool call written as text) or after calling
+Knapsack (6), the orchestration weakness already seen in Experiment 4.
+Granite stops after fetching the profile in six right-person runs. Once
+identification is solved, finishing the workflow becomes the bottleneck.
+
+A conversation that must be clarified and ends without a plan does not
+always mean the system was safe. The exact-name gate hands four
+near-miss names, such as ``Greg Thompson'', to the stored person with
+the same first name. Qwen completes those workflows and releases four
+wrong-person plans, while Granite and Llama stop before release.
+Similarly, Llama picks a person for all 12 conversations that must be
+clarified but releases a plan for only one. The wrong-person release
+count is the reliable safety measure, and only propose and confirm keeps
+it at zero for every model.
+
+The cost is user effort and latency. Propose and confirm asks a
+confirmation question in 37 to 40 of the 48 conversations, and the
+simulated user never confirms a wrong suggestion, which real users
+sometimes would. A full agent run takes 4.6 s (Llama), 6.6 s (Granite),
+or 26.3 s (Qwen) on average.
+
+\subsubsection{5.8 Constrained hybrid
+reranking}\label{constrained-hybrid-reranking}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2588}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1176}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1176}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1294}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1882}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1882}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Selector
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Satisfied
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Explicit
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Goal-style
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Default not best
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Hard violations
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Knapsack default & 16/48 & 8/24 & 8/24 & 0/32 & 0 \\
+Keyword reranker & 39/48 & \textbf{24/24} & 15/24 & 24/32 & 0 \\
+Granite 4 3B & 31/48 & 19/24 & 12/24 & 25/32 & 0 \\
+Llama 3.2 3B & 23/48 & 17/24 & 6/24 & 19/32 & 0 \\
+Qwen 3.5 4B & \textbf{42/48} & \textbf{24/24} & \textbf{18/24} &
+\textbf{28/32} & 0 \\
+\end{longtable}
+
+Every persona has five distinct candidates. Knapsack's default is
+already a best candidate for 16 requests, so the other 32 are where a
+selector can add value (``Default not best''). Every model made the same
+choice in all three repetitions for every request.
+
+\textbf{H7c is supported:} no selector ever chose a plan that fails
+validation, because every candidate passed validation before any
+selector saw it. \textbf{H7b is supported:} the keyword reranker
+satisfies all 24 explicit requests, as does Qwen. Granite and Llama miss
+5 and 7 explicit requests, such as ``Choose the plan with the least
+carbohydrate'', by picking a candidate that is not the lowest even
+though every total is printed next to it; comparing numbers is exact
+work these models do unreliably.
+
+\textbf{H7a is not supported.} On goal-style wording Qwen satisfies 18
+of 24 requests against 15 for the keyword reranker: 7 only by the model
+and 4 only by the rules (exact McNemar p = 0.55). The reranker finds the
+right nutrient in 11 goal-style requests (``drop a few pounds'',
+``keto-style'') and misreads one, treating ``Atkins diet'' as a calorie
+cue because its synonym list includes ``diet''. It finds no cue in the
+other 12 requests, such as ``I've been a bit backed up lately'' or ``my
+blood sugar spikes after big meals'', and keeps the default. Qwen
+resolves 9 of those 12, but misses four requests the rules satisfy:
+three about fiber (``backed up'', ``sluggish'', ``stay regular'') and
+one about building muscle.
+
+The two methods fail on different requests, which suggests combining
+them. In an exploratory combination defined after the results were seen,
+the keyword reranker decides whenever it detects a cue and the model
+decides otherwise. This satisfies 44 of 48 requests with Qwen (20 of 24
+goal-style), 41 with Granite, and 37 with Llama. A model choice takes
+about 3 s; the keyword rule takes under a millisecond once the
+candidates are built.
+
 \subsection{6. Discussion}\label{discussion}
 
 \subsubsection{6.1 Answering the research
@@ -1371,6 +1579,28 @@ should not be the authority on identity. Used only to propose a person
 for the user to confirm, the same models reach the right person on 34 or
 35 of 36 resolvable requests without executing a wrong one.
 
+\textbf{RQ6 / H6 --- H6b supported, H6a not supported.} In the full
+release-gated workflow, propose and confirm is the only identification
+method that never releases a plan for the wrong person. Letting the
+model decide releases up to nine, because the release gate validates the
+plan, not the choice of person. Propose and confirm more than doubles
+the right plans delivered by the exact-name gate with Granite and Qwen,
+but not significantly with Llama. Llama identifies the right person but
+rarely finishes the workflow, so H6a fails on its every-model criterion.
+
+\textbf{RQ7 / H7 --- H7b and H7c supported, H7a not supported.} When
+Knapsack proposes only validated plans, no selector can choose an unsafe
+one. The best model matches the keyword reranker on explicit preferences
+and leads it on goal-style wording, 18 to 15 of 24, but not
+significantly. The two smaller models trail the keyword reranker even on
+explicit requests. The rules and the model fail on different requests:
+in an exploratory combination, the rules decide when they detect a cue
+and the model decides otherwise, which satisfies 44 of 48. Because that
+combination was defined after the results were seen, it suggests rather
+than shows where a model can add value beyond a rule written in advance:
+on goal-style wording, inside a bounded choice among plans that are
+already safe.
+
 Experiments 1 and 3 have no hypothesis. In Experiment 1, one hosted
 model completes all six required tool trajectories and preserves the
 Knapsack output at substantial latency cost. In Experiment 3, Granite
@@ -1410,6 +1640,16 @@ controlled evaluation:
   compares release-gated and ungated runs on development and held-out
   wording with repeated runs, paired tests, and a check that the two
   conditions' traces agree up to the gate's first refusal.
+\item
+  it tests identity resolution on realistic wording, including
+  code-mixed Telugu--English and Hindi--English, against rules committed
+  before the requests were written, and carries every identification
+  through the full release-gated workflow, separating a wrong guess, a
+  wrong plan actually released, and a workflow that stops early.
+\item
+  it bounds the model's recommendation role to choosing among plans
+  Knapsack has already validated, and compares that choice with a
+  keyword rule on explicit and goal-style preferences.
 \end{itemize}
 
 The work does not claim that deterministic identity resolution is itself
@@ -1434,7 +1674,9 @@ enforces hard constraints and produces feasible candidates. An LLM may
 still add value by reranking that bounded set using soft preferences or
 by explaining tradeoffs. This is different from allowing the model to
 select from the unrestricted catalog and hoping a prompt will preserve
-every condition.
+every condition. Experiment 7 tests exactly this design: no chosen plan
+violates a constraint, and the best model leads a keyword rule only on
+goal-style wording, by three requests.
 
 \subsection{7. Limitations and Ethical
 Scope}\label{limitations-and-ethical-scope}
@@ -1472,6 +1714,24 @@ romanized Telugu--English and Hindi--English requests were written by
 the authors, not collected from users. Models ran with thinking
 disabled, and the propose-and-confirm condition is derived from the same
 answers rather than tested with users.
+
+Experiment 6 replaces the user with a simulation that confirms only the
+labeled person, so its zero wrong-person releases are an upper bound: a
+real user may accept a plausible wrong suggestion, and a careless
+confirmation would pass straight through the release gate. The agent
+sees the conversation and a system line naming the person, and its
+identity-dependent tools are bound to that person, so the experiment
+does not test a model that could override the confirmed identity.
+
+Experiment 7 scores a single preference per request by one nutrient
+total, so it does not measure taste, variety, or trade-offs between
+several preferences, and its safety result holds by construction because
+every candidate was validated first. Personas with identical constraints
+share candidates, and the five candidates per persona come from
+consecutive Knapsack days, so they differ less than an open catalog
+would. The keyword reranker and the requests were written by the same
+authors, and the combination of rules and model reported for it is
+exploratory.
 
 The gate's six unclear cases were handcrafted for the resolver's fixed
 rules, so its perfect clarification result is an invariant on this test
@@ -1513,34 +1773,38 @@ independent and therefore understate dependence among prompts that share
 a persona or category. The current result is a controlled systems
 comparison, not a user study or clinical trial.
 
-\subsection{8. Next Experiment: Constrained Hybrid
-Reranking}\label{next-experiment-constrained-hybrid-reranking}
+\subsection{8. Future Work}\label{future-work}
 
-The next study should add a hybrid selection condition while retaining
-the two completed baselines. It should hold personas, catalog, candidate
-visibility, and evaluation metrics fixed and compare:
+Experiments 5 to 7 carried out the next steps proposed in earlier
+drafts: harder wording, propose and confirm in the full workflow, and
+constrained hybrid reranking. Four directions remain.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  \textbf{Deterministic Knapsack:} the existing reference selector;
+  \textbf{Real users.} Replace the simulated confirmation with people,
+  and collect requests, including code-mixed ones, instead of writing
+  them. This measures how often users accept a plausible wrong
+  suggestion, which Experiment 6 assumes never happens.
 \item
-  \textbf{LLM-only selector:} the completed direct-selection condition;
+  \textbf{Finishing the workflow.} Once identification is solved, small
+  models stop before releasing a plan. A deterministic workflow after a
+  confirmed identity, or a model that only extracts the request's
+  parameters, should be compared with the agent.
 \item
-  \textbf{Constrained hybrid reranker:} deterministic code produces
-  several feasible candidate plans, the LLM reranks them for stated soft
-  preferences, and a deterministic validator rejects any invalid output.
+  \textbf{Preference extraction.} Experiment 7 suggests the model is
+  useful for mapping goal-style wording to a nutrient and a direction,
+  and unreliable at comparing numbers. A selector in which the model
+  only extracts the preference and code picks the best candidate, frozen
+  before new requests are written, would test this directly, together
+  with multiple preferences and explanation faithfulness.
+\item
+  \textbf{Stronger baselines and models.} Few-shot prompts, an explicit
+  \texttt{ask\_clarification} tool, larger hosted models, and sampling
+  at nonzero temperature, so that conclusions do not depend on three
+  small local models.
 \end{enumerate}
-
-Run each stochastic condition repeatedly and expand the persona/request
-set. Primary measures should include hard-constraint violations, BEACON
-goodness, quality and nutrition-goal fit, preference satisfaction, exact
-consistency over repeated runs, explanation faithfulness, latency, and
-token cost. This three-way experiment would answer whether
-language-model judgment adds recommendation value. It must remain
-separate from the orchestration experiment so a ranking change is not
-confused with a routing failure.
 
 \subsection{9. Conclusion}\label{conclusion}
 
@@ -1563,15 +1827,21 @@ but does not reverse. With harder wording, models finally help: they
 resolve nicknames, misspellings, and references that the exact-name gate
 cannot. A rule resolver written in advance comes within two requests of
 the best model, however, and the models guess where they should ask, so
-no experiment here shows a model beating carefully written rules. The
-direct-selection comparison reinforces the division of responsibility:
-one LLM sacrifices quality and variety while the other violates stored
-dietary conditions, and an agent that bypasses Knapsack writes the same
-kind of unsafe plan in prose. Use the model for language-dependent steps
-only where it beats a declared rule baseline, and for bounded
-soft-preference ranking. Where a model interprets language, let it
-propose and let the user or deterministic code decide; keep
-constraint-sensitive recommendation, identity binding, and release
+no experiment here shows a model significantly beating carefully written
+rules. In the full workflow, a model's guess becomes a released plan for
+the wrong person, which the release gate cannot catch because the plan
+itself is valid; letting the model only propose and the user confirm
+removes those releases. Choosing among validated Knapsack plans, the
+best model leads a keyword rule only on goal-style preferences, and the
+two fail on different requests, so the most promising design combines
+them. The direct-selection comparison reinforces the division of
+responsibility: one LLM sacrifices quality and variety while the other
+violates stored dietary conditions, and an agent that bypasses Knapsack
+writes the same kind of unsafe plan in prose. Use the model for
+language-dependent steps only where it beats a declared rule baseline,
+and for bounded soft-preference ranking. Where a model interprets
+language, let it propose and let the user or deterministic code decide;
+keep constraint-sensitive recommendation, identity binding, and release
 decisions in inspectable deterministic components; and evaluate both the
 trajectory and the resulting state.
 

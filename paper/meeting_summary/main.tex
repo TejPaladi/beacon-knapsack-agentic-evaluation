@@ -48,15 +48,17 @@ fixed; the models only run the workflow around it.
   \item Meeting feedback addressed: tools mapped from the six discussed
         candidates to five meaningful tools (Section~6.1), one set of research
         questions with a hypothesis each (Section~2), and all 110 items of the
-        Agentic AI Test Checklist screened (Section~8).
+        Agentic AI Test Checklist screened (Section~10).
   \item Experiment~2 re-run at a 1,024-token reply limit. The earlier 160-token
         limit cut off Qwen's reasoning and understated it.
   \item Experiment~4 redesigned so that showing a plan is the model's own
         decision (\tool{release\_plan}), then run on two request sets (original
         and held-out wording), three repetitions each.
-  \item A next step done: Experiment~5 (Section~7) tests hard wording, i.e.
+  \item Next steps done: Experiment~5 (Section~7) tests hard wording, i.e.
         nicknames, misspellings, descriptions, earlier turns, and
-        Telugu--English or Hindi--English requests.
+        Telugu--English or Hindi--English requests; Experiment~6 (Section~8)
+        carries propose and confirm through the full workflow; Experiment~7
+        (Section~9) tests the hybrid reranker.
 \end{itemize}
 
 \textbf{Headline results.}
@@ -75,6 +77,12 @@ fixed; the models only run the workflow around it.
         for almost every request they should question. Used only to
         \emph{propose} a person for the user to confirm, they are helpful and
         safe.
+  \item In the full workflow, a model deciding alone releases up to nine plans
+        for the wrong person (the release check inspects the plan, not the
+        person); propose and confirm releases none.
+  \item Choosing among Knapsack's validated plans, the best model ties a
+        keyword rule on explicit preferences and leads it on goal-style wording
+        (18 vs.\ 15 of 24, not significant). No choice was ever unsafe.
 \end{itemize}
 
 \section{System Architecture, Tools, and Prompts}
@@ -150,13 +158,19 @@ RQ4 & H4: model orchestration is slower, so its value must come from language ha
 RQ5 & H5a: the best model identifies more people correctly than stronger rules written in advance. & 5 & \textbf{Not supported.} 29 vs.\ 27 of 30 hard requests ($p=0.5$). \\
  & H5b: every model picks a wrong person more often than those rules. & 5 & \textbf{Supported.} 10--14 vs.\ 3. \\
  & H5c: every condition handles exact full names. & 5 & \textbf{Supported.} 6/6 for all. \\
+RQ6 & H6a: propose and confirm delivers more right plans than the exact-name check in the full workflow. & 6 & \textbf{Not supported.} Granite 28 vs.\ 13 and Qwen 35 vs.\ 13 (both $p<0.001$), Llama 6 vs.\ 3 ($p=0.25$). \\
+ & H6b: propose and confirm releases no wrong-person plan; the model deciding alone does. & 6 & \textbf{Supported.} 0 vs.\ 5, 1, 9. \\
+RQ7 & H7a: on goal-style wording the best model beats a keyword reranker. & 7 & \textbf{Not supported.} 18 vs.\ 15 of 24 ($p=0.55$). \\
+ & H7b: on explicit wording the keyword reranker does at least as well. & 7 & \textbf{Supported.} 24/24 vs.\ 24/24. \\
+ & H7c: every chosen plan passes validation. & 7 & \textbf{Supported.} 0 violations. \\
 \bottomrule
 \end{xltabular}}
 
 H3 and H4 were committed on November 2 before the final runs. H1 and H2 were
 written after the first Experiment~2 run and before its re-run. H5 and the
-stronger rules were committed before the Experiment~5 requests were written.
-Experiments 1 and 3 are descriptive.
+stronger rules were committed before the Experiment~5 requests were written;
+H6, H7, and the keyword reranker before any Experiment~6 run or Experiment~7
+request. Experiments 1 and 3 are descriptive.
 
 \section{Experiment 1: Direct vs.\ Agentic Knapsack Integration}
 
@@ -524,6 +538,114 @@ Table 7: Propose and confirm. The right person is reached on 34--35 of 36.
         proposals the user must decline. Each answer takes 0.4--0.8\,s.
 \end{itemize}
 
+\section{Experiment 6: Propose and Confirm in the Full Workflow}
+
+\textbf{Goal:} Experiment~5 only named a person. Does propose and confirm still
+help, and stay safe, when the named person goes through the whole
+release-gated Experiment~4 agent?
+
+\textbf{Setup:}
+\begin{itemize}
+  \item The same 48 conversations. Four ways to identify the person: the
+        exact-name check, the stronger rules, the model deciding alone, and
+        propose and confirm. A simulated user confirms only the labeled person.
+  \item The identified person is handed to the Experiment~4 agent (five tools,
+        release gate) run by the same model, which then fetches the profile,
+        runs Knapsack, validates, and releases.
+  \item Success: the right person's plan is released, passes validation, and
+        matches Knapsack; on the 12 conversations that must be clarified, no
+        plan is released. A \emph{wrong-person release} is the safety outcome.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Identification & Granite 4 3B & Llama 3.2 3B & Qwen 3.5 4B \\
+\midrule
+Exact-name check & 13 / 0 & 3 / 0 & 13 / 4 \\
+Stronger rules & 27 / 1 & 6 / 0 & 33 / 2 \\
+Model decides & 28 / 5 & 6 / 1 & 35 / 9 \\
+Propose and confirm & \textbf{28 / 0} & \textbf{6 / 0} & \textbf{35 / 0} \\
+\bottomrule
+\end{tabular}
+
+Table 8: Right plans delivered (of 36) / wrong-person plans released (of 48).
+All three repetitions gave identical outcomes.
+\end{center}
+
+\textbf{Key findings:}
+\begin{itemize}
+  \item \emph{H6b supported.} Propose and confirm never released a plan for the
+        wrong person. Letting the model decide released 5, 1, and 9: the
+        release gate checks the \emph{plan}, and a valid plan for the wrong
+        person passes it.
+  \item \emph{H6a not supported} (it required a significant gain for every
+        model). Granite 28 vs.\ 13 ($p=6\times10^{-5}$) and Qwen 35 vs.\ 13
+        ($p=5\times10^{-7}$), but Llama only 6 vs.\ 3 ($p=0.25$).
+  \item \emph{The bottleneck moves.} Llama is handed the right person in 34 of
+        36 conversations but usually stops right after fetching the profile.
+  \item \emph{Cost:} 37--40 of 48 conversations ask the user to confirm, and the
+        simulated user never accepts a wrong suggestion, so this is the best
+        case.
+\end{itemize}
+
+\section{Experiment 7: Constrained Hybrid Reranking}
+
+\textbf{Goal:} Experiment~3 showed models should not pick food from the open
+catalog. Can a model add value by choosing among plans Knapsack has
+\emph{already} validated, to match a stated preference?
+
+\textbf{Setup:}
+\begin{itemize}
+  \item For each persona, Knapsack plans five consecutive days; the five
+        distinct day-plans (all passing validation) are the candidates.
+        Candidate~1 is Knapsack's usual plan.
+  \item 48 requests: 6 personas $\times$ \{more protein, fewer calories, more
+        fiber, fewer carbs\} $\times$ \{explicit (\emph{``the plan with the
+        most fiber''}), goal-style (\emph{``I've been a bit backed up
+        lately''})\}.
+  \item Selectors: the Knapsack default; a keyword reranker with synonyms,
+        committed before the requests were written; and the three models,
+        which see every candidate's items and totals and answer with a number
+        (structured output, temperature 0, 3 repetitions).
+  \item A choice \emph{satisfies} the request when its total for that nutrient
+        is the best among the candidates (ties count).
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Selector & Satisfied (48) & Explicit (24) & Goal-style (24) & Default not best (32) & Violations \\
+\midrule
+Knapsack default & 16 & 8 & 8 & 0 & 0 \\
+Keyword reranker & 39 & \textbf{24} & 15 & 24 & 0 \\
+Granite 4 3B & 31 & 19 & 12 & 25 & 0 \\
+Llama 3.2 3B & 23 & 17 & 6 & 19 & 0 \\
+Qwen 3.5 4B & \textbf{42} & \textbf{24} & \textbf{18} & \textbf{28} & 0 \\
+\bottomrule
+\end{tabular}
+
+Table 9: Experiment 7. All three model repetitions gave identical choices.
+\end{center}
+
+\textbf{Key findings:}
+\begin{itemize}
+  \item \emph{H7c supported:} no selector chose an invalid plan, because every
+        candidate was validated first. Safety holds by construction.
+  \item \emph{H7b supported:} the keyword reranker gets all 24 explicit
+        requests, as does Qwen. Granite and Llama miss 5 and 7, e.g.\ picking
+        a plan that is not the lowest for \emph{``the least carbohydrate''}
+        even though the totals are printed.
+  \item \emph{H7a not supported:} on goal-style wording Qwen leads 18 vs.\ 15,
+        but not significantly ($p=0.55$). The rules miss wording with no
+        keyword (\emph{``my blood sugar spikes after big meals''}) and read
+        \emph{``Atkins diet''} as a calorie cue.
+  \item \emph{Exploratory} (defined after seeing results): rules when a keyword
+        is found, Qwen otherwise, satisfies 44 of 48.
+\end{itemize}
+
 \section{Agentic AI Test Checklist (meeting feedback)}
 
 All 110 items of the checklist~[4] were screened against this system. It is a
@@ -548,7 +670,7 @@ T7 Metamorphic / consistency & 14 & 1 & 3 & 2 & 5 & 3 \\
 \bottomrule
 \end{tabular}
 
-Table 8: Checklist screen. ``Exploratory'' items were added after the hypotheses
+Table 10: Checklist screen. ``Exploratory'' items were added after the hypotheses
 were fixed.
 \end{center}
 
@@ -568,12 +690,16 @@ partial); most of T6 still needs multi-turn workflows.
   \item Name matching is identity resolution, not authentication.
   \item Experiment~5's rules and requests were written by the same authors
         (rules first); the mixed-language requests were written, not collected.
-  \item \textbf{Next:} (1) build propose-and-confirm into the Experiment~4
-        agent, so hard wording reaches the full workflow; (2) the hybrid
-        reranker, where Knapsack proposes five safe day-plans and a model picks
-        one by soft preference (checked: a five-day Knapsack run gives five
-        distinct plans that all pass validation); (3) requests collected from
-        real users instead of written by the authors.
+  \item Experiment~6's confirming user is simulated and never accepts a wrong
+        suggestion, so its safety result is a best case. Experiment~7 scores
+        one nutrient per request, and its rule-plus-model result is
+        exploratory.
+  \item \textbf{Next:} (1) real users confirming suggestions, and requests
+        collected rather than written; (2) a fixed workflow after a confirmed
+        identity, since small models often stop before releasing a plan;
+        (3) a selector where the model only extracts the preference (nutrient
+        and direction) and code picks the best plan; (4) stronger prompt
+        baselines and larger models.
 \end{itemize}
 
 \section*{References}
