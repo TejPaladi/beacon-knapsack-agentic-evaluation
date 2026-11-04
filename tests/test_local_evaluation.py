@@ -39,6 +39,13 @@ from meaningful_tools_benchmark import (  # noqa: E402
 )
 from report_meaningful_tools import paraphrase_pairs  # noqa: E402
 from rule_persona_resolver import resolve as resolve_rules  # noqa: E402
+from hard_wording_benchmark import (  # noqa: E402
+    load_cases as load_hard_cases,
+    parse_answer,
+    run_case as run_hard_case,
+    score as score_hard,
+)
+from report_hard_wording import full_name_persona  # noqa: E402
 from benchmark import (  # noqa: E402
     GROQ_USER_AGENT,
     GroqRateLimitError,
@@ -384,6 +391,56 @@ class LocalEvaluationTests(unittest.TestCase):
         )
         self.assertEqual(who("I work with Aaliyah Brooks.", "Okay.", "Plan her meals."), "A-NV")
         self.assertIsNone(who("Plan her meals for today."))
+
+    def test_hard_wording_dataset_has_balanced_labeled_design(self):
+        cases = load_hard_cases()
+        by_category = {}
+        for case in cases:
+            by_category.setdefault(case["category"], []).append(case)
+        self.assertEqual(len(by_category), 8)
+        self.assertTrue(all(len(group) == 6 for group in by_category.values()))
+        resolvable = [c for c in cases if c["expected_action"] == "resolve"]
+        self.assertEqual(len(resolvable), 36)
+        personas = {}
+        for case in resolvable:
+            personas[case["expected_persona_id"]] = personas.get(case["expected_persona_id"], 0) + 1
+        self.assertEqual(set(personas.values()), {6})
+
+    def test_hard_wording_scoring_separates_wrong_person_from_missed(self):
+        resolvable = {"expected_persona_id": "NA-V"}
+        clarify = {"expected_persona_id": None}
+        self.assertEqual(score_hard(resolvable, "NA-V")["outcome"], "correct_resolution")
+        self.assertEqual(score_hard(resolvable, None)["outcome"], "missed_resolution")
+        self.assertTrue(score_hard(resolvable, "A-V")["wrong_person"])
+        self.assertTrue(score_hard(clarify, "NA-NV")["wrong_person"])
+        self.assertTrue(score_hard(clarify, None)["correct_action"])
+        self.assertEqual(parse_answer('{"persona_id": "unclear"}'), "unclear")
+        self.assertIsNone(parse_answer('{"persona_id": "Becca"}'))
+        self.assertIsNone(parse_answer("not json"))
+
+    def test_hard_wording_model_resolver_treats_unclear_as_clarification(self):
+        case = next(c for c in load_hard_cases() if c["case_id"] == "near_greg")
+        reply = {"content": '{"persona_id": "unclear"}', "done_reason": "stop",
+                 "prompt_tokens": 10, "completion_tokens": 5}
+        with patch("hard_wording_benchmark.call_model", return_value=reply):
+            result = run_hard_case(case, "model", "granite4:3b", "http://localhost:11434/v1")
+        self.assertEqual(result["outcome"], "correct_clarification")
+        reply["content"] = '{"persona_id": "NA-NV"}'
+        with patch("hard_wording_benchmark.call_model", return_value=reply):
+            result = run_hard_case(case, "model", "granite4:3b", "http://localhost:11434/v1")
+        self.assertTrue(result["wrong_person"])
+
+    def test_propose_and_confirm_executes_only_a_single_stored_full_name(self):
+        def turns(*texts):
+            return [{"role": "user", "content": text} for text in texts]
+
+        self.assertEqual(full_name_persona(turns("Plan meals for Becca Moore.")), "NA-V")
+        self.assertIsNone(full_name_persona(turns("Plan for Becca Moore or Greg Taylor.")))
+        self.assertIsNone(full_name_persona(turns("Plan for Becca.")))
+        self.assertEqual(
+            full_name_persona(turns("Plan for Greg Taylor.", "I meant Aaliyah Brooks, not Greg.")),
+            "A-NV",
+        )
 
     def test_text_tool_call_detector_accepts_malformed_calls_to_known_tools(self):
         self.assertTrue(
