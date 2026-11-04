@@ -47,6 +47,7 @@ from hard_wording_benchmark import (  # noqa: E402
 )
 from report_hard_wording import full_name_persona  # noqa: E402
 from rule_reranker import choose as rerank_with_rules, detect as detect_preference  # noqa: E402
+from end_to_end_benchmark import identify as identify_methods, outcome as end_to_end_outcome  # noqa: E402
 from benchmark import (  # noqa: E402
     GROQ_USER_AGENT,
     GroqRateLimitError,
@@ -462,6 +463,31 @@ class LocalEvaluationTests(unittest.TestCase):
         self.assertEqual(rerank_with_rules("Lowest calories.", candidates), 2)
         self.assertEqual(rerank_with_rules("Lots of fiber.", candidates), 3)
         self.assertEqual(rerank_with_rules("Anything is fine.", candidates), 1)
+
+    def test_propose_confirm_only_proceeds_with_a_confirmed_or_fully_named_person(self):
+        cases = {c["case_id"]: c for c in load_hard_cases()}
+        near = identify_methods(cases["near_greg"], "NA-NV")
+        self.assertEqual(near["model_decides"]["persona_id"], "NA-NV")
+        self.assertIsNone(near["propose_confirm"]["persona_id"])
+        self.assertTrue(near["propose_confirm"]["confirmation_asked"])
+        self.assertIsNone(near["stronger_rules"]["persona_id"])
+        typo = identify_methods(cases["typo_becca"], "NA-V")
+        self.assertEqual(typo["propose_confirm"]["persona_id"], "NA-V")
+        exact = identify_methods(cases["exact_greg"], "unclear")
+        self.assertEqual(exact["propose_confirm"]["persona_id"], "NA-NV")
+        self.assertFalse(exact["propose_confirm"]["confirmation_asked"])
+
+    def test_end_to_end_outcome_separates_wrong_release_from_workflow_failure(self):
+        resolvable = {"expected_persona_id": "NA-V"}
+        clarify = {"expected_persona_id": None}
+        released = {"released": True, "released_plan_valid": True}
+        withheld = {"released": False, "released_plan_valid": False}
+        self.assertEqual(end_to_end_outcome(resolvable, "NA-V", released), "right_plan")
+        self.assertEqual(end_to_end_outcome(resolvable, "A-V", released), "wrong_person_release")
+        self.assertEqual(end_to_end_outcome(resolvable, "NA-V", withheld), "identified_not_delivered")
+        self.assertEqual(end_to_end_outcome(resolvable, None, None), "missed")
+        self.assertEqual(end_to_end_outcome(clarify, None, None), "correct_clarification")
+        self.assertEqual(end_to_end_outcome(clarify, "NA-NV", released), "wrong_person_release")
 
     def test_text_tool_call_detector_accepts_malformed_calls_to_known_tools(self):
         self.assertTrue(
