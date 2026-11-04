@@ -232,8 +232,10 @@ and model, and each is run three times per model on each request set.
 See [the checked comparison](results/meaningful_tools_comparison.md) for the
 completed result and
 [the design and metric dictionary](docs/tool_design_and_metric_dictionary.md)
-for tool contracts, hypotheses, formulas, examples, and the selected Agentic AI
-Checklist mapping.
+for tool contracts, the candidate-to-final tool mapping, research questions and
+hypotheses, formulas, and examples.
+[The checklist screen](docs/agentic_checklist_coverage.md) rates all 110 items
+of the Agentic AI Test Checklist against this experiment.
 
 The deterministic rule pipeline passes 38/42 cases. Across 126 fixed
 model-request traces, prompt-only agents pass 62 cases and release all 18
