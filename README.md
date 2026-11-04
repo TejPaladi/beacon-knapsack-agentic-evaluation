@@ -88,22 +88,15 @@ Knapsack`, and exactly reproduce the deterministic reference plan. This makes
 routing accuracy, Knapsack action, plan fidelity, tool sequence, failures, and
 latency objectively scoreable without an LLM judge.
 
-The initial matched comparison used two local Ollama tool-calling models:
-`granite4:3b` and `qwen3.5:4b`. They were run sequentially so they did not
-compete for local memory:
+The initial matched comparison used two local Ollama tool-calling models,
+`granite4:3b` and `qwen3.5:4b`, run sequentially so they did not compete for
+local memory. Its report is now built from the prompt-only runs of the
+five-model matrix below:
 
 ```bash
-"$BEACON_PYTHON" code/robustness_benchmark.py \
-  --model granite4:3b \
-  --output results/robustness_granite4_3b.json
-
-"$BEACON_PYTHON" code/robustness_benchmark.py \
-  --model qwen3.5:4b \
-  --output results/robustness_qwen3_5_4b.json
-
 "$BEACON_PYTHON" code/report_robustness.py \
-  --result results/robustness_granite4_3b.json \
-  --result results/robustness_qwen3_5_4b.json \
+  --result results/policy_gate_matrix/ungated_agent__granite4_3b.json \
+  --result results/policy_gate_matrix/ungated_agent__qwen3_5_4b.json \
   --output results/robustness_comparison.md
 ```
 
@@ -114,9 +107,12 @@ latency. No API key is needed. See
 [results/README.md](results/README.md) for the exact metric definitions.
 
 The completed two-model result is available in
-[results/robustness_comparison.md](results/robustness_comparison.md). Granite
-passed 22/30 cases and Qwen3.5 passed 16/30. Neither model successfully asked
-for clarification on the six unknown, missing, or ambiguous-persona requests.
+[results/robustness_comparison.md](results/robustness_comparison.md). At the
+1,024-token completion limit, Granite passed 22/30 cases and Qwen3.5 passed
+26/30. Granite asked for clarification on none of the six unknown, missing, or
+ambiguous-persona requests and ran Knapsack on all six; Qwen3.5 clarified four
+and ran Knapsack on one. An earlier 160-token limit cut off Qwen's reasoning
+and left it at 16/30, mostly with empty replies.
 
 ## Identity-gated hybrid extension
 
@@ -146,13 +142,14 @@ for the controlled design, literature basis, and bounded novelty claim.
 The completed 300-case matrix is in
 [results/policy_gate_comparison.md](results/policy_gate_comparison.md). Across
 five models and 150 matched model-request pairs per architecture, complete-case
-passes increased from 49/150 to 73/150. The valid recommendation workflows were
-unchanged at 43/120; the gain came from unclear-persona cases improving from
-6/30 to 30/30. Unsafe Knapsack executions on unclear requests fell from 10 to
-zero, and mean per-case latency fell 44.9%. This is evidence of improved
-system-level safety and efficiency, not improved model capability.
+passes increased from 59/150 to 79/150. The valid recommendation workflows were
+unchanged at 49/120, with no valid request changing result; the gain came from
+unclear-persona cases improving from 10/30 to 30/30. Unsafe Knapsack executions
+on unclear requests fell from 10 to zero, and mean per-case latency fell 50.7%.
+This is evidence of improved system-level safety and efficiency, not improved
+model capability.
 
-The no-LLM baseline passes 30/30 with 146.3 ms mean latency per case and no
+The no-LLM baseline passes 30/30 with 145.8 ms mean latency per case and no
 model tokens. Because all
 valid requests contain an exact name or unique first name and the other cases
 are covered by fixed resolver rules, this result is close to true by
@@ -237,12 +234,16 @@ hypotheses, formulas, and examples.
 [The checklist screen](docs/agentic_checklist_coverage.md) rates all 110 items
 of the Agentic AI Test Checklist against this experiment.
 
-The deterministic rule pipeline passes 38/42 cases. Across 126 fixed
-model-request traces, prompt-only agents pass 62 cases and release all 18
-injected faulty plans; replaying those exact traces through the deterministic
-release gate raises complete passes to 80 and reduces unsafe releases to zero.
-The gain is fault containment only: routing, tool selection, model failures,
-Knapsack output, and latency are unchanged.
+All three repetitions produced identical traces. Without the release gate,
+Granite and Qwen release plans that their own validation call rejected (6 of 6
+on the development set; 4 and 6 of 6 on the held-out set); Llama releases none.
+With the gate, unsafe releases are zero, correct outcomes rise by up to six
+cases, and no model's strict pass changes. The keyword rule baseline leads on
+the development set (38/42 strict, 39/42 correct outcomes) but falls to 33/42
+and 34/42 on held-out wording, where the gated Granite and Qwen agents reach a
+comparable 36/42 correct outcomes. Exploratory checks also show final replies
+that contradict the recorded state, such as claiming a rejected plan was
+validated.
 
 Run one condition with:
 
@@ -261,7 +262,8 @@ Run one condition with:
 ```
 
 To reproduce every Experiment 2 and Experiment 4 result from a clean commit,
-run the full matrix (about five hours on a laptop) and then build the report:
+run the full matrix (about nine hours on a laptop, which must stay awake and
+plugged in) and then build the reports:
 
 ```bash
 code/run_full_matrix.sh /tmp/beacon_runs
@@ -269,6 +271,15 @@ cp -R /tmp/beacon_runs/meaningful_tools /tmp/beacon_runs/policy_gate_matrix resu
 python3 code/report_meaningful_tools.py \
   --results-dir results/meaningful_tools \
   --output results/meaningful_tools_comparison.md
+
+P=results/policy_gate_matrix
+args=()
+for m in llama3_2_1b llama3_2_3b phi4-mini_3_8b qwen3_5_4b granite4_3b; do
+  args+=(--result $P/ungated_agent__$m.json --result $P/policy_gated_agent__$m.json)
+done
+python3 code/report_policy_gate.py "${args[@]}" \
+  --deterministic $P/deterministic_pipeline.json \
+  --output results/policy_gate_comparison.md
 ```
 
 Outputs are written outside the repository during the run, because a result
