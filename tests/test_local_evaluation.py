@@ -38,6 +38,7 @@ from meaningful_tools_benchmark import (  # noqa: E402
     valid_tool_path,
 )
 from report_meaningful_tools import paraphrase_pairs  # noqa: E402
+from rule_persona_resolver import resolve as resolve_rules  # noqa: E402
 from benchmark import (  # noqa: E402
     GROQ_USER_AGENT,
     GroqRateLimitError,
@@ -339,6 +340,50 @@ class LocalEvaluationTests(unittest.TestCase):
         self.assertEqual(safe["release_decision"]["status"], "released")
         self.assertTrue(fault["case_pass"])
         self.assertFalse(fault["released"])
+
+    def test_rule_resolver_handles_names_nicknames_typos_and_conflicts(self):
+        def who(*turns):
+            messages = [
+                {"role": "user" if i % 2 == 0 else "assistant", "content": text}
+                for i, text in enumerate(turns)
+            ]
+            return resolve_rules(messages).persona_id
+
+        self.assertEqual(who("Plan meals for Greg Taylor."), "NA-NV")
+        self.assertEqual(who("plan meals for jess smith"), "jessicaSmith")
+        self.assertEqual(who("Rebecca needs a menu."), "NA-V")
+        self.assertEqual(who("Make a plan for Jesicca."), "jessicaSmith")
+        self.assertIsNone(who("Make a plan for Greg Thompson."))
+        self.assertIsNone(who("Make a plan for Jessica Jones."))
+        self.assertIsNone(who("More protein for lunch, please."))
+        self.assertIsNone(who("An early dinner plan, please."))
+        self.assertEqual(who("Dr. Brooks wants her plan."), "A-NV")
+        self.assertEqual(who("Plan meals for E.J. today."), "earlJones")
+
+    def test_rule_resolver_uses_attributes_corrections_and_earlier_turns(self):
+        def who(*turns):
+            messages = [
+                {"role": "user" if i % 2 == 0 else "assistant", "content": text}
+                for i, text in enumerate(turns)
+            ]
+            return resolve_rules(messages).persona_id
+
+        self.assertEqual(who("Plan meals for the diabetic client."), "jessicaSmith")
+        self.assertIsNone(who("Plan meals for the vegetarian client."))
+        self.assertIsNone(who("Plan meals for the vegan client."))
+        self.assertEqual(who("Plan for the 2,400 calorie client."), "earlJones")
+        self.assertEqual(who("Plan for Greg. Sorry, I meant Dylan."), "A-V")
+        self.assertEqual(who("Use Dylan, not Greg."), "A-V")
+        self.assertEqual(
+            who("I look after Earl Jones and Becca Moore.", "Noted.", "Do the vegetarian one."),
+            "NA-V",
+        )
+        self.assertEqual(
+            who("I look after Earl Jones and Becca Moore.", "Noted.", "Start with the second one."),
+            "NA-V",
+        )
+        self.assertEqual(who("I work with Aaliyah Brooks.", "Okay.", "Plan her meals."), "A-NV")
+        self.assertIsNone(who("Plan her meals for today."))
 
     def test_text_tool_call_detector_accepts_malformed_calls_to_known_tools(self):
         self.assertTrue(
