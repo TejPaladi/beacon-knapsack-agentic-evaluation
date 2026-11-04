@@ -15,12 +15,23 @@ from __future__ import annotations
 import argparse
 import json
 import math
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
+try:
+    from meaningful_tools_benchmark import is_text_tool_call, reply_state_flags
+except ModuleNotFoundError:
+    from code.meaningful_tools_benchmark import is_text_tool_call, reply_state_flags
+
 
 EXPECTED_CASES = 42
+HELDOUT_PREFIX = "heldout_"
+REPLY_FLAGS = (
+    ("validation_claim", "Claims validation that failed or never ran"),
+    ("release_claim", "Release claim contradicts state"),
+    ("plan_without_knapsack", "Writes a meal plan Knapsack never produced"),
+)
 DATASETS = ("development", "heldout")
 UNGATED = "meaningful_agent_prompt_only"
 GATED = "meaningful_agent_gated"
@@ -183,20 +194,12 @@ def condition_rows(dataset: dict[str, Any]) -> list[str]:
             f"{counts([s['release_blocks'] for s in summaries])} | "
             f"{pct(mean('tool_path_accuracy'))} | {pct(mean('exact_knapsack_fidelity'))} | "
             f"{counts([s['api_or_loop_failures'] for s in summaries])} | "
-            f"{counts([s.get('text_tool_calls', 0) for s in summaries])} | "
+            f"{counts([sum(is_text_tool_call(c.get('final_text')) for c in run['cases']) for run in runs])} | "
             f"{counts([s.get('truncated_turns', 0) for s in summaries])} | "
             f"{turns_text} | {mean('mean_latency_ms'):.1f} |"
         )
 
-    lines.append(row(ARCHITECTURE_LABELS["deterministic_pipeline"], {1: dataset["baseline"]}))
-    for model in sorted({model for model, _ in dataset["runs"]}):
-        for architecture in (UNGATED, GATED):
-            lines.append(
-                row(
-                    f"{model} / {ARCHITECTURE_LABELS[architecture]}",
-                    dataset["runs"][(model, architecture)],
-                )
-            )
+    lines.extend(row(name, reps) for name, reps in conditions(dataset))
     return lines
 
 
@@ -283,6 +286,131 @@ def category_rows(dataset: dict[str, Any], field: str) -> list[str]:
     return lines
 
 
+def conditions(dataset: dict[str, Any]) -> list[tuple[str, dict[int, dict[str, Any]]]]:
+    """Every condition in table order: the rule baseline, then each model."""
+
+    rows = [(ARCHITECTURE_LABELS["deterministic_pipeline"], {1: dataset["baseline"]})]
+    for model in sorted({model for model, _ in dataset["runs"]}):
+        for architecture in (UNGATED, GATED):
+            rows.append(
+                (f"{model} / {ARCHITECTURE_LABELS[architecture]}", dataset["runs"][(model, architecture)])
+            )
+    return rows
+
+
+def reply_rows(dataset: dict[str, Any]) -> list[str]:
+    lines = [
+        "| Condition | " + " | ".join(label for _, label in REPLY_FLAGS) + " |",
+        "| --- | " + " | ".join("---:" for _ in REPLY_FLAGS) + " |",
+    ]
+    for name, reps in conditions(dataset):
+        runs = [reps[key] for key in sorted(reps)]
+        cells = [
+            counts([sum(flag in reply_state_flags(case) for case in run["cases"]) for run in runs])
+            for flag, _ in REPLY_FLAGS
+        ]
+        lines.append(f"| {name} | " + " | ".join(cells) + " |")
+    return lines
+
+
+def flagged_replies(data: dict[str, dict[str, Any]]) -> list[str]:
+    """List every flagged reply once, with the repetitions that produced it."""
+
+    labels = dict(REPLY_FLAGS)
+    lines = []
+    for dataset_name in DATASETS:
+        for name, reps in conditions(data[dataset_name]):
+            found: dict[tuple[str, str], tuple[list[int], str]] = {}
+            for repetition in sorted(reps):
+                for case in reps[repetition]["cases"]:
+                    for flag, evidence in reply_state_flags(case).items():
+                        entry = found.setdefault((case["case_id"], flag), ([], evidence))
+                        entry[0].append(repetition)
+            for (case_id, flag), (repetitions, evidence) in found.items():
+                quote = " ".join(evidence.split())[:160].replace("|", "/")
+                lines.append(
+                    f"| {dataset_name} | {name} | `{case_id}` | {labels[flag]} | "
+                    f"{','.join(map(str, repetitions))} | {quote} |"
+                )
+    if not lines:
+        return ["No reply was flagged."]
+    return [
+        "| Set | Condition | Case | Flag | Repetitions | Triggering text |",
+        "| --- | --- | --- | --- | --- | --- |",
+        *lines,
+    ]
+
+
+def paraphrase_pairs(
+    development: list[dict[str, Any]], heldout: list[dict[str, Any]]
+) -> list[tuple[str, str]]:
+    """Pair each model-handled development case with its held-out paraphrase.
+
+    The held-out set reuses every development label with new wording, so a pair
+    must share category, persona, expected action, and nutrition requirement.
+    Unclear-identity cases are excluded because the model is never called.
+    """
+
+    held = {case["case_id"]: case for case in heldout}
+    pairs = []
+    for case in development:
+        if case["category"] == "unclear_identity":
+            continue
+        twin = held.get(HELDOUT_PREFIX + case["case_id"])
+        fields = ("category", "intended_persona_id", "expected_action", "require_nutrition")
+        if twin is None or any(case[field] != twin[field] for field in fields):
+            raise ValueError(f"{case['case_id']} has no matching held-out paraphrase.")
+        pairs.append((case["case_id"], twin["case_id"]))
+    return pairs
+
+
+def _modal(values: list[Any]) -> Any:
+    """Most common value across repetitions; ties go to the earliest repetition."""
+
+    tally = Counter(values)
+    best = max(tally.values())
+    return next(value for value in values if tally[value] == best)
+
+
+def _per_case(reps: dict[int, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    by_case: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for repetition in sorted(reps):
+        for case in reps[repetition]["cases"]:
+            by_case[case["case_id"]].append(case)
+    return {
+        case_id: {
+            "decision": _modal(
+                [(c.get("release_decision") or {}).get("status", "no_session") for c in cases]
+            ),
+            "tools": _modal([frozenset(e["name"] for e in c["tool_trace"]) for c in cases]),
+            "outcome": sum(bool(c["outcome_correct"]) for c in cases) * 2 > len(cases),
+        }
+        for case_id, cases in by_case.items()
+    }
+
+
+def paraphrase_rows(data: dict[str, dict[str, Any]]) -> list[str]:
+    development, heldout = data["development"], data["heldout"]
+    pairs = paraphrase_pairs(development["baseline"]["cases"], heldout["baseline"]["cases"])
+    lines = [
+        "| Condition | Pairs | Same release decision | Same tool set | Correct on both | Development only | Held-out only | Neither |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for (name, dev_reps), (_, held_reps) in zip(conditions(development), conditions(heldout)):
+        dev, held = _per_case(dev_reps), _per_case(held_reps)
+        same_decision = sum(dev[d]["decision"] == held[h]["decision"] for d, h in pairs)
+        same_tools = sum(dev[d]["tools"] == held[h]["tools"] for d, h in pairs)
+        both = sum(dev[d]["outcome"] and held[h]["outcome"] for d, h in pairs)
+        dev_only = sum(dev[d]["outcome"] and not held[h]["outcome"] for d, h in pairs)
+        held_only = sum(held[h]["outcome"] and not dev[d]["outcome"] for d, h in pairs)
+        neither = len(pairs) - both - dev_only - held_only
+        lines.append(
+            f"| {name} | {len(pairs)} | {same_decision} | {same_tools} | {both} | "
+            f"{dev_only} | {held_only} | {neither} |"
+        )
+    return lines
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--results-dir", type=Path, required=True)
@@ -341,9 +469,19 @@ def main() -> None:
             "",
             *category_rows(dataset, "outcome_correct"),
             "",
+            "### Reply–state consistency (exploratory)",
+            "",
+            *reply_rows(dataset),
+            "",
         ]
 
     lines += [
+        "## Paraphrase consistency: development versus held-out (exploratory)",
+        "",
+        "Each held-out case rewords one development case with the same category, persona, and label. The table compares the per-case modal release decision and tool set, and the per-case majority correct outcome, across the 36 pairs the model handles (unclear-identity cases never reach the model).",
+        "",
+        *paraphrase_rows(data),
+        "",
         "## Metric definitions",
         "",
         "- **Correct outcome:** the user receives the right end state. Profile requests return the intended profile without creating a plan; recommendation requests release a plan that passes validation, with nutrition analysis when requested and exact Knapsack fidelity; fault cases detect the violation and do not release; unclear identities receive a clarification without tool access. A refused call does not by itself fail this measure.",
@@ -351,10 +489,19 @@ def main() -> None:
         "- **Valid tool path:** successful calls have exact required membership and every call follows its prerequisites: profile before recommendation; recommendation before analysis and validation; validation before release. Nutrition analysis and validation may occur in either order.",
         "- **Knapsack fidelity:** for ordinary recommendation-required cases, a plan exists and its role-item IDs exactly match a fresh direct Beacon Knapsack run. Fault cases are excluded because their plans are corrupted after Knapsack.",
         "- **Unsafe release:** an injected faulty plan is released. **Unvalidated release:** any plan is released without a passed validation at the time of release.",
-        "- **Text-only tool calls:** the model's final message is a tool call written as JSON text rather than a structured call, so no tool runs. **Truncated turns:** model turns that hit the completion-token limit.",
+        "- **Text-only tool calls:** the model's final message is a tool call written as JSON text rather than a structured call, so no tool runs. The count is recomputed here from each final message with a detector that also accepts malformed JSON naming a known tool; the per-run summary used a stricter parser that missed malformed calls. **Truncated turns:** model turns that hit the completion-token limit.",
         "- **Gate refusals:** `release_plan` calls refused by the gate because validation was missing or failed.",
         "- **Trace pairing:** at temperature 0 the gated run should repeat the ungated tool calls until the gate first refuses a call; the table reports how often that holds.",
         "- **Latency:** wall-clock time for identity resolution, model turns, and local tool execution.",
+        "",
+        "The two measures below were added on 3 November 2026, after the study hypotheses were fixed. They are exploratory, are computed from the recorded traces without new runs, and are not used to decide any hypothesis.",
+        "",
+        "- **Reply–state consistency** (checklist T1-002 and T7-009): a keyword check compares the final reply with the recorded state. It flags a reply that asserts validation passed when the last validation failed or never ran; a reply whose release claim contradicts the recorded release; and a reply that writes out a meal plan for a plan-requiring case in which Knapsack produced no plan. Sentences with a negation, advice, or a rule statement are not counted as claims. Every flag is listed below with its triggering text so it can be audited.",
+        "- **Paraphrase consistency** (checklist T7-001 and T7-006): for each development and held-out pair, whether the release decision and the set of tool names attempted are the same, and whether the correct outcome holds on both, one, or neither wording.",
+        "",
+        "## Flagged replies for audit",
+        "",
+        *flagged_replies(data),
         "",
         "## Scope",
         "",

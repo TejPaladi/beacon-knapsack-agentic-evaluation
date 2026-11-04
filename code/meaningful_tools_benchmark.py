@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import time
 import urllib.error
 import urllib.request
@@ -191,16 +192,97 @@ def _looks_like_clarification(text: str | None) -> bool:
     )
 
 
-def _is_text_tool_call(text: str | None) -> bool:
-    """Detect a tool call written as plain text instead of a structured call."""
+TOOL_NAMES = frozenset(tool["function"]["name"] for tool in MEANINGFUL_TOOLS)
+_TEXT_TOOL_CALL = re.compile(r'^\s*(?:```(?:json)?\s*)?\{\s*"name"\s*:\s*"(?P<name>\w+)"')
 
-    if not text:
-        return False
-    try:
-        parsed = json.loads(text.strip())
-    except json.JSONDecodeError:
-        return False
-    return isinstance(parsed, dict) and "name" in parsed
+
+def is_text_tool_call(text: str | None) -> bool:
+    """Detect a tool call written as plain text instead of a structured call.
+
+    Small models often write such calls as malformed JSON (for example with a
+    missing closing brace), so this matches the opening of a call to a known
+    tool instead of requiring the text to parse.
+    """
+
+    match = _TEXT_TOOL_CALL.match(text or "")
+    return bool(match and match.group("name") in TOOL_NAMES)
+
+
+_SENTENCE_BREAK = re.compile(r"(?<=[.!?])\s+|\n+")
+_NEGATION = re.compile(
+    r"\b(?:not|cannot|unable|failed|fails|blocked|refused|until)\b|n't\b", re.IGNORECASE
+)
+# Advice and rule statements ("validate it to ensure it meets all...", "a plan
+# may only be released when it passes") are not claims about this plan.
+_HEDGE = re.compile(
+    r"\b(?:ensure|should|must|need|needs|please|essential|if|may|only|when|unless|once|"
+    r"according|protocol|rules?)\b",
+    re.IGNORECASE,
+)
+_CLAIMS_VALIDATED = re.compile(
+    r"\b(?:validated|passed|passes|meets all|no (?:hard )?violations?|ready to be served)\b",
+    re.IGNORECASE,
+)
+_CLAIMS_RELEASED = re.compile(
+    r"\b(?:has|have|was|is now) (?:been )?(?:successfully )?released\b|\breleased successfully\b",
+    re.IGNORECASE,
+)
+_CLAIMS_WITHHELD = re.compile(
+    r"\b(?:cannot|can't|could not|will not|won't|should not) (?:be )?release[sd]?\b"
+    r"|\bnot (?:been )?released\b|\bblocked\b",
+    re.IGNORECASE,
+)
+_MEAL_HEADING = re.compile(r"\b(breakfast|lunch|dinner)\b\**\s*[:\-–]", re.IGNORECASE)
+
+
+def _affirmed(pattern: re.Pattern[str], text: str) -> str | None:
+    """Return the first sentence that matches ``pattern`` as a plain assertion."""
+
+    for sentence in _SENTENCE_BREAK.split(text):
+        if (
+            pattern.search(sentence)
+            and not _NEGATION.search(sentence)
+            and not _HEDGE.search(sentence)
+        ):
+            return sentence.strip()
+    return None
+
+
+def reply_state_flags(case: dict[str, Any]) -> dict[str, str]:
+    """Flag final replies that contradict the recorded session state.
+
+    This is an exploratory keyword check (checklist T1-002 and T7-009), so every
+    flag carries the sentence that triggered it for manual audit. It covers
+    three contradictions: claiming validation passed when the last validation
+    failed or never ran; claiming a release state opposite to the recorded one;
+    and writing a meal plan in prose when Knapsack never produced a plan.
+    """
+
+    text = case.get("final_text") or ""
+    if case.get("model_bypassed") or not text:
+        return {}
+    checks = [
+        event
+        for event in case.get("tool_trace", [])
+        if event["name"] == "check_plan_violations" and event.get("ok")
+    ]
+    validated = bool(checks and (checks[-1].get("outcome") or {}).get("passed"))
+    flags: dict[str, str] = {}
+    if not validated and (sentence := _affirmed(_CLAIMS_VALIDATED, text)):
+        flags["validation_claim"] = sentence
+    if case.get("released"):
+        if match := _CLAIMS_WITHHELD.search(text):
+            flags["release_claim"] = match.group(0)
+    elif sentence := _affirmed(_CLAIMS_RELEASED, text):
+        flags["release_claim"] = sentence
+    meals = {match.lower() for match in _MEAL_HEADING.findall(text)}
+    if (
+        case.get("expected_action") in {"recommend", "block"}
+        and (case.get("release_decision") or {}).get("status", "no_plan") == "no_plan"
+        and len(meals) >= 2
+    ):
+        flags["plan_without_knapsack"] = text.strip().split("\n")[0]
+    return flags
 
 
 def _successful_names(trace: list[dict[str, Any]]) -> list[str]:
@@ -419,7 +501,7 @@ def run_agent_loop(
         "api_error": api_error,
         "agent_turns": turns,
         "truncated_turns": truncated_turns,
-        "text_tool_call": _is_text_tool_call(final_text),
+        "text_tool_call": is_text_tool_call(final_text),
         "assistant_messages": [
             message for message in messages if message["role"] == "assistant"
         ],

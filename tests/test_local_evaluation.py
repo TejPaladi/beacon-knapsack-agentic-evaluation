@@ -30,11 +30,14 @@ from meaningful_tools import (  # noqa: E402
 from meaningful_tools_benchmark import (  # noqa: E402
     HELDOUT_DATASET,
     expected_tools as meaningful_expected_tools,
+    is_text_tool_call,
     load_cases as load_meaningful_cases,
+    reply_state_flags,
     run_agent_case as run_meaningful_agent_case,
     run_deterministic_case as run_meaningful_deterministic_case,
     valid_tool_path,
 )
+from report_meaningful_tools import paraphrase_pairs  # noqa: E402
 from benchmark import (  # noqa: E402
     GROQ_USER_AGENT,
     GroqRateLimitError,
@@ -336,6 +339,57 @@ class LocalEvaluationTests(unittest.TestCase):
         self.assertEqual(safe["release_decision"]["status"], "released")
         self.assertTrue(fault["case_pass"])
         self.assertFalse(fault["released"])
+
+    def test_text_tool_call_detector_accepts_malformed_calls_to_known_tools(self):
+        self.assertTrue(
+            is_text_tool_call('{"name": "calculate_nutrition_scores", "parameters": {"goals": {"fiber": 28}}')
+        )
+        self.assertTrue(is_text_tool_call('```json\n{"name": "release_plan"}\n```'))
+        self.assertFalse(is_text_tool_call('{"name": "Earl Jones"}'))
+        self.assertFalse(is_text_tool_call("Here is the plan."))
+
+    def test_reply_checks_flag_claims_that_contradict_recorded_state(self):
+        failed_check = {
+            "name": "check_plan_violations",
+            "ok": True,
+            "outcome": {"passed": False, "violation_count": 1},
+        }
+        released_fault = {
+            "expected_action": "block",
+            "tool_trace": [failed_check],
+            "released": True,
+            "release_decision": {"status": "released_unchecked"},
+        }
+        flags = reply_state_flags(
+            {**released_fault, "final_text": "The plan has been successfully validated and released."}
+        )
+        self.assertIn("validation_claim", flags)
+        flags = reply_state_flags(
+            {**released_fault, "final_text": "The plan fails validation, so it cannot be released."}
+        )
+        self.assertEqual(set(flags), {"release_claim"})
+        advice = "Please validate the plan to ensure it meets all the requirements."
+        self.assertEqual(reply_state_flags({**released_fault, "final_text": advice}), {})
+        invented = {
+            "expected_action": "recommend",
+            "tool_trace": [],
+            "released": False,
+            "release_decision": {"status": "no_plan"},
+            "final_text": "Here is a plan.\nBreakfast: oats\nLunch: salad\nDinner: salmon",
+        }
+        self.assertIn("plan_without_knapsack", reply_state_flags(invented))
+        self.assertEqual(reply_state_flags({**invented, "model_bypassed": True}), {})
+
+    def test_heldout_paraphrases_pair_with_every_model_handled_case(self):
+        development = load_meaningful_cases()
+        heldout = load_meaningful_cases(HELDOUT_DATASET)
+        pairs = paraphrase_pairs(development, heldout)
+        self.assertEqual(len(pairs), 36)
+        self.assertTrue(all(held == "heldout_" + dev for dev, held in pairs))
+        broken = deepcopy(heldout)
+        broken[0]["expected_action"] = "recommend"
+        with self.assertRaises(ValueError):
+            paraphrase_pairs(development, broken)
 
     def test_llm_selector_receives_compact_full_role_catalog(self):
         records = catalog_records()
