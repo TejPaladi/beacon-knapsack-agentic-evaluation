@@ -323,6 +323,63 @@ wrong-person outcomes against 3 for the stronger rules. Using a model only to
 propose a person for the user to confirm executes no wrong person and reaches
 the right person on 34–35 of the 36 resolvable requests.
 
+## Propose and confirm end to end
+
+Experiment 6 feeds the Experiment 5 conversations through the full
+release-gated Experiment 4 agent. Four identification methods (exact-name gate,
+stronger rules, model decides, propose and confirm with a simulated user who
+confirms only the labeled person) hand a person to the same model's agent run,
+and a conversation succeeds only if the right person's validated Knapsack plan
+is released, or, for a conversation that must be clarified, if nothing is
+released. The design and hypotheses are in
+[docs/end_to_end_experiment.md](docs/end_to_end_experiment.md).
+
+```bash
+code/run_end_to_end.sh /tmp/beacon_runs
+cp -R /tmp/beacon_runs/end_to_end results/
+python3 code/report_end_to_end.py \
+  --results-dir results/end_to_end \
+  --output results/end_to_end_comparison.md
+```
+
+The [checked comparison](results/end_to_end_comparison.md) shows propose and
+confirm releases no wrong-person plan with any model, while letting the model
+decide releases 5 (Granite), 1 (Llama), and 9 (Qwen): the release gate checks
+the plan, not the choice of person. Propose and confirm delivers 28 and 35 of
+36 right plans with Granite and Qwen, against 13 for the exact-name gate, but
+only 6 against 3 with Llama, which identifies the right person and then stops
+before release. H6b is supported; H6a, which required a significant gain for
+every model, is not.
+
+## Constrained hybrid reranking
+
+Experiment 7 tests the hybrid proposed after Experiment 3. Knapsack plans five
+consecutive days per persona; the distinct days, all of which pass validation,
+become the candidates, and candidate 1 is Knapsack's usual one-day plan. Each of
+48 requests ([data/preference_requests.json](data/preference_requests.json))
+states one preference (more protein, fewer calories, more fiber, or fewer
+carbohydrates) either explicitly or as a goal. The Knapsack default, a keyword
+reranker ([code/rule_reranker.py](code/rule_reranker.py)) committed before the
+requests were written, and three local models each pick one candidate. The
+design and hypotheses are in
+[docs/reranking_experiment.md](docs/reranking_experiment.md).
+
+```bash
+code/run_reranking.sh /tmp/beacon_runs
+cp -R /tmp/beacon_runs/reranking results/
+python3 code/report_reranking.py \
+  --results-dir results/reranking \
+  --output results/reranking_comparison.md
+```
+
+The [checked comparison](results/reranking_comparison.md) shows no selector
+chose an invalid plan. The keyword reranker satisfies 39 of 48 requests,
+including all 24 explicit ones; Qwen satisfies 42 (24 explicit, 18 goal-style,
+against 15 for the rules, p = 0.55), while Granite and Llama satisfy 31 and 23
+and miss explicit numeric comparisons. H7b and H7c are supported and H7a is
+not. In an exploratory combination, the rules decide when they detect a cue and
+Qwen decides otherwise, satisfying 44 of 48.
+
 ## Setup
 
 ### 1. Obtain the compatible Beacon backend
@@ -413,7 +470,8 @@ tests/      offline tests against the locally installed Beacon backend
 
 - This is an evaluation of a six-profile, one-day simulated setup; it is not a
   clinical study or a health recommendation product.
-- It measures whether the LLM follows a restricted workflow, not whether it
-  improves deterministic Knapsack recommendations.
+- It mainly measures whether the LLM follows a restricted workflow. Only
+  Experiment 7 asks whether a model improves on Knapsack's choice, and only by
+  choosing among Knapsack's own validated plans for one stated preference.
 - Different catalog versions or Beacon commits can produce different plans.
   Record the backend commit and environment when reporting new results.
