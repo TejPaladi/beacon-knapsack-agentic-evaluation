@@ -1,0 +1,5842 @@
+{
+  "experiment": "end_to_end_propose_confirm",
+  "generated_at": "2026-11-04T06:16:29.894139+00:00",
+  "provenance": {
+    "model": "granite4:3b",
+    "model_digest": "89962fcc75239ac434cdebceb6b7e0669397f92eaef9c487774b718bc36a3e5f",
+    "repetition": 2,
+    "dataset": "data/hard_wording_requests.json",
+    "dataset_sha256": "a79e994b5da38fb26d7e443f8d5e14a8ecdabf3a7966234ff87a73227f6ef04b",
+    "identity_prompt_sha256": "5c62e070a0023c23a6c916256c1771594f1a9e98bcc2b02ec709f3f636b14bde",
+    "agent_prompt_sha256": "93991c5054face1fa475beef687fa3967833a89d6b488d2847e9ff38dc55b5b2",
+    "tool_schema_sha256": "40efc2651412de45308035b6cde9033e55f0a19262df6ed4d9ceaa4b8f10ac72",
+    "rule_resolver_sha256": "da452a6db3c198ca3bafa1a334cc5e90677ed8e38767965ac6eafa4460af6e7f",
+    "simulated_user": "confirms only the labeled person",
+    "repository_commit": "4204472e5d2abc6d956066d3be04b0b195e8803a",
+    "worktree_dirty": false,
+    "beacon_backend_commit": "7ebe3ae94d86dd6a4e9fc93ccc4734d549a531c4"
+  },
+  "summary": {
+    "cases": 48,
+    "exact_rules": {
+      "successes": 25,
+      "right_plans": 13,
+      "wrong_person_releases": 0,
+      "clarify_successes": 12,
+      "identified_not_delivered": 0,
+      "missed": 22,
+      "confirmations_asked": 0
+    },
+    "stronger_rules": {
+      "successes": 39,
+      "right_plans": 27,
+      "wrong_person_releases": 1,
+      "clarify_successes": 12,
+      "identified_not_delivered": 6,
+      "missed": 1,
+      "confirmations_asked": 0
+    },
+    "model_decides": {
+      "successes": 36,
+      "right_plans": 28,
+      "wrong_person_releases": 5,
+      "clarify_successes": 8,
+      "identified_not_delivered": 6,
+      "missed": 0,
+      "confirmations_asked": 0
+    },
+    "propose_confirm": {
+      "successes": 40,
+      "right_plans": 28,
+      "wrong_person_releases": 0,
+      "clarify_successes": 12,
+      "identified_not_delivered": 6,
+      "missed": 2,
+      "confirmations_asked": 38
+    }
+  },
+  "cases": [
+    {
+      "case_id": "exact_earl",
+      "category": "exact_control",
+      "expected_persona_id": "earlJones",
+      "model_answer": "earlJones",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "earlJones",
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "exact_jessica",
+      "category": "exact_control",
+      "expected_persona_id": "jessicaSmith",
+      "model_answer": "jessicaSmith",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "jessicaSmith",
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "exact_aaliyah",
+      "category": "exact_control",
+      "expected_persona_id": "A-NV",
+      "model_answer": "A-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "A-NV",
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "exact_becca",
+      "category": "exact_control",
+      "expected_persona_id": "NA-V",
+      "model_answer": "NA-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-V",
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "exact_greg",
+      "category": "exact_control",
+      "expected_persona_id": "NA-NV",
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-NV",
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "exact_dylan",
+      "category": "exact_control",
+      "expected_persona_id": "A-V",
+      "model_answer": "A-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "A-V",
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "nickname_jessica",
+      "category": "nickname",
+      "expected_persona_id": "jessicaSmith",
+      "model_answer": "jessicaSmith",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "jessicaSmith",
+          "confirmation_asked": true,
+          "proposal": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "nickname_becca",
+      "category": "nickname",
+      "expected_persona_id": "NA-V",
+      "model_answer": "NA-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "NA-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "model_decides": {
+          "persona_id": "NA-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": "NA-V",
+          "confirmation_asked": true,
+          "proposal": "NA-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        }
+      }
+    },
+    {
+      "case_id": "nickname_greg",
+      "category": "nickname",
+      "expected_persona_id": "NA-NV",
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-NV",
+          "confirmation_asked": true,
+          "proposal": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "nickname_earl",
+      "category": "nickname",
+      "expected_persona_id": "earlJones",
+      "model_answer": "earlJones",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "earlJones",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "model_decides": {
+          "persona_id": "earlJones",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": "earlJones",
+          "confirmation_asked": true,
+          "proposal": "earlJones",
+          "outcome": "identified_not_delivered",
+          "success": false
+        }
+      }
+    },
+    {
+      "case_id": "nickname_aaliyah",
+      "category": "nickname",
+      "expected_persona_id": "A-NV",
+      "model_answer": "A-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "A-NV",
+          "confirmation_asked": true,
+          "proposal": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "nickname_dylan",
+      "category": "nickname",
+      "expected_persona_id": "A-V",
+      "model_answer": "A-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "A-V",
+          "confirmation_asked": true,
+          "proposal": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "typo_jessica",
+      "category": "misspelling",
+      "expected_persona_id": "jessicaSmith",
+      "model_answer": "jessicaSmith",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "jessicaSmith",
+          "confirmation_asked": true,
+          "proposal": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "typo_aaliyah",
+      "category": "misspelling",
+      "expected_persona_id": "A-NV",
+      "model_answer": "A-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "A-NV",
+          "confirmation_asked": true,
+          "proposal": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "typo_dylan",
+      "category": "misspelling",
+      "expected_persona_id": "A-V",
+      "model_answer": "A-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "A-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "model_decides": {
+          "persona_id": "A-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": "A-V",
+          "confirmation_asked": true,
+          "proposal": "A-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        }
+      }
+    },
+    {
+      "case_id": "typo_greg",
+      "category": "misspelling",
+      "expected_persona_id": "NA-NV",
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-NV",
+          "confirmation_asked": true,
+          "proposal": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "typo_becca",
+      "category": "misspelling",
+      "expected_persona_id": "NA-V",
+      "model_answer": "NA-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "model_decides": {
+          "persona_id": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-V",
+          "confirmation_asked": true,
+          "proposal": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "typo_earl",
+      "category": "misspelling",
+      "expected_persona_id": "earlJones",
+      "model_answer": "earlJones",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "earlJones",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "model_decides": {
+          "persona_id": "earlJones",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": "earlJones",
+          "confirmation_asked": true,
+          "proposal": "earlJones",
+          "outcome": "identified_not_delivered",
+          "success": false
+        }
+      }
+    },
+    {
+      "case_id": "description_jessica",
+      "category": "description",
+      "expected_persona_id": "jessicaSmith",
+      "model_answer": "jessicaSmith",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "jessicaSmith",
+          "confirmation_asked": true,
+          "proposal": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "description_earl",
+      "category": "description",
+      "expected_persona_id": "earlJones",
+      "model_answer": "earlJones",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "earlJones",
+          "confirmation_asked": true,
+          "proposal": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "description_dylan",
+      "category": "description",
+      "expected_persona_id": "A-V",
+      "model_answer": "A-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "A-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "model_decides": {
+          "persona_id": "A-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": "A-V",
+          "confirmation_asked": true,
+          "proposal": "A-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        }
+      }
+    },
+    {
+      "case_id": "description_greg",
+      "category": "description",
+      "expected_persona_id": "NA-NV",
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-NV",
+          "confirmation_asked": true,
+          "proposal": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "description_aaliyah",
+      "category": "description",
+      "expected_persona_id": "A-NV",
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "A-V",
+          "outcome": "wrong_person_release",
+          "success": false
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "wrong_person_release",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "NA-NV",
+          "outcome": "missed",
+          "success": false
+        }
+      }
+    },
+    {
+      "case_id": "description_becca",
+      "category": "description",
+      "expected_persona_id": "NA-V",
+      "model_answer": "NA-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-V",
+          "confirmation_asked": true,
+          "proposal": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "context_jessica",
+      "category": "earlier_turns",
+      "expected_persona_id": "jessicaSmith",
+      "model_answer": "jessicaSmith",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "jessicaSmith",
+          "confirmation_asked": true,
+          "proposal": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "context_greg",
+      "category": "earlier_turns",
+      "expected_persona_id": "NA-NV",
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-NV",
+          "confirmation_asked": true,
+          "proposal": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "context_aaliyah",
+      "category": "earlier_turns",
+      "expected_persona_id": "A-NV",
+      "model_answer": "A-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "A-NV",
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "context_becca",
+      "category": "earlier_turns",
+      "expected_persona_id": "NA-V",
+      "model_answer": "NA-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-V",
+          "confirmation_asked": true,
+          "proposal": "NA-V",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "context_dylan",
+      "category": "earlier_turns",
+      "expected_persona_id": "A-V",
+      "model_answer": "NA-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "NA-V",
+          "outcome": "wrong_person_not_released",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "NA-V",
+          "outcome": "wrong_person_not_released",
+          "success": false
+        },
+        "model_decides": {
+          "persona_id": "NA-V",
+          "outcome": "wrong_person_not_released",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "NA-V",
+          "outcome": "missed",
+          "success": false
+        }
+      }
+    },
+    {
+      "case_id": "context_earl",
+      "category": "earlier_turns",
+      "expected_persona_id": "earlJones",
+      "model_answer": "earlJones",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "earlJones",
+          "confirmation_asked": true,
+          "proposal": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "mixed_earl",
+      "category": "mixed_language",
+      "expected_persona_id": "earlJones",
+      "model_answer": "earlJones",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "earlJones",
+          "confirmation_asked": true,
+          "proposal": "earlJones",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "mixed_becca",
+      "category": "mixed_language",
+      "expected_persona_id": "NA-V",
+      "model_answer": "NA-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "NA-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "model_decides": {
+          "persona_id": "NA-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": "NA-V",
+          "confirmation_asked": true,
+          "proposal": "NA-V",
+          "outcome": "identified_not_delivered",
+          "success": false
+        }
+      }
+    },
+    {
+      "case_id": "mixed_greg",
+      "category": "mixed_language",
+      "expected_persona_id": "NA-NV",
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "NA-NV",
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "mixed_aaliyah",
+      "category": "mixed_language",
+      "expected_persona_id": "A-NV",
+      "model_answer": "A-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "A-NV",
+          "confirmation_asked": true,
+          "proposal": "A-NV",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "mixed_dylan",
+      "category": "mixed_language",
+      "expected_persona_id": "A-V",
+      "model_answer": "A-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "A-V",
+          "confirmation_asked": true,
+          "proposal": "A-V",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "mixed_jessica",
+      "category": "mixed_language",
+      "expected_persona_id": "jessicaSmith",
+      "model_answer": "jessicaSmith",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "missed",
+          "success": false
+        },
+        "stronger_rules": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": "jessicaSmith",
+          "confirmation_asked": true,
+          "proposal": "jessicaSmith",
+          "outcome": "right_plan",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "unclear_unknown",
+      "category": "unknown_or_ambiguous",
+      "expected_persona_id": null,
+      "model_answer": "unclear",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "unclear_vegetarian",
+      "category": "unknown_or_ambiguous",
+      "expected_persona_id": null,
+      "model_answer": "NA-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-V",
+          "outcome": "wrong_person_release",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "NA-V",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "unclear_no_person",
+      "category": "unknown_or_ambiguous",
+      "expected_persona_id": null,
+      "model_answer": "unclear",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": false,
+          "proposal": null,
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "unclear_pronoun",
+      "category": "unknown_or_ambiguous",
+      "expected_persona_id": null,
+      "model_answer": "A-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-NV",
+          "outcome": "wrong_person_release",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "A-NV",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "unclear_two_people",
+      "category": "unknown_or_ambiguous",
+      "expected_persona_id": null,
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "wrong_person_release",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "NA-NV",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "unclear_calories",
+      "category": "unknown_or_ambiguous",
+      "expected_persona_id": null,
+      "model_answer": "A-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-NV",
+          "outcome": "wrong_person_release",
+          "success": false
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "A-NV",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "near_greg",
+      "category": "near_miss",
+      "expected_persona_id": null,
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "NA-NV",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "near_jessica",
+      "category": "near_miss",
+      "expected_persona_id": null,
+      "model_answer": "jessicaSmith",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "jessicaSmith",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "jessicaSmith",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "jessicaSmith",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "near_earl",
+      "category": "near_miss",
+      "expected_persona_id": null,
+      "model_answer": "earlJones",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "earlJones",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "earlJones",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "earlJones",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "near_becca",
+      "category": "near_miss",
+      "expected_persona_id": null,
+      "model_answer": "NA-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-V",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "NA-V",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "near_dylan",
+      "category": "near_miss",
+      "expected_persona_id": null,
+      "model_answer": "A-V",
+      "methods": {
+        "exact_rules": {
+          "persona_id": "A-V",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "A-V",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "A-V",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    },
+    {
+      "case_id": "near_taylor",
+      "category": "near_miss",
+      "expected_persona_id": null,
+      "model_answer": "NA-NV",
+      "methods": {
+        "exact_rules": {
+          "persona_id": null,
+          "outcome": "correct_clarification",
+          "success": true
+        },
+        "stronger_rules": {
+          "persona_id": "NA-NV",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "model_decides": {
+          "persona_id": "NA-NV",
+          "outcome": "no_plan_released",
+          "success": true
+        },
+        "propose_confirm": {
+          "persona_id": null,
+          "confirmation_asked": true,
+          "proposal": "NA-NV",
+          "outcome": "correct_clarification",
+          "success": true
+        }
+      }
+    }
+  ],
+  "agent_runs": [
+    {
+      "case_id": "exact_earl",
+      "persona_id": "earlJones",
+      "final_text": "Here is today's meal plan for Earl Jones:\n\n**Breakfast**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Hot Chocolate  \n\n**Lunch**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Apple Pie  \n- Beverage: Hot Chocolate  \n\n**Dinner**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Hot Chocolate  \n\nEnjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_jwvb4eho",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Earl Jones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_rbljhes4",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"earlJones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_g00s48l3",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_5j86bvb8",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is today's meal plan for Earl Jones:\n\n**Breakfast**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Hot Chocolate  \n\n**Lunch**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Apple Pie  \n- Beverage: Hot Chocolate  \n\n**Dinner**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Hot Chocolate  \n\nEnjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 9318.9
+    },
+    {
+      "case_id": "exact_jessica",
+      "persona_id": "jessicaSmith",
+      "final_text": "Here is the one-day meal plan for Jessica Smith:\n\n**Breakfast**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Apple (side)\n- Almond Milk (beverage)\n\n**Lunch**\n- Bean Burrito Copycat (main course)\n- Medium Chick-fil-A\u00ae Waffle Potato Fries (side)\n- Almond Milk (beverage)\n\n**Dinner**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Sweet Potato Cornbread Muffins (side)\n- Almond Milk (beverage)",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_1nnpb88l",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Jessica Smith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_fyadp2x4",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"jessicaSmith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_s8accnsl",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_097kzwc6",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the one-day meal plan for Jessica Smith:\n\n**Breakfast**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Apple (side)\n- Almond Milk (beverage)\n\n**Lunch**\n- Bean Burrito Copycat (main course)\n- Medium Chick-fil-A\u00ae Waffle Potato Fries (side)\n- Almond Milk (beverage)\n\n**Dinner**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Sweet Potato Cornbread Muffins (side)\n- Almond Milk (beverage)"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 9318.9
+    },
+    {
+      "case_id": "exact_aaliyah",
+      "persona_id": "A-NV",
+      "final_text": "Here are the meals for Aaliyah Brooks for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nThe plan has been successfully released.",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_inibwv5z",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Aaliyah Brooks\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_cuqrbml8",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_d2rjhfn4",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_lz71p0fe",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here are the meals for Aaliyah Brooks for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nThe plan has been successfully released."
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 9940.7
+    },
+    {
+      "case_id": "exact_becca",
+      "persona_id": "NA-V",
+      "final_text": "Here is your meal plan for today:\n\n**Breakfast**\n- Main Course: Maple Oatmeal  \n- Side: Chick-fil-A\u00ae Kale Crunch Side  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Mexican Brown Rice and Pinto Bowl  \n- Side: Apple Pie  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Bean Burrito (Copycat)  \n- Side: Chick-fil-A\u00ae Kale Crunch Side  \n- Beverage: Almond Milk  \n\nEnjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_q7ksn3i3",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Becca Moore\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_20hjl0ty",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_1y9f0fc1",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_hbuhfk0m",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is your meal plan for today:\n\n**Breakfast**\n- Main Course: Maple Oatmeal  \n- Side: Chick-fil-A\u00ae Kale Crunch Side  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Mexican Brown Rice and Pinto Bowl  \n- Side: Apple Pie  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Bean Burrito (Copycat)  \n- Side: Chick-fil-A\u00ae Kale Crunch Side  \n- Beverage: Almond Milk  \n\nEnjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 9098.1
+    },
+    {
+      "case_id": "exact_greg",
+      "persona_id": "NA-NV",
+      "final_text": "Here are the meal plans for Greg Taylor:\n\n**Breakfast**\n- **Main Course:** Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- **Side:** Deviled Eggs with Smoked Salmon and Capers  \n- **Beverage:** Almond Milk  \n\n**Lunch**\n- **Main Course:** Cheesy Gordita Crunch Copycat  \n- **Side:** Dunkin' Snackin' Bacon  \n- **Beverage:** Almond Milk  \n\n**Dinner**\n- **Main Course:** Crunchwrap Supreme Copycat  \n- **Side:** Deviled Eggs with Smoked Salmon and Capers  \n- **Beverage:** Almond Milk  \n\nThe plan has been validated and is ready for consumption. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_zpwi47c0",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Greg Taylor\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_zq33v0a8",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_0j8z1hjr",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_8lwi5c04",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here are the meal plans for Greg Taylor:\n\n**Breakfast**\n- **Main Course:** Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- **Side:** Deviled Eggs with Smoked Salmon and Capers  \n- **Beverage:** Almond Milk  \n\n**Lunch**\n- **Main Course:** Cheesy Gordita Crunch Copycat  \n- **Side:** Dunkin' Snackin' Bacon  \n- **Beverage:** Almond Milk  \n\n**Dinner**\n- **Main Course:** Crunchwrap Supreme Copycat  \n- **Side:** Deviled Eggs with Smoked Salmon and Capers  \n- **Beverage:** Almond Milk  \n\nThe plan has been validated and is ready for consumption. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 10595.6
+    },
+    {
+      "case_id": "exact_dylan",
+      "persona_id": "A-V",
+      "final_text": "Here\u2019s the meal plan for Dylan Bennet:\n\n**Breakfast:**  \n- **Main Course:** Maple Oatmeal  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple Pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean Burrito (Copycat)  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan meets all dietary preferences and nutritional goals. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_qnf9rekx",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Dylan Bennet\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_6cdnsnif",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_gutgfder",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_z32ne0e3",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here\u2019s the meal plan for Dylan Bennet:\n\n**Breakfast:**  \n- **Main Course:** Maple Oatmeal  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple Pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean Burrito (Copycat)  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan meets all dietary preferences and nutritional goals. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Bennet"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 9887.8
+    },
+    {
+      "case_id": "nickname_jessica",
+      "persona_id": "jessicaSmith",
+      "final_text": "Here\u2019s the meal plan for Jessica Smith:\n\n**Breakfast:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Bean Burrito Copycat  \n- **Side:** Medium Chick-fil-A\u00ae Waffle Potato Fries  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Sweet Potato Cornbread Muffins  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and dietary restrictions. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_phfwjf0l",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Jessica Smith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_vliw8y5l",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"jessicaSmith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_7u8bdj4v",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_dwpwa9n8",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here\u2019s the meal plan for Jessica Smith:\n\n**Breakfast:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Bean Burrito Copycat  \n- **Side:** Medium Chick-fil-A\u00ae Waffle Potato Fries  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Sweet Potato Cornbread Muffins  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and dietary restrictions. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8405.4
+    },
+    {
+      "case_id": "nickname_becca",
+      "persona_id": "NA-V",
+      "final_text": "I\u2019m sorry, but the system couldn\u2019t locate a profile for \u201cBecky Moore.\u201d Could you please confirm the exact name or identifier of the persona you\u2019re referring to? Once I have the correct profile, I can generate today\u2019s meal plan.",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_y7w9gaw7",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Becky Moore\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I\u2019m sorry, but the system couldn\u2019t locate a profile for \u201cBecky Moore.\u201d Could you please confirm the exact name or identifier of the persona you\u2019re referring to? Once I have the correct profile, I can generate today\u2019s meal plan."
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becky Moore"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 2246.9
+    },
+    {
+      "case_id": "nickname_greg",
+      "persona_id": "NA-NV",
+      "final_text": "Here is your meal plan for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nEnjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_xkl6jwsj",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Greg Taylor\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_nn3545rd",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_ktiexv01",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_k7gdhs8g",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is your meal plan for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nEnjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8138.7
+    },
+    {
+      "case_id": "nickname_earl",
+      "persona_id": "earlJones",
+      "final_text": "I'm sorry, but I couldn't find a matching profile for Mr. Jones. Could you please provide the exact name used in our system?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_df5il0m4",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Mr. Jones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but I couldn't find a matching profile for Mr. Jones. Could you please provide the exact name used in our system?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Mr. Jones"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1622.9
+    },
+    {
+      "case_id": "nickname_aaliyah",
+      "persona_id": "A-NV",
+      "final_text": "Here is your daily menu for Aaliyah Brooks:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nEnjoy your meal!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_45agkvl1",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Aaliyah Brooks\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_89ro7t2h",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_7yf0x63f",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_18n5z9i1",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is your daily menu for Aaliyah Brooks:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nEnjoy your meal!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8218.5
+    },
+    {
+      "case_id": "nickname_dylan",
+      "persona_id": "A-V",
+      "final_text": "Here\u2019s the meal plan for Dylan Bennet:\n\n**Breakfast:**  \n- **Main Course:** Maple Oatmeal  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple Pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean Burrito (Copycat)  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan has been validated and is ready for consumption. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_n4xvq0cr",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"A-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_3x68r7kr",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_t0d946ky",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_yro0wivn",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here\u2019s the meal plan for Dylan Bennet:\n\n**Breakfast:**  \n- **Main Course:** Maple Oatmeal  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple Pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean Burrito (Copycat)  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan has been validated and is ready for consumption. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8309.0
+    },
+    {
+      "case_id": "typo_jessica",
+      "persona_id": "jessicaSmith",
+      "final_text": "Here is the meal plan for Jessica Smith:\n\n**Breakfast**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Apple (side)\n- Almond Milk (beverage)\n\n**Lunch**\n- Bean Burrito Copycat (main course)\n- Medium Chick-fil-A\u00ae Waffle Potato Fries (side)\n- Almond Milk (beverage)\n\n**Dinner**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Sweet Potato Cornbread Muffins (side)\n- Almond Milk (beverage)\n\nThe plan meets all nutritional goals and passes all validation checks. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_9tn4sac3",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Jessica Smith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_sr0fq641",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"jessicaSmith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_3dig8arp",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_b2pgyprt",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the meal plan for Jessica Smith:\n\n**Breakfast**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Apple (side)\n- Almond Milk (beverage)\n\n**Lunch**\n- Bean Burrito Copycat (main course)\n- Medium Chick-fil-A\u00ae Waffle Potato Fries (side)\n- Almond Milk (beverage)\n\n**Dinner**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Sweet Potato Cornbread Muffins (side)\n- Almond Milk (beverage)\n\nThe plan meets all nutritional goals and passes all validation checks. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8399.7
+    },
+    {
+      "case_id": "typo_aaliyah",
+      "persona_id": "A-NV",
+      "final_text": "Here are the meal plans for Aaliyah Brooks for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nThe plan has been validated and is ready for consumption. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_ksj99gxn",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Aaliyah Brooks\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_rbl4jem8",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_e9x0nbo9",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_uwunc55s",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here are the meal plans for Aaliyah Brooks for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nThe plan has been validated and is ready for consumption. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8652.0
+    },
+    {
+      "case_id": "typo_dylan",
+      "persona_id": "A-V",
+      "final_text": "I'm sorry, but I couldn't find a profile for Dillon Bennett. Could you please confirm the correct name?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_25yh0qy1",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Dillon Bennett\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but I couldn't find a profile for Dillon Bennett. Could you please confirm the correct name?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dillon Bennett"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1480.3
+    },
+    {
+      "case_id": "typo_greg",
+      "persona_id": "NA-NV",
+      "final_text": "Here is your meal plan for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nEnjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_nwiaav29",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Greg Taylor\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_hrfsrgrr",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_v67nsb0u",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_le8888u6",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is your meal plan for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nEnjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8232.3
+    },
+    {
+      "case_id": "typo_becca",
+      "persona_id": "NA-V",
+      "final_text": "Here\u2019s Becca Moore\u2019s meal plan for today:\n\n**Breakfast:**  \n- **Main Course:** Maple\u2011oatmeal  \n- **Side:** Chick\u2011fil\u2011A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican brown\u2011rice and pinto\u2011bowl  \n- **Side:** Apple\u2011pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean burrito (copycat)  \n- **Side:** Chick\u2011fil\u2011A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and passes all validation checks. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_qf8faojw",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Becca Moore\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_dgb00har",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_dkmosrae",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_13z73ph8",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here\u2019s Becca Moore\u2019s meal plan for today:\n\n**Breakfast:**  \n- **Main Course:** Maple\u2011oatmeal  \n- **Side:** Chick\u2011fil\u2011A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican brown\u2011rice and pinto\u2011bowl  \n- **Side:** Apple\u2011pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean burrito (copycat)  \n- **Side:** Chick\u2011fil\u2011A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and passes all validation checks. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8442.2
+    },
+    {
+      "case_id": "typo_earl",
+      "persona_id": "earlJones",
+      "final_text": "I'm sorry, but the system couldn't identify a matching profile for \"Erl Jonse\". Could you please confirm the exact name or provide the correct persona ID? Once I have the right profile, I can proceed with planning the meals.",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_vhidev9n",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Erl Jonse\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but the system couldn't identify a matching profile for \"Erl Jonse\". Could you please confirm the exact name or provide the correct persona ID? Once I have the right profile, I can proceed with planning the meals."
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Erl Jonse"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 2419.5
+    },
+    {
+      "case_id": "description_jessica",
+      "persona_id": "jessicaSmith",
+      "final_text": "Here are the meals planned for Jessica Smith today:\n\n**Breakfast:**  \n- Mexican Brown Rice and Pinto Bowl (main course)  \n- Apple (side)  \n- Almond Milk (beverage)  \n\n**Lunch:**  \n- Bean Burrito Copycat (main course)  \n- Medium Chick-fil-A\u00ae Waffle Potato Fries (side)  \n- Almond Milk (beverage)  \n\n**Dinner:**  \n- Mexican Brown Rice and Pinto Bowl (main course)  \n- Sweet Potato Cornbread Muffins (side)  \n- Almond Milk (beverage)  \n\nThe plan meets all nutritional goals and passes all validation checks.",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_olg23jqn",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Jessica Smith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_73vv9hze",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"jessicaSmith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_2f9sig30",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_hnfa0sdm",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here are the meals planned for Jessica Smith today:\n\n**Breakfast:**  \n- Mexican Brown Rice and Pinto Bowl (main course)  \n- Apple (side)  \n- Almond Milk (beverage)  \n\n**Lunch:**  \n- Bean Burrito Copycat (main course)  \n- Medium Chick-fil-A\u00ae Waffle Potato Fries (side)  \n- Almond Milk (beverage)  \n\n**Dinner:**  \n- Mexican Brown Rice and Pinto Bowl (main course)  \n- Sweet Potato Cornbread Muffins (side)  \n- Almond Milk (beverage)  \n\nThe plan meets all nutritional goals and passes all validation checks."
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8573.7
+    },
+    {
+      "case_id": "description_earl",
+      "persona_id": "earlJones",
+      "final_text": "Here is your meal plan for today, Earl Jones:\n\n**Breakfast**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Hot Chocolate  \n\n**Lunch**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Apple Pie  \n- Beverage: Hot Chocolate  \n\n**Dinner**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Hot Chocolate  \n\nEnjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_gw0jarmf",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Earl Jones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_87a6m4wl",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"earlJones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_mvczy52x",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_co5i7tvx",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is your meal plan for today, Earl Jones:\n\n**Breakfast**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Hot Chocolate  \n\n**Lunch**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Apple Pie  \n- Beverage: Hot Chocolate  \n\n**Dinner**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Hot Chocolate  \n\nEnjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 7829.2
+    },
+    {
+      "case_id": "description_dylan",
+      "persona_id": "A-V",
+      "final_text": "I'm sorry, but the system couldn't identify a single vegetarian profile. Could you please provide a specific persona ID or more details so I can assist you accurately?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_um8ru1u0",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"vegetarian\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but the system couldn't identify a single vegetarian profile. Could you please provide a specific persona ID or more details so I can assist you accurately?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "vegetarian"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1718.5
+    },
+    {
+      "case_id": "description_greg",
+      "persona_id": "NA-NV",
+      "final_text": "Greg Taylor's meal plan for today has been released successfully. Here are the details:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nThe plan meets all nutritional goals and passes all validation checks. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_qmgi0kyy",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Greg Taylor\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_95nlby87",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_jy7ohl1e",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_hgzbfjis",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Greg Taylor's meal plan for today has been released successfully. Here are the details:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nThe plan meets all nutritional goals and passes all validation checks. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8606.6
+    },
+    {
+      "case_id": "description_aaliyah",
+      "persona_id": "A-V",
+      "final_text": "Here is your personalized meal plan for Dylan Bennet, who is not vegetarian and consumes 3,500 calories daily:\n\n**Breakfast**\n- **Main Course:** Maple Oatmeal  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch**\n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple Pie  \n- **Beverage:** Almond Milk  \n\n**Dinner**\n- **Main Course:** Bean Burrito (Copycat)  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and dietary restrictions. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_477e2u07",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Dylan Bennet\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_958nhjqj",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_djmw5ivl",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_gjm1otl0",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is your personalized meal plan for Dylan Bennet, who is not vegetarian and consumes 3,500 calories daily:\n\n**Breakfast**\n- **Main Course:** Maple Oatmeal  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch**\n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple Pie  \n- **Beverage:** Almond Milk  \n\n**Dinner**\n- **Main Course:** Bean Burrito (Copycat)  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and dietary restrictions. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Bennet"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8571.4
+    },
+    {
+      "case_id": "description_aaliyah",
+      "persona_id": "NA-NV",
+      "final_text": "Here is your meal plan for Greg Taylor:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nThe plan meets all dietary and nutritional goals. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_yzeengr1",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Greg Taylor\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_myxukwrr",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_mk0fzdt0",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_viec85c7",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is your meal plan for Greg Taylor:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nThe plan meets all dietary and nutritional goals. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8530.6
+    },
+    {
+      "case_id": "description_becca",
+      "persona_id": "NA-V",
+      "final_text": "Here\u2019s today\u2019s menu for Becca Moore (2,000\u2011calorie vegetarian plan):\n\n**Breakfast**  \n- **Maple Oatmeal** \u2013 main course  \n- **Chick\u2011fil\u2011A\u00ae Kale Crunch Side** \u2013 side  \n- **Almond Milk** \u2013 beverage  \n\n**Lunch**  \n- **Mexican Brown Rice & Pinto Bowl** \u2013 main course  \n- **Apple Pie** \u2013 side  \n- **Almond Milk** \u2013 beverage  \n\n**Dinner**  \n- **Bean Burrito (Copycat)** \u2013 main course  \n- **Chick\u2011fil\u2011A\u00ae Kale Crunch Side** \u2013 side  \n- **Almond Milk** \u2013 beverage  \n\nThe plan meets all nutritional goals and passes validation. Enjoy!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_mxew5ys2",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Becca Moore\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_c7lrlg14",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_d38wx4uo",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_uojchdd0",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here\u2019s today\u2019s menu for Becca Moore (2,000\u2011calorie vegetarian plan):\n\n**Breakfast**  \n- **Maple Oatmeal** \u2013 main course  \n- **Chick\u2011fil\u2011A\u00ae Kale Crunch Side** \u2013 side  \n- **Almond Milk** \u2013 beverage  \n\n**Lunch**  \n- **Mexican Brown Rice & Pinto Bowl** \u2013 main course  \n- **Apple Pie** \u2013 side  \n- **Almond Milk** \u2013 beverage  \n\n**Dinner**  \n- **Bean Burrito (Copycat)** \u2013 main course  \n- **Chick\u2011fil\u2011A\u00ae Kale Crunch Side** \u2013 side  \n- **Almond Milk** \u2013 beverage  \n\nThe plan meets all nutritional goals and passes validation. Enjoy!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8609.2
+    },
+    {
+      "case_id": "context_jessica",
+      "persona_id": "jessicaSmith",
+      "final_text": "Jessica's meal plan for today has been successfully released. Here are the details:\n\n**Breakfast**\n- **Main Course**: Mexican Brown Rice and Pinto Bowl  \n- **Side**: Apple  \n- **Beverage**: Almond Milk  \n\n**Lunch**\n- **Main Course**: Bean Burrito Copycat  \n- **Side**: Medium Chick-fil-A\u00ae Waffle Potato Fries  \n- **Beverage**: Almond Milk  \n\n**Dinner**\n- **Main Course**: Mexican Brown Rice and Pinto Bowl  \n- **Side**: Sweet Potato Cornbread Muffins  \n- **Beverage**: Almond Milk  \n\nThe plan meets all nutritional goals and dietary restrictions. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "Great, how can I help with Jessica's meals?"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_a5cylk5s",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Jessica Smith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_nhlwomgw",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"jessicaSmith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_l394qnrn",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_tdu4zof7",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Jessica's meal plan for today has been successfully released. Here are the details:\n\n**Breakfast**\n- **Main Course**: Mexican Brown Rice and Pinto Bowl  \n- **Side**: Apple  \n- **Beverage**: Almond Milk  \n\n**Lunch**\n- **Main Course**: Bean Burrito Copycat  \n- **Side**: Medium Chick-fil-A\u00ae Waffle Potato Fries  \n- **Beverage**: Almond Milk  \n\n**Dinner**\n- **Main Course**: Mexican Brown Rice and Pinto Bowl  \n- **Side**: Sweet Potato Cornbread Muffins  \n- **Beverage**: Almond Milk  \n\nThe plan meets all nutritional goals and dietary restrictions. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8806.9
+    },
+    {
+      "case_id": "context_greg",
+      "persona_id": "NA-NV",
+      "final_text": "The meal plan for Greg Taylor has been successfully released.",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "Understood. Who should I start with?"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_f5596iyc",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Greg Taylor\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_qwx6xtdb",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_favfexgt",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_4qx9b4u0",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "The meal plan for Greg Taylor has been successfully released."
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 5454.7
+    },
+    {
+      "case_id": "context_aaliyah",
+      "persona_id": "A-NV",
+      "final_text": "Aaliyah Brooks' meal plan for today has been successfully released. Here are the details:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nEnjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "Sure, preparing Greg Taylor's plan."
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_kz41x155",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Aaliyah Brooks\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_m2eg27rq",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_urfys7sw",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_q8p80zu0",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Aaliyah Brooks' meal plan for today has been successfully released. Here are the details:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nEnjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8503.7
+    },
+    {
+      "case_id": "context_becca",
+      "persona_id": "NA-V",
+      "final_text": "Here is the meal plan for Becca Moore, a vegetarian:\n\n**Breakfast**\n- Main Course: Maple Oatmeal  \n- Side: Chick-fil-A\u00ae Kale Crunch Side  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Mexican Brown Rice and Pinto Bowl  \n- Side: Apple Pie  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Bean Burrito (Copycat)  \n- Side: Chick-fil-A\u00ae Kale Crunch Side  \n- Beverage: Almond Milk  \n\nThe plan has been validated and is ready for consumption.",
+      "api_error": null,
+      "agent_turns": 6,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "Got it."
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_q42sj08e",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Becca Moore\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_zywjq2nk",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Earl Jones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_u5qn43mx",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_5bxptimr",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_7mkh4qoa",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the meal plan for Becca Moore, a vegetarian:\n\n**Breakfast**\n- Main Course: Maple Oatmeal  \n- Side: Chick-fil-A\u00ae Kale Crunch Side  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Mexican Brown Rice and Pinto Bowl  \n- Side: Apple Pie  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Bean Burrito (Copycat)  \n- Side: Chick-fil-A\u00ae Kale Crunch Side  \n- Beverage: Almond Milk  \n\nThe plan has been validated and is ready for consumption."
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": false,
+          "error": "Profile does not match the application-resolved persona.",
+          "policy_blocked": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8534.4
+    },
+    {
+      "case_id": "context_dylan",
+      "persona_id": "NA-V",
+      "final_text": "I need the name of the vegetarian client to fetch their profile and generate a meal plan. Could you please provide the exact name?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "Yes, Becca's plan is done."
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_b0scl3d9",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"vegetarian client\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I need the name of the vegetarian client to fetch their profile and generate a meal plan. Could you please provide the exact name?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "vegetarian client"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1693.1
+    },
+    {
+      "case_id": "context_earl",
+      "persona_id": "earlJones",
+      "final_text": "Here is Earl Jones' meal plan for today:\n\n**Breakfast:**  \n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Hot Chocolate  \n\n**Lunch:**  \n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Apple Pie  \n- Beverage: Hot Chocolate  \n\n**Dinner:**  \n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Hot Chocolate  \n\nThe plan has been validated and is ready for him to follow. Enjoy his meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "Thanks, I see Earl Jones in the list."
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_i3skrez4",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Earl Jones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_ol7av554",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"earlJones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_ot32cx3z",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_c49nkvru",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is Earl Jones' meal plan for today:\n\n**Breakfast:**  \n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Hot Chocolate  \n\n**Lunch:**  \n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Apple Pie  \n- Beverage: Hot Chocolate  \n\n**Dinner:**  \n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Hot Chocolate  \n\nThe plan has been validated and is ready for him to follow. Enjoy his meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8356.2
+    },
+    {
+      "case_id": "mixed_earl",
+      "persona_id": "earlJones",
+      "final_text": "Here\u2019s your three\u2011meal plan for Earl Jones:\n\n**Breakfast**  \n- **Main Course:** Cheesy Gordita Crunch Copycat  \n- **Side:** Deviled Eggs with Smoked Salmon & Capers  \n- **Beverage:** Hot Chocolate  \n\n**Lunch**  \n- **Main Course:** Crunchwrap Supreme Copycat  \n- **Side:** Apple Pie  \n- **Beverage:** Hot Chocolate  \n\n**Dinner**  \n- **Main Course:** Cheesy Gordita Crunch Copycat  \n- **Side:** Dunkin\u2019 Snackin\u2019 Bacon  \n- **Beverage:** Hot Chocolate  \n\nThe plan meets all nutritional goals and passes validation checks. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_mh9pphtw",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Earl Jones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_3kjod9gf",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"earlJones\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_1ljz8eir",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_sq9z5qgp",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here\u2019s your three\u2011meal plan for Earl Jones:\n\n**Breakfast**  \n- **Main Course:** Cheesy Gordita Crunch Copycat  \n- **Side:** Deviled Eggs with Smoked Salmon & Capers  \n- **Beverage:** Hot Chocolate  \n\n**Lunch**  \n- **Main Course:** Crunchwrap Supreme Copycat  \n- **Side:** Apple Pie  \n- **Beverage:** Hot Chocolate  \n\n**Dinner**  \n- **Main Course:** Cheesy Gordita Crunch Copycat  \n- **Side:** Dunkin\u2019 Snackin\u2019 Bacon  \n- **Beverage:** Hot Chocolate  \n\nThe plan meets all nutritional goals and passes validation checks. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Jones"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "earlJones"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8525.2
+    },
+    {
+      "case_id": "mixed_becca",
+      "persona_id": "NA-V",
+      "final_text": "I'm sorry, but I couldn't find a matching profile for \"Becky\". Could you please provide the exact persona ID or name so I can proceed with generating the meal plan?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_2clomid7",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Becky\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but I couldn't find a matching profile for \"Becky\". Could you please provide the exact persona ID or name so I can proceed with generating the meal plan?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becky"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1904.3
+    },
+    {
+      "case_id": "mixed_greg",
+      "persona_id": "NA-NV",
+      "final_text": "Your meal plan has been released successfully. Here are the details:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nEnjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_40pdahgf",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Greg Taylor\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_038nrqoo",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_pn6hmh10",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_4gw97tng",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Your meal plan has been released successfully. Here are the details:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nEnjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8305.8
+    },
+    {
+      "case_id": "mixed_aaliyah",
+      "persona_id": "A-NV",
+      "final_text": "Aaliyah's meal plan for today has been successfully generated and released. Here are the meals:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nThe plan adheres to all dietary and nutritional guidelines. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_hbocs0sm",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Aaliyah\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_i1h9rmmf",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_xm7z8ydy",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_8gr3tyl8",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Aaliyah's meal plan for today has been successfully generated and released. Here are the meals:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat\n- Side: Dunkin' Snackin' Bacon\n- Beverage: Almond Milk\n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat\n- Side: Deviled Eggs with Smoked Salmon and Capers\n- Beverage: Almond Milk\n\nThe plan adheres to all dietary and nutritional guidelines. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8692.7
+    },
+    {
+      "case_id": "mixed_dylan",
+      "persona_id": "A-V",
+      "final_text": "Here\u2019s your meal plan for today:\n\n**Breakfast:**  \n- **Main Course:** Maple\u2011oatmeal  \n- **Side:** Chick\u2011fil\u2011A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican brown\u2011rice and pinto\u2011bowl  \n- **Side:** Apple\u2011pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean burrito (copycat)  \n- **Side:** Chick\u2011fil\u2011A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nEnjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_3whqrtjr",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Dylan Bennet\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_ug0a22ap",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_lo8he4ow",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_dhw2kbgx",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here\u2019s your meal plan for today:\n\n**Breakfast:**  \n- **Main Course:** Maple\u2011oatmeal  \n- **Side:** Chick\u2011fil\u2011A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican brown\u2011rice and pinto\u2011bowl  \n- **Side:** Apple\u2011pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean burrito (copycat)  \n- **Side:** Chick\u2011fil\u2011A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nEnjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Bennet"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8081.2
+    },
+    {
+      "case_id": "mixed_jessica",
+      "persona_id": "jessicaSmith",
+      "final_text": "Here is the meal plan for Jessica Smith, who has diabetes:\n\n**Breakfast**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Apple (side)\n- Almond Milk (beverage)\n\n**Lunch**\n- Bean Burrito Copycat (main course)\n- Medium Chick-fil-A\u00ae Waffle Potato Fries (side)\n- Almond Milk (beverage)\n\n**Dinner**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Sweet Potato Cornbread Muffins (side)\n- Almond Milk (beverage)\n\nThe plan has been validated and is ready for consumption.",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_7w0sfwo4",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Jessica Smith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_hs5627u7",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"jessicaSmith\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_14o8snl6",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_raiynhp7",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the meal plan for Jessica Smith, who has diabetes:\n\n**Breakfast**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Apple (side)\n- Almond Milk (beverage)\n\n**Lunch**\n- Bean Burrito Copycat (main course)\n- Medium Chick-fil-A\u00ae Waffle Potato Fries (side)\n- Almond Milk (beverage)\n\n**Dinner**\n- Mexican Brown Rice and Pinto Bowl (main course)\n- Sweet Potato Cornbread Muffins (side)\n- Almond Milk (beverage)\n\nThe plan has been validated and is ready for consumption."
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Smith"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "jessicaSmith"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8187.0
+    },
+    {
+      "case_id": "unclear_vegetarian",
+      "persona_id": "NA-V",
+      "final_text": "Here is the meal plan for Becca Moore:\n\n**Breakfast:**  \n- **Main Course:** Maple Oatmeal  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple Pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean Burrito Copycat  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and dietary restrictions. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_imrprvjd",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Becca Moore\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_0o247o4u",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-V\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_hi30n0k0",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_zjbmyimv",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is the meal plan for Becca Moore:\n\n**Breakfast:**  \n- **Main Course:** Maple Oatmeal  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\n**Lunch:**  \n- **Main Course:** Mexican Brown Rice and Pinto Bowl  \n- **Side:** Apple Pie  \n- **Beverage:** Almond Milk  \n\n**Dinner:**  \n- **Main Course:** Bean Burrito Copycat  \n- **Side:** Chick-fil-A\u00ae Kale Crunch Side  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and dietary restrictions. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-V"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8059.6
+    },
+    {
+      "case_id": "unclear_pronoun",
+      "persona_id": "A-NV",
+      "final_text": "Here is Aaliyah Brooks' meal plan for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nThe plan has been validated and is ready for consumption. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_ypdfx5pq",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Aaliyah Brooks\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_f0t6h4qk",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_jwyjdmxv",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_fe5z1cbc",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is Aaliyah Brooks' meal plan for today:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nThe plan has been validated and is ready for consumption. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8635.0
+    },
+    {
+      "case_id": "unclear_two_people",
+      "persona_id": "NA-NV",
+      "final_text": "Here\u2019s the meal plan for Greg Taylor:\n\n**Breakfast**\n- **Main Course:** Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- **Side:** Deviled Eggs with Smoked Salmon and Capers  \n- **Beverage:** Almond Milk  \n\n**Lunch**\n- **Main Course:** Cheesy Gordita Crunch Copycat  \n- **Side:** Dunkin' Snackin' Bacon  \n- **Beverage:** Almond Milk  \n\n**Dinner**\n- **Main Course:** Crunchwrap Supreme Copycat  \n- **Side:** Deviled Eggs with Smoked Salmon and Capers  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and passes all validation checks. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 6,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_od8gaxuk",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Becca Moore\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_8ojtryrl",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Greg Taylor\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_5r49jrh7",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"NA-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_u42x9jhr",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_ekwwe6px",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here\u2019s the meal plan for Greg Taylor:\n\n**Breakfast**\n- **Main Course:** Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- **Side:** Deviled Eggs with Smoked Salmon and Capers  \n- **Beverage:** Almond Milk  \n\n**Lunch**\n- **Main Course:** Cheesy Gordita Crunch Copycat  \n- **Side:** Dunkin' Snackin' Bacon  \n- **Beverage:** Almond Milk  \n\n**Dinner**\n- **Main Course:** Crunchwrap Supreme Copycat  \n- **Side:** Deviled Eggs with Smoked Salmon and Capers  \n- **Beverage:** Almond Milk  \n\nThe plan meets all nutritional goals and passes all validation checks. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Becca Moore"
+          },
+          "ok": false,
+          "error": "Profile does not match the application-resolved persona.",
+          "policy_blocked": true
+        },
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Taylor"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "NA-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 9623.5
+    },
+    {
+      "case_id": "unclear_calories",
+      "persona_id": "A-NV",
+      "final_text": "Here is today's meal plan for Aaliyah Brooks, totaling 3,500 calories:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nThe plan has been validated and is ready for consumption. Enjoy your meals!",
+      "api_error": null,
+      "agent_turns": 5,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_2zu1ou6g",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Aaliyah Brooks\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_qdm76hxw",
+              "type": "function",
+              "function": {
+                "name": "recommend_meal_plan",
+                "arguments": "{\"persona_id\":\"A-NV\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_4vbfrro7",
+              "type": "function",
+              "function": {
+                "name": "check_plan_violations",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_z2esmkav",
+              "type": "function",
+              "function": {
+                "name": "release_plan",
+                "arguments": "{}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "Here is today's meal plan for Aaliyah Brooks, totaling 3,500 calories:\n\n**Breakfast**\n- Main Course: Eggs and Bacon (The Perfect Quick Paleo Meal)  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\n**Lunch**\n- Main Course: Cheesy Gordita Crunch Copycat  \n- Side: Dunkin' Snackin' Bacon  \n- Beverage: Almond Milk  \n\n**Dinner**\n- Main Course: Crunchwrap Supreme Copycat  \n- Side: Deviled Eggs with Smoked Salmon and Capers  \n- Beverage: Almond Milk  \n\nThe plan has been validated and is ready for consumption. Enjoy your meals!"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Aaliyah Brooks"
+          },
+          "ok": true
+        },
+        {
+          "name": "recommend_meal_plan",
+          "arguments": {
+            "persona_id": "A-NV"
+          },
+          "ok": true
+        },
+        {
+          "name": "check_plan_violations",
+          "arguments": {},
+          "ok": true,
+          "outcome": {
+            "passed": true,
+            "violation_count": 0
+          }
+        },
+        {
+          "name": "release_plan",
+          "arguments": {},
+          "ok": true
+        }
+      ],
+      "release_decision": {
+        "status": "released",
+        "released": true
+      },
+      "released": true,
+      "released_plan_valid": true,
+      "latency_ms": 8714.3
+    },
+    {
+      "case_id": "near_greg",
+      "persona_id": "NA-NV",
+      "final_text": "I'm sorry, but the system couldn't find a matching profile for Greg Thompson. Could you please confirm the exact name or identifier used?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_b70u49zs",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Greg Thompson\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but the system couldn't find a matching profile for Greg Thompson. Could you please confirm the exact name or identifier used?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Greg Thompson"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1561.1
+    },
+    {
+      "case_id": "near_jessica",
+      "persona_id": "jessicaSmith",
+      "final_text": "I'm sorry, but I couldn't find a profile for Jessica Brown. Could you please confirm the correct name or provide any additional details so I can assist you better?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_a5ak28bh",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Jessica Brown\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but I couldn't find a profile for Jessica Brown. Could you please confirm the correct name or provide any additional details so I can assist you better?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Jessica Brown"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1719.2
+    },
+    {
+      "case_id": "near_earl",
+      "persona_id": "earlJones",
+      "final_text": "I'm sorry, but the system couldn't find a matching profile for \"Earl Johnson\". Could you please confirm the exact name or identifier of the person you're referring to? Once I have the correct persona ID, I can generate today's meal plan.",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_2mgsjt83",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Earl Johnson\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but the system couldn't find a matching profile for \"Earl Johnson\". Could you please confirm the exact name or identifier of the person you're referring to? Once I have the correct persona ID, I can generate today's meal plan."
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Earl Johnson"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 2203.8
+    },
+    {
+      "case_id": "near_becca",
+      "persona_id": "NA-V",
+      "final_text": "I'm sorry, but the system couldn't find a profile for Rebecca Morales. Could you please confirm the correct name or provide the persona ID?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_shtbvl0v",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Rebecca Morales\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but the system couldn't find a profile for Rebecca Morales. Could you please confirm the correct name or provide the persona ID?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Rebecca Morales"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1634.9
+    },
+    {
+      "case_id": "near_dylan",
+      "persona_id": "A-V",
+      "final_text": "I'm sorry, but I couldn't find a matching profile for Dylan Thomas. Could you please confirm the correct name or identifier?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_u7gpd1fl",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Dylan Thomas\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but I couldn't find a matching profile for Dylan Thomas. Could you please confirm the correct name or identifier?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Dylan Thomas"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1552.3
+    },
+    {
+      "case_id": "near_taylor",
+      "persona_id": "NA-NV",
+      "final_text": "I'm sorry, but I couldn't find a profile for Megan Taylor. Could you please confirm the correct name or provide any additional details so I can assist you better?",
+      "api_error": null,
+      "agent_turns": 2,
+      "truncated_turns": 0,
+      "text_tool_call": false,
+      "assistant_messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_1fyb2nee",
+              "type": "function",
+              "function": {
+                "name": "fetch_persona_profile",
+                "arguments": "{\"persona_query\":\"Megan Taylor\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": "I'm sorry, but I couldn't find a profile for Megan Taylor. Could you please confirm the correct name or provide any additional details so I can assist you better?"
+        }
+      ],
+      "tool_trace": [
+        {
+          "name": "fetch_persona_profile",
+          "arguments": {
+            "persona_query": "Megan Taylor"
+          },
+          "ok": false,
+          "error": "Persona query must resolve to exactly one stored profile."
+        }
+      ],
+      "release_decision": {
+        "status": "no_plan",
+        "released": false
+      },
+      "released": false,
+      "released_plan_valid": false,
+      "latency_ms": 1756.5
+    }
+  ]
+}

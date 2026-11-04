@@ -62,3 +62,11 @@ Fixed on 4 November 2026, before any Experiment 6 run.
   workflow did not release a valid plan; this separates identification
   failures from workflow failures.
 - **Confirmations asked** under propose and confirm.
+
+## Results
+
+The runs, the report, and the verdicts are in
+[results/end_to_end_comparison.md](../results/end_to_end_comparison.md):
+H6b is supported and H6a is not, because the gain over the exact-name gate is
+significant for Granite and Qwen but not for Llama. The sections above are
+unchanged since they were committed before the first run.
