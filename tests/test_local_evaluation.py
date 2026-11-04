@@ -48,6 +48,11 @@ from hard_wording_benchmark import (  # noqa: E402
 from report_hard_wording import full_name_persona  # noqa: E402
 from rule_reranker import choose as rerank_with_rules, detect as detect_preference  # noqa: E402
 from end_to_end_benchmark import identify as identify_methods, outcome as end_to_end_outcome  # noqa: E402
+from reranking_benchmark import (  # noqa: E402
+    best_numbers,
+    build_candidates,
+    load_cases as load_preference_cases,
+)
 from benchmark import (  # noqa: E402
     GROQ_USER_AGENT,
     GroqRateLimitError,
@@ -488,6 +493,27 @@ class LocalEvaluationTests(unittest.TestCase):
         self.assertEqual(end_to_end_outcome(resolvable, None, None), "missed")
         self.assertEqual(end_to_end_outcome(clarify, None, None), "correct_clarification")
         self.assertEqual(end_to_end_outcome(clarify, "NA-NV", released), "wrong_person_release")
+
+    def test_reranking_candidates_are_distinct_safe_and_start_with_default(self):
+        for persona_id in ("jessicaSmith", "NA-V"):
+            candidates = build_candidates(persona_id)
+            self.assertGreaterEqual(len(candidates), 3)
+            self.assertEqual(len({c["signature"] for c in candidates}), len(candidates))
+            self.assertTrue(all(c["passes_validation"] for c in candidates))
+            self.assertEqual(
+                candidates[0]["signature"],
+                run_knapsack_for_persona(persona_id)["normalized_meals"],
+            )
+
+    def test_reranking_labels_include_every_tied_best_candidate(self):
+        cases = load_preference_cases()
+        self.assertEqual(sum(c["wording"] == "implicit" for c in cases), 24)
+        candidates = (
+            {"number": 1, "totals": {"kcal": 2000, "carbs": 300, "protein": 70, "fiber": 20}},
+            {"number": 2, "totals": {"kcal": 1800, "carbs": 250, "protein": 70, "fiber": 25}},
+        )
+        self.assertEqual(best_numbers({"nutrient": "protein", "direction": 1}, candidates), [1, 2])
+        self.assertEqual(best_numbers({"nutrient": "kcal", "direction": -1}, candidates), [2])
 
     def test_text_tool_call_detector_accepts_malformed_calls_to_known_tools(self):
         self.assertTrue(
