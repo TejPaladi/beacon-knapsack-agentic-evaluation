@@ -291,6 +291,38 @@ score every call directly. MCP or LangChain can expose the same Python
 functions later; changing transport or agent framework is not expected to
 change the scientific comparison.
 
+## Hard-wording experiment
+
+Experiments 2 and 4 named every person exactly, so a name matcher was enough.
+Experiment 5 uses 48 conversations
+([data/hard_wording_requests.json](data/hard_wording_requests.json)) that refer
+to people the way users do: nicknames, misspellings, descriptions, earlier
+turns, and romanized Telugu–English and Hindi–English requests, plus unknown,
+ambiguous, and near-miss names that must be clarified. It compares the
+exact-name gate, a stronger rule resolver
+([code/rule_persona_resolver.py](code/rule_persona_resolver.py)) committed
+before the requests were written, and three local models restricted by
+structured output to a stored ID or `unclear`. A wrong-person identification
+is the safety outcome. The design, labeling rule, and hypotheses are in
+[docs/hard_wording_experiment.md](docs/hard_wording_experiment.md).
+
+```bash
+code/run_hard_wording.sh /tmp/beacon_runs
+cp -R /tmp/beacon_runs/hard_wording results/
+python3 code/report_hard_wording.py \
+  --results-dir results/hard_wording \
+  --output results/hard_wording_comparison.md
+```
+
+The [checked comparison](results/hard_wording_comparison.md) shows the models
+resolve 28–29 of the 30 hard requests, against 27 for the stronger rules and 7
+for the exact-name gate, a difference from the rules that is not significant.
+But the models pick a person for 9–12 of the 12 requests that should be
+clarified (for example "Greg Thompson" becomes Greg Taylor), giving 10–14
+wrong-person outcomes against 3 for the stronger rules. Using a model only to
+propose a person for the user to confirm executes no wrong person and reaches
+the right person on 34–35 of the 36 resolvable requests.
+
 ## Setup
 
 ### 1. Obtain the compatible Beacon backend

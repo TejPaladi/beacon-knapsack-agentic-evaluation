@@ -97,3 +97,10 @@ labeled one, including resolving a request whose correct action is to clarify.
   people executed without confirmation.
 - 95% Wilson intervals, exact McNemar tests on paired requests, repetition
   stability, and latency.
+
+## Results
+
+The runs, the report, and the verdicts are in
+[results/hard_wording_comparison.md](../results/hard_wording_comparison.md):
+H5a is not supported, and H5b and H5c are supported. The sections above are
+unchanged since they were committed before the requests were written.
