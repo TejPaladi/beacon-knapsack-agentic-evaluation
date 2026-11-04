@@ -53,6 +53,7 @@ from reranking_benchmark import (  # noqa: E402
     build_candidates,
     load_cases as load_preference_cases,
 )
+from report_reranking import fallback_rows  # noqa: E402
 from benchmark import (  # noqa: E402
     GROQ_USER_AGENT,
     GroqRateLimitError,
@@ -514,6 +515,21 @@ class LocalEvaluationTests(unittest.TestCase):
         )
         self.assertEqual(best_numbers({"nutrient": "protein", "direction": 1}, candidates), [1, 2])
         self.assertEqual(best_numbers({"nutrient": "kcal", "direction": -1}, candidates), [2])
+
+    def test_reranking_fallback_uses_the_model_only_without_a_keyword_cue(self):
+        def run(choices):
+            return {1: {"cases": [
+                {"case_id": cid, "wording": "implicit", "default_is_best": False, "chosen": chosen,
+                 "satisfied": ok, "request": request, "best_candidates": [2]}
+                for cid, request, chosen, ok in choices
+            ]}}
+
+        conditions = {
+            "Knapsack default": run([("a", "Most fiber please.", 1, False), ("b", "I feel backed up.", 1, False)]),
+            "Keyword reranker": run([("a", "Most fiber please.", 2, True), ("b", "I feel backed up.", 1, False)]),
+            "m": run([("a", "Most fiber please.", 1, False), ("b", "I feel backed up.", 2, True)]),
+        }
+        self.assertIn("| m | 2 | 2 | 1/1 |", fallback_rows(conditions))
 
     def test_text_tool_call_detector_accepts_malformed_calls_to_known_tools(self):
         self.assertTrue(

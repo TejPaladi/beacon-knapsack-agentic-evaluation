@@ -1,0 +1,3183 @@
+{
+  "experiment": "constrained_hybrid_reranking",
+  "generated_at": "2026-11-04T07:26:53.698231+00:00",
+  "provenance": {
+    "selector": "model",
+    "model": "qwen3.5:4b",
+    "model_digest": "7f3251fa6878a78a606bcb3c074283306e5ad2ea411a7774a9dd98a4bc7f2d13",
+    "temperature": 0,
+    "thinking": false,
+    "repetition": 2,
+    "dataset": "data/preference_requests.json",
+    "dataset_sha256": "cf1bb154166816ab3dfbad73c94454dfb74e152888d00ab2c21f24f063e52392",
+    "system_prompt_sha256": "a1b89ce773a080725e0cf7146c227ad4d99732ff01d0a4eb0e10674ffcbd76db",
+    "rule_reranker_sha256": "45637a2f3fe9b471c0ef82d0577fd3e1245061d2ef8eb6036c8af3fbe55cc8ce",
+    "candidates_sha256": "d66c9ea5cf076b9acca5a0a6c321b4f462cf28393dd0ecfcff284ecb76e2f1b8",
+    "repository_commit": "64638ab431163e5b714ccfaeb5740d00b29ba7a4",
+    "worktree_dirty": false,
+    "beacon_backend_commit": "7ebe3ae94d86dd6a4e9fc93ccc4734d549a531c4"
+  },
+  "summary": {
+    "cases": 48,
+    "satisfied": 42,
+    "explicit_satisfied": 24,
+    "implicit_satisfied": 18,
+    "non_default_cases": 32,
+    "non_default_satisfied": 28,
+    "hard_violations": 0,
+    "invalid_answers": 0,
+    "mean_latency_ms": 3144.9
+  },
+  "candidates": {
+    "A-NV": [
+      {
+        "number": 1,
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1527.0,
+          "carbs": 51.0,
+          "protein": 71.0,
+          "fiber": 4.1
+        }
+      },
+      {
+        "number": 2,
+        "date": "2026-01-06",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1694.0,
+          "carbs": 79.0,
+          "protein": 75.0,
+          "fiber": 4.1
+        }
+      },
+      {
+        "number": 3,
+        "date": "2026-01-07",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1408.0,
+          "carbs": 89.0,
+          "protein": 56.0,
+          "fiber": 7.1
+        }
+      },
+      {
+        "number": 4,
+        "date": "2026-01-08",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1065.0,
+          "carbs": 54.0,
+          "protein": 38.0,
+          "fiber": 5.1
+        }
+      },
+      {
+        "number": 5,
+        "date": "2026-01-09",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1694.0,
+          "carbs": 79.0,
+          "protein": 75.0,
+          "fiber": 4.1
+        }
+      }
+    ],
+    "A-V": [
+      {
+        "number": 1,
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2184.0,
+          "carbs": 321.1,
+          "protein": 58.2,
+          "fiber": 22.5
+        }
+      },
+      {
+        "number": 2,
+        "date": "2026-01-06",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2351.0,
+          "carbs": 349.1,
+          "protein": 62.2,
+          "fiber": 22.5
+        }
+      },
+      {
+        "number": 3,
+        "date": "2026-01-07",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "159",
+                "name": "Dunkin' Pumpkin Spice Muffins"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2458.0,
+          "carbs": 390.1,
+          "protein": 51.2,
+          "fiber": 29.5
+        }
+      },
+      {
+        "number": 4,
+        "date": "2026-01-08",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "159",
+                "name": "Dunkin' Pumpkin Spice Muffins"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2299.0,
+          "carbs": 359.0,
+          "protein": 49.0,
+          "fiber": 22.0
+        }
+      },
+      {
+        "number": 5,
+        "date": "2026-01-09",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2351.0,
+          "carbs": 349.1,
+          "protein": 62.2,
+          "fiber": 22.5
+        }
+      }
+    ],
+    "NA-NV": [
+      {
+        "number": 1,
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1527.0,
+          "carbs": 51.0,
+          "protein": 71.0,
+          "fiber": 4.1
+        }
+      },
+      {
+        "number": 2,
+        "date": "2026-01-06",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1694.0,
+          "carbs": 79.0,
+          "protein": 75.0,
+          "fiber": 4.1
+        }
+      },
+      {
+        "number": 3,
+        "date": "2026-01-07",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1408.0,
+          "carbs": 89.0,
+          "protein": 56.0,
+          "fiber": 7.1
+        }
+      },
+      {
+        "number": 4,
+        "date": "2026-01-08",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1065.0,
+          "carbs": 54.0,
+          "protein": 38.0,
+          "fiber": 5.1
+        }
+      },
+      {
+        "number": 5,
+        "date": "2026-01-09",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "123",
+                "name": "eggs-and-bacon-the-perfect-quick-paleo-meal"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1694.0,
+          "carbs": 79.0,
+          "protein": 75.0,
+          "fiber": 4.1
+        }
+      }
+    ],
+    "NA-V": [
+      {
+        "number": 1,
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2184.0,
+          "carbs": 321.1,
+          "protein": 58.2,
+          "fiber": 22.5
+        }
+      },
+      {
+        "number": 2,
+        "date": "2026-01-06",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2351.0,
+          "carbs": 349.1,
+          "protein": 62.2,
+          "fiber": 22.5
+        }
+      },
+      {
+        "number": 3,
+        "date": "2026-01-07",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "159",
+                "name": "Dunkin' Pumpkin Spice Muffins"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2458.0,
+          "carbs": 390.1,
+          "protein": 51.2,
+          "fiber": 29.5
+        }
+      },
+      {
+        "number": 4,
+        "date": "2026-01-08",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "159",
+                "name": "Dunkin' Pumpkin Spice Muffins"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2299.0,
+          "carbs": 359.0,
+          "protein": 49.0,
+          "fiber": 22.0
+        }
+      },
+      {
+        "number": 5,
+        "date": "2026-01-09",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "148",
+                "name": "maple-oatmeal"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "168",
+                "name": "Chick-fil-A\u00ae Kale Crunch Side"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2351.0,
+          "carbs": 349.1,
+          "protein": 62.2,
+          "fiber": 22.5
+        }
+      }
+    ],
+    "earlJones": [
+      {
+        "number": 1,
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2400.0,
+          "carbs": 92.0,
+          "protein": 98.0,
+          "fiber": 7.1
+        }
+      },
+      {
+        "number": 2,
+        "date": "2026-01-06",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "13",
+                "name": "Cappuccino"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2400.0,
+          "carbs": 92.0,
+          "protein": 98.0,
+          "fiber": 7.1
+        }
+      },
+      {
+        "number": 3,
+        "date": "2026-01-07",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "13",
+                "name": "Cappuccino"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "135",
+                "name": "crunchy-taco"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1763.0,
+          "carbs": 61.0,
+          "protein": 83.0,
+          "fiber": 5.1
+        }
+      },
+      {
+        "number": 4,
+        "date": "2026-01-08",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "135",
+                "name": "crunchy-taco"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "13",
+                "name": "Cappuccino"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 1908.0,
+          "carbs": 89.0,
+          "protein": 80.0,
+          "fiber": 7.0
+        }
+      },
+      {
+        "number": 5,
+        "date": "2026-01-09",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "140",
+                "name": "apple-pie"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "131",
+                "name": "crunchwrap-supreme-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "125",
+                "name": "deviled-eggs-with-smoked-salmon-and-capers"
+              },
+              {
+                "role": "beverage",
+                "item_id": "13",
+                "name": "Cappuccino"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "130",
+                "name": "cheesy-gordita-crunch-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "153",
+                "name": "Dunkin' Snackin' Bacon"
+              },
+              {
+                "role": "beverage",
+                "item_id": "10",
+                "name": "Hot Chocolate"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2400.0,
+          "carbs": 92.0,
+          "protein": 98.0,
+          "fiber": 7.1
+        }
+      }
+    ],
+    "jessicaSmith": [
+      {
+        "number": 1,
+        "date": "2026-01-05",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "161",
+                "name": "apple"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "169",
+                "name": "Medium Chick-fil-A\u00ae Waffle Potato Fries"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "3004",
+                "name": "sweet-potato-cornbread-muffins"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2244.0,
+          "carbs": 367.1,
+          "protein": 67.7,
+          "fiber": 16.9
+        }
+      },
+      {
+        "number": 2,
+        "date": "2026-01-06",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "161",
+                "name": "apple"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "169",
+                "name": "Medium Chick-fil-A\u00ae Waffle Potato Fries"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "3004",
+                "name": "sweet-potato-cornbread-muffins"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2411.0,
+          "carbs": 395.1,
+          "protein": 71.7,
+          "fiber": 16.9
+        }
+      },
+      {
+        "number": 3,
+        "date": "2026-01-07",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "161",
+                "name": "apple"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "3004",
+                "name": "sweet-potato-cornbread-muffins"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "169",
+                "name": "Medium Chick-fil-A\u00ae Waffle Potato Fries"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2570.0,
+          "carbs": 426.2,
+          "protein": 73.9,
+          "fiber": 24.4
+        }
+      },
+      {
+        "number": 4,
+        "date": "2026-01-08",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "134",
+                "name": "black-bean-chalupa-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "161",
+                "name": "apple"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "169",
+                "name": "Medium Chick-fil-A\u00ae Waffle Potato Fries"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "161",
+                "name": "apple"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2113.0,
+          "carbs": 325.1,
+          "protein": 55.2,
+          "fiber": 26.3
+        }
+      },
+      {
+        "number": 5,
+        "date": "2026-01-09",
+        "meals": [
+          {
+            "meal_name": "Breakfast",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "169",
+                "name": "Medium Chick-fil-A\u00ae Waffle Potato Fries"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          },
+          {
+            "meal_name": "Lunch",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "133",
+                "name": "bean-burrito-copycat"
+              },
+              {
+                "role": "side",
+                "item_id": "161",
+                "name": "apple"
+              },
+              {
+                "role": "beverage",
+                "item_id": "27",
+                "name": "Dunkin' Coffee Coolatta"
+              }
+            ]
+          },
+          {
+            "meal_name": "Dinner",
+            "items": [
+              {
+                "role": "main_course",
+                "item_id": "3106",
+                "name": "mexican-brown-rice-and-pinto-bowl"
+              },
+              {
+                "role": "side",
+                "item_id": "3004",
+                "name": "sweet-potato-cornbread-muffins"
+              },
+              {
+                "role": "beverage",
+                "item_id": "22",
+                "name": "Almond Milk"
+              }
+            ]
+          }
+        ],
+        "totals": {
+          "kcal": 2411.0,
+          "carbs": 395.1,
+          "protein": 71.7,
+          "fiber": 16.9
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "earl_protein_explicit",
+      "persona_id": "earlJones",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "Please choose the plan with the most protein.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1,
+        2,
+        5
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 7226.1
+    },
+    {
+      "case_id": "earl_protein_implicit",
+      "persona_id": "earlJones",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "I've started lifting weights and want to build muscle.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1,
+        2,
+        5
+      ],
+      "default_is_best": true,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": false,
+      "chosen_passes_validation": true,
+      "latency_ms": 3019.1
+    },
+    {
+      "case_id": "earl_kcal_explicit",
+      "persona_id": "earlJones",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "Give me the plan with the fewest calories.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2827.9
+    },
+    {
+      "case_id": "earl_kcal_implicit",
+      "persona_id": "earlJones",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I'm trying to drop a few pounds before my daughter's wedding.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2758.2
+    },
+    {
+      "case_id": "earl_fiber_explicit",
+      "persona_id": "earlJones",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "Choose the plan with the most fiber.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1,
+        2,
+        5
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2784.3
+    },
+    {
+      "case_id": "earl_fiber_implicit",
+      "persona_id": "earlJones",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "I've been a bit backed up lately.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1,
+        2,
+        5
+      ],
+      "default_is_best": true,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": false,
+      "chosen_passes_validation": true,
+      "latency_ms": 2749.1
+    },
+    {
+      "case_id": "earl_carbs_explicit",
+      "persona_id": "earlJones",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "Give me the plan with the fewest carbohydrates.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2709.6
+    },
+    {
+      "case_id": "earl_carbs_implicit",
+      "persona_id": "earlJones",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I'm trying a keto-style day.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2827.7
+    },
+    {
+      "case_id": "jessica_protein_explicit",
+      "persona_id": "jessicaSmith",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "Which option has the highest protein? Give me that one.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3998.7
+    },
+    {
+      "case_id": "jessica_protein_implicit",
+      "persona_id": "jessicaSmith",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "I'm recovering from surgery and my doctor wants me to help my body rebuild tissue.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": false,
+      "chosen_passes_validation": true,
+      "latency_ms": 2845.4
+    },
+    {
+      "case_id": "jessica_kcal_explicit",
+      "persona_id": "jessicaSmith",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "I want the lowest-calorie option.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2862.0
+    },
+    {
+      "case_id": "jessica_kcal_implicit",
+      "persona_id": "jessicaSmith",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I had a huge dinner last night, so I want to keep today light.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2804.8
+    },
+    {
+      "case_id": "jessica_fiber_explicit",
+      "persona_id": "jessicaSmith",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "I'd like the highest-fiber option.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2813.1
+    },
+    {
+      "case_id": "jessica_fiber_implicit",
+      "persona_id": "jessicaSmith",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "My doctor told me I need more roughage.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2816.5
+    },
+    {
+      "case_id": "jessica_carbs_explicit",
+      "persona_id": "jessicaSmith",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "I'd like the lowest-carb option.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2818.5
+    },
+    {
+      "case_id": "jessica_carbs_implicit",
+      "persona_id": "jessicaSmith",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "My blood sugar spikes after big meals, so I want to keep it steady.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2863.4
+    },
+    {
+      "case_id": "aaliyah_protein_explicit",
+      "persona_id": "A-NV",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "I'd like the plan that's highest in protein.",
+      "raw_answer": "{\n  \"candidate\": 2\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        2,
+        5
+      ],
+      "default_is_best": false,
+      "chosen": 2,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 4313.2
+    },
+    {
+      "case_id": "aaliyah_protein_implicit",
+      "persona_id": "A-NV",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "I'm training for a powerlifting meet next month.",
+      "raw_answer": "{\n  \"candidate\": 2\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        2,
+        5
+      ],
+      "default_is_best": false,
+      "chosen": 2,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3239.4
+    },
+    {
+      "case_id": "aaliyah_kcal_explicit",
+      "persona_id": "A-NV",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "Choose the plan with the smallest calorie total.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3183.0
+    },
+    {
+      "case_id": "aaliyah_kcal_implicit",
+      "persona_id": "A-NV",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "My doctor wants me to slim down a bit.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3009.5
+    },
+    {
+      "case_id": "aaliyah_fiber_explicit",
+      "persona_id": "A-NV",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "Give me whichever plan has the most dietary fiber.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2995.3
+    },
+    {
+      "case_id": "aaliyah_fiber_implicit",
+      "persona_id": "A-NV",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "My digestion has been sluggish this week.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": false,
+      "chosen_passes_validation": true,
+      "latency_ms": 2996.2
+    },
+    {
+      "case_id": "aaliyah_carbs_explicit",
+      "persona_id": "A-NV",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "Choose the plan with the least carbohydrate.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3318.7
+    },
+    {
+      "case_id": "aaliyah_carbs_implicit",
+      "persona_id": "A-NV",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I'm cutting out bread, rice, and pasta for a while.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3798.4
+    },
+    {
+      "case_id": "becca_protein_explicit",
+      "persona_id": "NA-V",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "Pick the day with the most grams of protein.",
+      "raw_answer": "{\n  \"candidate\": 2\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        2,
+        5
+      ],
+      "default_is_best": false,
+      "chosen": 2,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3160.8
+    },
+    {
+      "case_id": "becca_protein_implicit",
+      "persona_id": "NA-V",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "I'm getting older and want to keep my muscles strong.",
+      "raw_answer": "{\n  \"candidate\": 5\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        2,
+        5
+      ],
+      "default_is_best": false,
+      "chosen": 5,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2859.5
+    },
+    {
+      "case_id": "becca_kcal_explicit",
+      "persona_id": "NA-V",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "Pick whichever day has the least calories.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2945.4
+    },
+    {
+      "case_id": "becca_kcal_implicit",
+      "persona_id": "NA-V",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I'm on a cut this month.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2891.8
+    },
+    {
+      "case_id": "becca_fiber_explicit",
+      "persona_id": "NA-V",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "Pick the plan with the largest fiber total.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2834.2
+    },
+    {
+      "case_id": "becca_fiber_implicit",
+      "persona_id": "NA-V",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "I want to stay regular.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": false,
+      "chosen_passes_validation": true,
+      "latency_ms": 2825.9
+    },
+    {
+      "case_id": "becca_carbs_explicit",
+      "persona_id": "NA-V",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "Pick whichever plan has the lowest carbs.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2565.7
+    },
+    {
+      "case_id": "becca_carbs_implicit",
+      "persona_id": "NA-V",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I want to avoid the afternoon crash I get from starchy food.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2602.2
+    },
+    {
+      "case_id": "greg_protein_explicit",
+      "persona_id": "NA-NV",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "Give me the most protein-rich plan.",
+      "raw_answer": "{\n  \"candidate\": 2\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        2,
+        5
+      ],
+      "default_is_best": false,
+      "chosen": 2,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3905.8
+    },
+    {
+      "case_id": "greg_protein_implicit",
+      "persona_id": "NA-NV",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "I want meals that help me put on lean muscle.",
+      "raw_answer": "{\n  \"candidate\": 2\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        2,
+        5
+      ],
+      "default_is_best": false,
+      "chosen": 2,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3178.6
+    },
+    {
+      "case_id": "greg_kcal_explicit",
+      "persona_id": "NA-NV",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "I'd like the plan lowest in calories.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3097.6
+    },
+    {
+      "case_id": "greg_kcal_implicit",
+      "persona_id": "NA-NV",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I want to fit back into my old jeans.",
+      "raw_answer": "{\n  \"candidate\": 4\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        4
+      ],
+      "default_is_best": false,
+      "chosen": 4,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3444.2
+    },
+    {
+      "case_id": "greg_fiber_explicit",
+      "persona_id": "NA-NV",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "Please choose the plan richest in fiber.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3162.5
+    },
+    {
+      "case_id": "greg_fiber_implicit",
+      "persona_id": "NA-NV",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "My gastroenterologist told me to eat more whole grains, beans, and vegetables.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3096.4
+    },
+    {
+      "case_id": "greg_carbs_explicit",
+      "persona_id": "NA-NV",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "Please pick the plan with the smallest carbohydrate total.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3007.2
+    },
+    {
+      "case_id": "greg_carbs_implicit",
+      "persona_id": "NA-NV",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I'm following the Atkins diet this week.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3091.6
+    },
+    {
+      "case_id": "dylan_protein_explicit",
+      "persona_id": "A-V",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "Choose the plan with the greatest protein total.",
+      "raw_answer": "{\n  \"candidate\": 2\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        2,
+        5
+      ],
+      "default_is_best": false,
+      "chosen": 2,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3462.7
+    },
+    {
+      "case_id": "dylan_protein_implicit",
+      "persona_id": "A-V",
+      "nutrient": "protein",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "I'm a vegetarian athlete and want my body to repair after hard training.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        2,
+        5
+      ],
+      "default_is_best": false,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": false,
+      "chosen_passes_validation": true,
+      "latency_ms": 3458.1
+    },
+    {
+      "case_id": "dylan_kcal_explicit",
+      "persona_id": "A-V",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "Please go with the lowest-calorie plan.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3112.3
+    },
+    {
+      "case_id": "dylan_kcal_implicit",
+      "persona_id": "A-V",
+      "nutrient": "kcal",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I've been overeating lately and want to make up for it today.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3011.9
+    },
+    {
+      "case_id": "dylan_fiber_explicit",
+      "persona_id": "A-V",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "explicit",
+      "request": "I want the plan with the most grams of fiber.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 3112.5
+    },
+    {
+      "case_id": "dylan_fiber_implicit",
+      "persona_id": "A-V",
+      "nutrient": "fiber",
+      "direction": 1,
+      "wording": "implicit",
+      "request": "I want to help lower my cholesterol and keep my gut healthy.",
+      "raw_answer": "{\n  \"candidate\": 3\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        3
+      ],
+      "default_is_best": false,
+      "chosen": 3,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2936.7
+    },
+    {
+      "case_id": "dylan_carbs_explicit",
+      "persona_id": "A-V",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "explicit",
+      "request": "I want the plan lowest in carbs.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2924.5
+    },
+    {
+      "case_id": "dylan_carbs_implicit",
+      "persona_id": "A-V",
+      "nutrient": "carbs",
+      "direction": -1,
+      "wording": "implicit",
+      "request": "I'm trying to eat fewer sugars and starches.",
+      "raw_answer": "{\n  \"candidate\": 1\n}",
+      "done_reason": "stop",
+      "candidate_count": 5,
+      "best_candidates": [
+        1
+      ],
+      "default_is_best": true,
+      "chosen": 1,
+      "invalid_answer": false,
+      "satisfied": true,
+      "chosen_passes_validation": true,
+      "latency_ms": 2688.1
+    }
+  ]
+}
