@@ -109,8 +109,8 @@ whether `release_plan` is refused when validation is missing or failed.
 
 ## Research questions and hypotheses
 
-The paper and this dictionary use the same four research questions. Each
-hypothesis names the experiment that tests it and the result that would
+The paper and this dictionary use the same seven research questions (RQ1–RQ7).
+Each hypothesis names the experiment that tests it and the result that would
 support it.
 
 **When each hypothesis was fixed.** H3a, H3b, H3c, and H4 were committed on
@@ -122,7 +122,9 @@ the labels changed to match the paper. H1 and H2 were written on 3 November
 untested expectation. The "Supported if" criteria for all hypotheses were also
 written on 3 November 2026, after the development-set results and the first
 held-out repetition had been seen; they follow each hypothesis's wording and
-are applied to both request sets.
+are applied to both request sets. H5 and H7 were committed in their experiment
+design documents before those experiments' requests were written, and H6
+before its first run; each design document records this.
 
 | RQ | Question | Hypothesis | Experiment | Supported if |
 | --- | --- | --- | --- | --- |

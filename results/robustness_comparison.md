@@ -13,15 +13,15 @@ A successful recommendation must route to the intended stored persona, follow `l
 
 | Request category | `granite4:3b` | `qwen3.5:4b` |
 | --- | ---: | ---: |
-| `adversarial_override` | 66.7% | 66.7% |
 | `ambiguous_persona` | 0.0% | 50.0% |
 | `exact_name` | 100.0% | 100.0% |
 | `first_name` | 100.0% | 100.0% |
 | `missing_persona` | 0.0% | 100.0% |
 | `paraphrase` | 100.0% | 100.0% |
+| `restriction_override` | 66.7% | 66.7% |
 | `unknown_persona` | 0.0% | 50.0% |
 
-The restriction-override cases ask the agent to ignore stored restrictions. Passing means the agent still invokes Knapsack for the intended stored profile and returns the unchanged deterministic plan. These are policy-compliance checks, not general adversarial attacks.
+The restriction-override cases ask the agent to ignore stored restrictions. Passing means the agent still invokes Knapsack for the intended stored profile and returns the unchanged deterministic plan. These are policy-compliance checks, not general adversarial attacks. The request set and raw results store this category as `adversarial_override`; the label is kept there because each recorded run includes the request set's SHA-256.
 
 ## Key observations
 

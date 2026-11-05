@@ -8,31 +8,81 @@ Start with the short plain-language report,
 experiments). The full paper-style write-up is
 [paper/paper_draft.md](paper/paper_draft.md).
 
+## Final design
+
+The final agent gives each part one job: the LLM reads the request and chooses
+tools, deterministic code selects and validates food, and application code
+decides what reaches the user.
+
+```
+request ─> identity: exact-name gate, or the LLM proposes a person the user confirms
+        ─> LLM chooses tools, each bound to that one person:
+             fetch_persona_profile       resolve and retrieve the stored profile
+             recommend_meal_plan         unchanged Beacon Knapsack selects the food
+             calculate_nutrition_scores  totals, goal fit, FSA/WHO-style proxies (on request)
+             check_plan_violations       deterministic structural and dietary check
+             release_plan                shows the plan; refused unless validation passed
+```
+
+In the constrained-reranking extension (Experiment 7), Knapsack proposes
+several validated plans and a model or keyword rule picks the one that best
+matches a stated preference. Why each tool exists, and how every metric is
+computed, is in
+[docs/tool_design_and_metric_dictionary.md](docs/tool_design_and_metric_dictionary.md).
+
+Experiments 1 and 2 used an earlier interface of three implementation-step
+tools (`list_personas`, `get_persona`, `run_knapsack_for_persona`). It is kept
+so those results can be reproduced; Experiment 4 replaced it with the tools
+above.
+
+## The seven experiments
+
+| # | Question | Headline result | Report |
+| --- | --- | --- | --- |
+| 1 | Does an agent calling three tools reproduce Knapsack's plan? | Exact fidelity for all six personas; slower. | [final_knapsack_vs_agentic_quality.md](results/final_knapsack_vs_agentic_quality.md) |
+| 2 | Do five small models run the workflow and clarify unclear requests, and does an identity gate help? | The gate cut unsafe Knapsack runs on unclear requests from 10 to 0; valid workflows unchanged at 49/120. A no-LLM pipeline passes 30/30. | [policy_gate_comparison.md](results/policy_gate_comparison.md) |
+| 3 | Can an LLM choose meals directly instead of Knapsack? | Knapsack 6/6 safe plans (quality 0.860); Granite 6/6 (0.679); Llama 3/6. | [recommendation_source_comparison.md](results/recommendation_source_comparison.md) |
+| 4 | With responsibility-based tools, do models withhold plans their own validation rejected? | Without the release gate Granite and Qwen release rejected plans; with it, none. | [meaningful_tools_comparison.md](results/meaningful_tools_comparison.md) |
+| 5 | Do models identify a person from realistic wording better than rules? | Models 28–29/30 vs. rules 27/30 (not significant), but 10–14 wrong-person picks vs. 3. | [hard_wording_comparison.md](results/hard_wording_comparison.md) |
+| 6 | Does propose and confirm deliver the right person's plan end to end? | No wrong-person release with any model; letting the model decide released 1–9. | [end_to_end_comparison.md](results/end_to_end_comparison.md) |
+| 7 | Can a model pick the best of several safe Knapsack plans for a preference? | Qwen 42/48 vs. keyword rules 39/48 (goal-style 18 vs. 15, p = 0.55); every choice valid. | [reranking_comparison.md](results/reranking_comparison.md) |
+
+Taken together: deterministic code should select and validate food and decide
+what is released. A model is safest as a proposer whose interpretation is
+confirmed; letting it decide the person or choose meals freely produced
+wrong-person plans and dietary violations, and no experiment showed a
+statistically significant gain from a model over the strongest deterministic
+rules.
+
+## What is included
+
+- A thin adapter ([code/beacon_m6.py](code/beacon_m6.py)) that calls Beacon's
+  real Knapsack pipeline, quality evaluators, and health-score code.
+- The final five-tool agent with identity binding and a release gate
+  ([code/meaningful_tools.py](code/meaningful_tools.py)), and the earlier
+  three-tool agent used by Experiments 1 and 2.
+- A rule persona resolver and a keyword reranker, each committed before the
+  requests that test it were written.
+- Six non-sensitive demonstration-profile snapshots, the fixed request sets,
+  checked result reports with the raw run files behind them, offline tests,
+  and a notebook for the Experiment 1 setup.
+
+The Beacon backend and food catalog are **not copied** into this repository.
+See [NOTICE.md](NOTICE.md) for the external dependency, source commit, and
+attribution.
+
+## Experiment 1: integration check (three-tool design)
+
 ```
 Direct baseline:  selected persona ──────────────────> Beacon Knapsack ─> plan
 Agentic setting:  plain request ─> LLM ─> tools ─────> Beacon Knapsack ─> plan
 No-LLM setting:   plain request ─> name resolver ─────> Beacon Knapsack ─> plan
 ```
 
-The LLM never selects food. In the agentic condition it must identify the
-persona, retrieve that profile, and invoke the same deterministic Knapsack
-pipeline used by the direct baseline. This separates **orchestration quality**
-from **meal-selection quality**.
-
-## What is included
-
-- A thin adapter that calls Beacon's real Knapsack pipeline and existing
-  quality evaluators.
-- Three restricted native function-calling tools: `list_personas`,
-  `get_persona`, and `run_knapsack_for_persona`.
-- Six non-sensitive demonstration-profile snapshots, offline tests, a concise
-  notebook, and a reviewed six-persona result report.
-
-The Beacon backend and food catalog are **not copied** into this repository.
-See [NOTICE.md](NOTICE.md) for the external dependency, source commit, and
-attribution.
-
-## Study design
+In Experiments 1 and 2 the LLM never selects food. In the agentic condition it
+must identify the persona, retrieve that profile, and invoke the same
+deterministic Knapsack pipeline used by the direct baseline. This separates
+**orchestration quality** from **meal-selection quality**.
 
 All cases use the same six stored profiles, catalog scope, fixed plan date,
 and Knapsack implementation.
@@ -50,7 +100,7 @@ matching profile has already been retrieved. The live agent loop uses native
 OpenAI-compatible function calling and standard Python HTTP, not MCP or
 LangChain, so the exact tool trace is visible and easy to score.
 
-## Metrics
+### Experiment 1 metrics
 
 | Metric | What it measures |
 | --- | --- |
@@ -67,7 +117,7 @@ does not use numeric calories, carbohydrates, protein, or fiber as optimization
 constraints; nutrition-goal fit therefore reports observed alignment, not a
 claim that Knapsack optimized these targets.
 
-## Result included here
+### Experiment 1 result
 
 The reviewed comparison is in
 [results/final_knapsack_vs_agentic_quality.md](results/final_knapsack_vs_agentic_quality.md).
@@ -76,7 +126,7 @@ agentic output had 100% requested-role coverage, exact Knapsack fidelity, and
 required tool sequence. The agentic path was slower because it includes LLM
 calls and provider rate-limit waits, while recommendations were unchanged.
 
-## Request-robustness experiment
+## Experiment 2: request robustness
 
 The next study keeps the same six fictional profiles and deterministic
 Knapsack recommender, but varies the user request. Its fixed 30-case dataset
@@ -116,7 +166,7 @@ ambiguous-persona requests and ran Knapsack on all six; Qwen3.5 clarified four
 and ran Knapsack on one. An earlier 160-token limit cut off Qwen's reasoning
 and left it at 16/30, mostly with empty replies.
 
-## Identity-gated hybrid extension
+## Experiment 2: identity-gated extension
 
 The prompt-only result exposed a specific system risk: a model could select an
 unrelated stored profile when identity was missing, unknown, or ambiguous. The
@@ -157,7 +207,8 @@ valid requests contain an exact name or unique first name and the other cases
 are covered by fixed resolver rules, this result is close to true by
 construction. It shows that the current request set does not establish a need
 for an LLM. Harder requests with typos, nicknames, conversational references,
-and free-form preferences are the necessary next evaluation.
+and free-form preferences were the necessary next evaluation; Experiments 5–7
+add them.
 
 Run one matched pair with:
 
@@ -183,7 +234,7 @@ tools. The explicit native loop keeps the evaluated trace and policy boundary
 small and auditable. An MCP/LangChain mirror would be a useful portability and
 framework-overhead study, but it is not the safety contribution.
 
-## Deterministic versus LLM-only selection
+## Experiment 3: deterministic versus LLM-only selection
 
 A separate recommendation-source experiment now compares Beacon Knapsack with
 direct selections from `granite4:3b` and `llama3.2:3b`. Each model sees the same
@@ -201,9 +252,9 @@ scored 0.453 across all cases. Its three safe plans averaged 0.906, so the
 results do not support claiming that Knapsack has the highest conditional meal
 quality. Both LLMs were over 20 times slower than direct Knapsack.
 
-## Meaningful-tool experiment
+## Experiment 4: meaningful tools and the release gate
 
-The latest experiment replaces implementation-step tools with four distinct
+Experiment 4 replaces the implementation-step tools with four distinct
 responsibilities and one release action:
 
 1. `fetch_persona_profile` resolves and retrieves one stored fictional profile;
@@ -293,7 +344,7 @@ score every call directly. MCP or LangChain can expose the same Python
 functions later; changing transport or agent framework is not expected to
 change the scientific comparison.
 
-## Hard-wording experiment
+## Experiment 5: hard wording
 
 Experiments 2 and 4 named every person exactly, so a name matcher was enough.
 Experiment 5 uses 48 conversations
@@ -325,7 +376,7 @@ wrong-person outcomes against 3 for the stronger rules. Using a model only to
 propose a person for the user to confirm executes no wrong person and reaches
 the right person on 34–35 of the 36 resolvable requests.
 
-## Propose and confirm end to end
+## Experiment 6: propose and confirm end to end
 
 Experiment 6 feeds the Experiment 5 conversations through the full
 release-gated Experiment 4 agent. Four identification methods (exact-name gate,
@@ -353,7 +404,7 @@ only 6 against 3 with Llama, which identifies the right person and then stops
 before release. H6b is supported; H6a, which required a significant gain for
 every model, is not.
 
-## Constrained hybrid reranking
+## Experiment 7: constrained hybrid reranking
 
 Experiment 7 tests the hybrid proposed after Experiment 3. Knapsack plans five
 consecutive days per persona; the distinct days, all of which pass validation,
@@ -419,7 +470,10 @@ quality evaluators are available.
 "$BEACON_PYTHON" -m unittest discover -s tests -v
 ```
 
-### 4. Run the two conditions
+### 4. Run Experiment 1 (direct vs. agentic)
+
+Experiment 1 uses a hosted Groq model. Experiments 2–7 use local Ollama models
+and their commands are given in their sections above.
 
 ```bash
 # Deterministic reference: all six personas, no API key.
@@ -461,12 +515,13 @@ with short explanations and run cells.
 ## Repository layout
 
 ```text
-code/       adapter, native tool loop, benchmark, scoring, and report generator
-data/       compact demonstration-profile snapshot and provenance
-notebooks/  concise walkthrough for verification and the two conditions
+code/       adapter, agent loops and tools, benchmarks, rule baselines, report generators
+data/       demonstration-profile snapshot, fixed request sets, and provenance
+docs/       tool design and metric dictionary, experiment designs, checklist screen
+notebooks/  concise walkthrough of the Experiment 1 setup
 paper/      study_report/ (short report), paper_draft.md, overleaf/ (paper PDF),
             meeting_summary/ (detailed meeting handout)
-results/    reviewed Markdown report; regenerated JSON is ignored
+results/    checked Markdown reports and, in subfolders, the raw runs behind them
 tests/      offline tests against the locally installed Beacon backend
 ```
 
@@ -474,6 +529,17 @@ tests/      offline tests against the locally installed Beacon backend
 
 - This is an evaluation of a six-profile, one-day simulated setup; it is not a
   clinical study or a health recommendation product.
+- Every request was written by the study authors, including the held-out set
+  and the Telugu–English and Hindi–English requests; none comes from real users.
+- The models are small local models (1–4B parameters) run at temperature zero,
+  so the results should not be generalized to larger hosted models.
+- The user who confirms a proposed person in Experiment 6 is simulated and
+  confirms only the right person, so its zero wrong-person releases are an
+  upper bound.
+- FSA-style and WHO-style values are application-defined proxies, not official
+  labels, and some catalog entries lack the fields they need.
+- The 110-item Agentic AI Test Checklist was used to screen the design, not as
+  a 110-case benchmark; the study claims no checklist score.
 - It mainly measures whether the LLM follows a restricted workflow. Only
   Experiment 7 asks whether a model improves on Knapsack's choice, and only by
   choosing among Knapsack's own validated plans for one stated preference.
