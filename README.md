@@ -3,7 +3,9 @@
 This repository evaluates when an LLM adds value around Beacon's deterministic
 Knapsack recommender, and when a simpler deterministic pipeline is sufficient.
 
-The current paper-style study is available in
+Start with the short plain-language report,
+[paper/study_report/main.pdf](paper/study_report/main.pdf) (6 pages, all seven
+experiments). The full paper-style write-up is
 [paper/paper_draft.md](paper/paper_draft.md).
 
 ```
@@ -462,6 +464,8 @@ with short explanations and run cells.
 code/       adapter, native tool loop, benchmark, scoring, and report generator
 data/       compact demonstration-profile snapshot and provenance
 notebooks/  concise walkthrough for verification and the two conditions
+paper/      study_report/ (short report), paper_draft.md, overleaf/ (paper PDF),
+            meeting_summary/ (detailed meeting handout)
 results/    reviewed Markdown report; regenerated JSON is ignored
 tests/      offline tests against the locally installed Beacon backend
 ```

@@ -31,19 +31,20 @@ class BeaconRuntimeError(RuntimeError):
 def beacon_backend_path() -> Path:
     """Find Beacon's backend without copying recommendation code or its catalog.
 
-    ``BEACON_BACKEND`` is the supported configuration.  The two sibling
-    directories below are only convenient local defaults after cloning this
-    evaluation repository beside a compatible Beacon checkout.
+    ``BEACON_BACKEND`` is the supported configuration.  The directories below
+    are only convenient local defaults: a Beacon checkout beside this
+    repository, or in an ``external/`` folder beside the folder that holds it.
     """
 
     configured = os.environ.get("BEACON_BACKEND")
     candidates = [Path(configured)] if configured else []
-    candidates.extend(
-        [
-            EXPERIMENT_ROOT.parent / "beacon-of-hope-2" / "backend",
-            EXPERIMENT_ROOT.parent / "beacon-of-hope-2-main-2" / "backend",
-        ]
-    )
+    for parent in (EXPERIMENT_ROOT.parent, EXPERIMENT_ROOT.parents[1] / "external"):
+        candidates.extend(
+            [
+                parent / "beacon-of-hope-2" / "backend",
+                parent / "beacon-of-hope-2-main-2" / "backend",
+            ]
+        )
     for candidate in candidates:
         if (candidate / "manage.py").is_file():
             return candidate.resolve()
