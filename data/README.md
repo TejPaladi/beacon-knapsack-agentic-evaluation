@@ -21,4 +21,8 @@ this repository. It uses only the six fictional names above and contains no
 private user data. Twenty-four requests should produce a plan: one exact-name,
 one paraphrase, one first-name, and one restriction-override request per
 persona. The remaining six contain an unknown, missing, or ambiguous persona
-and should produce a clarification without a Knapsack call.
+and should produce a clarification without a Knapsack call. The file labels the
+restriction-override category `adversarial_override`. The label is kept because
+every recorded run stores this file's SHA-256, but these requests test only
+whether stored restrictions survive an instruction to ignore them, not
+adversarial attacks in general. Reports show it as `restriction_override`.
