@@ -525,6 +525,13 @@ results/    checked Markdown reports and, in subfolders, the raw runs behind the
 tests/      offline tests against the locally installed Beacon backend
 ```
 
+Commit hashes cited in the docs, reports, and raw run files (for example
+`8277306`, where H3a–H4 were committed) refer to the original commits. On
+5 November 2026 the history of `main` was rewritten to correct the author
+email and remove co-author lines, with file contents and commit dates
+unchanged. The original commits remain on GitHub under the tag
+[`pre-attribution-rewrite`](https://github.com/TejPaladi/beacon-knapsack-agentic-evaluation/tree/pre-attribution-rewrite).
+
 ## Scope and limitations
 
 - This is an evaluation of a six-profile, one-day simulated setup; it is not a
