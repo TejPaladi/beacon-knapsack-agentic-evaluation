@@ -33,3 +33,10 @@ paper/meeting_summary/*.log
 paper/meeting_summary/*.out
 paper/meeting_summary/*.toc
 paper/meeting_summary/*.zip
+paper/study_report/*.aux
+paper/study_report/*.fdb_latexmk
+paper/study_report/*.fls
+paper/study_report/*.log
+paper/study_report/*.out
+paper/study_report/*.toc
+paper/study_report/*.zip
